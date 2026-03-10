@@ -118,7 +118,10 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
         .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
         .sidebar .toggle-btn:hover { color: var(--primary); }
 
-        .sidebar .nav { padding: 12px 0 96px; }
+        .sidebar .nav {
+            padding: 12px 0 96px;
+            display: block;
+        }
         .sidebar .nav-link {
             display: flex;
             align-items: center;
@@ -428,6 +431,59 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
             .table th, .table td { padding: 10px 8px; font-size: 14px; }
         }
     </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -470,6 +526,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                         <i class="bi bi-plus-circle"></i>
                         <span>Add Theatre</span>
                     </a>
+                    
                 </div>
             </div>
 
@@ -511,6 +568,11 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                 <span>Messages</span>
             </a>
 
+        <a href="votes.php" class="nav-link" title="Voting">
+            <i class="bi bi-bar-chart"></i>
+            <span>Voting</span>
+        </a>
+
             <!-- Settings (with submenu) -->
             <div class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
@@ -546,10 +608,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                 <div class="d-flex align-items-center flex-grow-1">
                     <!-- Unified hamburger button -->
                     <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    <div class="search-bar">
-                        <input type="text" id="searchTheatres" placeholder="Search theatres...">
-                        <i class="bi bi-search"></i>
-                    </div>
+                    
                 </div>
                 <div class="nav-icons">
                     <!-- Notification Bell Dropdown -->
@@ -615,7 +674,9 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                                     <td>$<?= $row['price'] ?></td>
                                     <td><span class="badge bg-secondary"><?= htmlspecialchars($facilities_str) ?></span></td>
                                     <td>
-                                        <a href="edit_theatre.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                        <a href="edit_theatre.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
                                         <a href="delete_theatre.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-outline-danger"
                                             onclick="return confirm('Are you sure?')"><i class="bi bi-trash"></i></a>
                                     </td>
@@ -722,11 +783,11 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
         (function () {
             const currentFile = window.location.pathname.split('/').pop();
 
-            if (['theatres.php', 'add_theatre.php', 'edit_theatre.php'].includes(currentFile)) {
+            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
                 const submenu = document.getElementById('theatresSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php'].includes(currentFile)) {
+            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
                 const submenu = document.getElementById('usersSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
@@ -775,14 +836,24 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
         })();
 
         // ========== SEARCH FILTER (theatres) ==========
-        document.getElementById('searchTheatres').addEventListener('input', function () {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#theatresTable tbody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
+        const searchTheatresInput = document.getElementById('searchTheatres');
+        if (searchTheatresInput) {
+            searchTheatresInput.addEventListener('input', function () {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#theatresTable tbody tr');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(filter) ? '' : 'none';
+                });
             });
-        });
+        }
     </script>
 </body>
 </html>
+
+
+
+
+
+
+

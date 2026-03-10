@@ -548,6 +548,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
             <a href="booking.php">Booking</a>
             <a href="about.php">About</a>
             <a href="user_dashboard.php">Dashboard</a>
+            <a href="logout.php">Logout</a>
         </nav>
     </header>
 
@@ -564,7 +565,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
                 <div class="ticket-card">
                     <div class="ticket-left">
                         <div class="ticket-header">
-                            <h1>??? <?= $site_name ?></h1>
+                            <h1><?= $site_name ?></h1>
                             <p>Digital Ticket · E-Ticket · Scan for verification</p>
                         </div>
                         <div class="info-grid" id="ticketInfo">

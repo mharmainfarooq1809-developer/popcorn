@@ -196,7 +196,8 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
         }
 
         .sidebar .nav {
-            padding: 20px 0
+            padding: 20px 0;
+            display: block;
         }
 
         .sidebar .nav-link {
@@ -604,6 +605,59 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             }
         }
     </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -650,6 +704,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                         <i class="bi bi-plus-circle"></i>
                         <span>Add Theatre</span>
                     </a>
+                    
                 </div>
             </div>
 
@@ -691,6 +746,11 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 <span>Messages</span>
             </a>
 
+        <a href="votes.php" class="nav-link" title="Voting">
+            <i class="bi bi-bar-chart"></i>
+            <span>Voting</span>
+        </a>
+
             <!-- Settings (with submenu) -->
             <div class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
@@ -724,10 +784,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
     <div class="main-content">
         <!-- Top Navbar -->
         <div class="top-navbar">
-            <div class="search-bar">
-                <input type="text" placeholder="Search...">
-                <i class="bi bi-search"></i>
-            </div>
+            
             <div class="nav-icons">
                 <div class="dropdown d-inline-block">
                     <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
@@ -958,11 +1015,11 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
         (function () {
             const currentFile = window.location.pathname.split('/').pop();
 
-            if (['theatres.php', 'add_theatre.php', 'edit_theatre.php'].includes(currentFile)) {
+            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
                 const submenu = document.getElementById('theatresSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php'].includes(currentFile)) {
+            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
                 const submenu = document.getElementById('usersSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
@@ -1053,3 +1110,9 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
     </script>
 </body>
 </html>
+
+
+
+
+
+

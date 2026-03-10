@@ -718,6 +718,7 @@ while ($row = $theatres_result->fetch_assoc()) {
             <a href="booking.php">Booking</a>
             <a href="about.php">About</a>
             <a href="user_dashboard.php">Dashboard</a>
+            <a href="logout.php">Logout</a>
         </nav>
     </header>
 

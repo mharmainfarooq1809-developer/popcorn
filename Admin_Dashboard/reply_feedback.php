@@ -1,11 +1,12 @@
 <?php
-// Enable error reporting for debugging (remove after fixing)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// Keep logs on server, but never print warnings/notices into JSON responses
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
 error_reporting(E_ALL);
 
 session_start();
 require_once '../db_connect.php'; // adjust path if needed
+header('Content-Type: application/json; charset=utf-8');
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -53,12 +54,20 @@ function getSettings($conn) {
 }
 
 $settings = getSettings($conn);
+$settings = array_merge([
+    'smtp_host' => 'smtp.gmail.com',
+    'smtp_port' => '465',
+    'smtp_secure' => 'ssl',
+    'smtp_username' => '',
+    'smtp_password' => '',
+    'admin_name' => ($_SESSION['user_name'] ?? 'Admin')
+], $settings);
 
 // Get POST data
 $feedback_id = intval($_POST['feedback_id'] ?? 0);
 $reply_subject = trim($_POST['reply_subject'] ?? '');
 $reply_message = trim($_POST['reply_message'] ?? '');
-$admin_id = intval($_POST['admin_id'] ?? 0);
+$admin_id = intval($_POST['admin_id'] ?? ($_SESSION['user_id'] ?? 0));
 
 // Validate required fields
 if (!$feedback_id || empty($reply_message) || !$admin_id) {

@@ -240,7 +240,7 @@
             </div>
 
             <div class="section">
-                <h2>Why Work With Us?</h2>
+                <h2>Why Work With Us</h2>
                 <ul>
                     <li>Competitive pay and benefits</li>
                     <li>Free movies for you and your family</li>

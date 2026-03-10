@@ -162,7 +162,7 @@
             </div>
 
             <div class="section">
-                <h2>Still Need Help?</h2>
+                <h2>Still Need Help</h2>
                 <p>Email our support team at <strong>help@popcornhub.com</strong> or call (555) 123‑4567.</p>
             </div>
         </div>

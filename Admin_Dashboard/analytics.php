@@ -8,66 +8,42 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-$admin_name = $_SESSION['user_name'] ?? 'Admin';
+// ========== FETCH REAL STATISTICS ==========
+$total_users = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc()['count'];
+$total_movies = $conn->query("SELECT COUNT(*) as count FROM movies")->fetch_assoc()['count'];
+$total_bookings = $conn->query("SELECT COUNT(*) as count FROM bookings")->fetch_assoc()['count'];
 
-// ========== KPI DATA ==========
-$revenue_total = $conn->query("SELECT SUM(total_price) as total FROM bookings WHERE booking_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['total'] ?? 0;
-$bookings_total = $conn->query("SELECT COUNT(*) as count FROM bookings WHERE booking_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['count'] ?? 0;
-$avg_ticket = $conn->query("SELECT AVG(total_price) as avg FROM bookings WHERE booking_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)")->fetch_assoc()['avg'] ?? 0;
-$conversion_rate = 4.2;
+$revenue_result = $conn->query("SELECT SUM(total_price) as total FROM bookings");
+$total_revenue = $revenue_result->fetch_assoc()['total'] ?? 0;
 
-// ========== DAILY BOOKINGS (LAST 7 DAYS) ==========
-$daily_labels = [];
-$daily_data = [];
-for ($i = 6; $i >= 0; $i--) {
-    $date = date('Y-m-d', strtotime("-$i days"));
-    $daily_labels[] = date('D', strtotime($date));
-    $result = $conn->query("SELECT COUNT(*) as count FROM bookings WHERE DATE(booking_date) = '$date'");
-    $daily_data[] = $result->fetch_assoc()['count'] ?? 0;
-}
-
-// ========== REVENUE BY MOVIE (TOP 5) ==========
-$movie_revenue_labels = [];
-$movie_revenue_data = [];
-$movie_query = $conn->query("
-    SELECT m.title, SUM(b.total_price) as total
+$recent_bookings = $conn->query("
+    SELECT 
+        b.id AS booking_id,
+        u.name AS customer,
+        m.title AS movie,
+        s.show_date,
+        b.total_price,
+        b.status
     FROM bookings b
+    JOIN users u ON b.user_id = u.id
     JOIN showtimes s ON b.showtime_id = s.id
     JOIN movies m ON s.movie_id = m.id
-    WHERE b.booking_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-    GROUP BY m.id
-    ORDER BY total DESC
+    ORDER BY b.booking_date DESC
     LIMIT 5
 ");
-while ($row = $movie_query->fetch_assoc()) {
-    $movie_revenue_labels[] = $row['title'];
-    $movie_revenue_data[] = $row['total'];
+
+$revenue_data = [];
+$labels = [];
+for ($i = 6; $i >= 0; $i--) {
+    $date = date('Y-m-d', strtotime("-$i days"));
+    $labels[] = date('D', strtotime($date));
+    $day_result = $conn->query("SELECT SUM(total_price) as daily FROM bookings WHERE DATE(booking_date) = '$date'");
+    $revenue_data[] = $day_result->fetch_assoc()['daily'] ?? 0;
 }
 
-// ========== USER GROWTH (LAST 4 WEEKS) ==========
-$user_growth_labels = [];
-$user_growth_data = [];
-for ($i = 3; $i >= 0; $i--) {
-    $start = date('Y-m-d', strtotime("-$i week Monday"));
-    $end = date('Y-m-d', strtotime("-$i week Sunday"));
-    $user_growth_labels[] = "Week " . (4 - $i);
-    $result = $conn->query("SELECT COUNT(*) as count FROM users WHERE created_at BETWEEN '$start' AND '$end 23:59:59'");
-    $user_growth_data[] = $result->fetch_assoc()['count'] ?? 0;
-}
-
-// ========== BOOKING STATUS DISTRIBUTION ==========
-$status_labels = [];
-$status_data = [];
-$status_query = $conn->query("SELECT status, COUNT(*) as count FROM bookings GROUP BY status");
-while ($row = $status_query->fetch_assoc()) {
-    $status_labels[] = ucfirst($row['status']);
-    $status_data[] = $row['count'];
-}
-if (empty($status_labels)) {
-    $status_labels = ['Confirmed', 'Pending', 'Cancelled'];
-    $status_data = [65, 25, 10];
-}
-$status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
+$sources = ['Website', 'Mobile App', 'Walk-in'];
+$source_counts = [60, 30, 10];
+$admin_name = $_SESSION['user_name'] ?? 'Admin';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -85,7 +61,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        /* ========== GLOBAL & VARIABLES ========== */
+        /* ========== UNIFIED ADMIN CSS (same for all pages) ========== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Heebo', sans-serif;
@@ -114,7 +90,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
             --transition: all 0.3s ease;
         }
 
-        /* ========== SIDEBAR OVERLAY ========== */
+        /* ===== SIDEBAR OVERLAY ===== */
         .sidebar-overlay {
             display: none;
             position: fixed;
@@ -127,7 +103,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         }
         .sidebar-overlay.active { display: block; }
 
-        /* ========== SIDEBAR ========== */
+        /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
             top: 0;
@@ -176,7 +152,10 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
         .sidebar .toggle-btn:hover { color: var(--primary); }
 
-        .sidebar .nav { padding: 12px 0 96px; }
+        .sidebar .nav {
+            padding: 12px 0 96px;
+            display: block;
+        }
         .sidebar .nav-link {
             display: flex;
             align-items: center;
@@ -228,7 +207,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         }
         .dark-mode .sidebar .bottom-section { border-top-color: var(--border-dark); }
 
-        /* ========== MAIN CONTENT ========== */
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 0;
             padding: 20px 30px;
@@ -239,9 +218,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         }
 
         @media (min-width: 992px) {
-            .sidebar {
-                transform: translateX(0);
-            }
+            .sidebar { transform: translateX(0); }
             .main-content {
                 margin-left: var(--sidebar-width);
                 width: calc(100% - var(--sidebar-width));
@@ -253,13 +230,10 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         }
 
         @media (max-width: 991px) {
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
+            .main-content { margin-left: 0; width: 100%; }
         }
 
-        /* ========== TOP NAVBAR ========== */
+        /* ===== TOP NAVBAR ===== */
         .top-navbar {
             display: flex;
             justify-content: space-between;
@@ -341,15 +315,15 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         }
         .avatar-icon:hover { color: var(--primary-dark); }
 
-        /* ========== CARDS ========== */
+        /* ===== CARDS ===== */
         .card {
             border: none;
             border-radius: 20px;
             padding: 14px;
             background: var(--light-card);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: var(--transition);
             margin-bottom: 20px;
-            overflow: hidden;
         }
         .dark-mode .card {
             background: var(--dark-card);
@@ -389,8 +363,30 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255,165,0,0.5);
         }
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            background: transparent;
+        }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 13px;
+        }
 
-        /* ========== TABLES ========== */
+        /* ===== TABLES ===== */
         .table-responsive {
             overflow-x: auto;
             min-width: 100%;
@@ -434,20 +430,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         .table tbody tr:hover { background: rgba(0,0,0,0.02); }
         .dark-mode .table tbody tr:hover { background: rgba(255,255,255,0.02); }
 
-        /* ========== CHARTS ========== */
-        .card canvas {
-            max-width: 100% !important;
-            height: auto !important;
-            max-height: 250px;
-            width: 100% !important;
-        }
-
-        @media (min-width: 1400px) {
-            .card canvas { max-height: 320px; }
-            .table th, .table td { padding: 16px 18px; }
-        }
-
-        /* ========== FOOTER ========== */
+        /* ===== FOOTER ===== */
         .footer {
             background: var(--light-card);
             border-top: 1px solid var(--border-light);
@@ -461,7 +444,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
             color: #adb5bd;
         }
 
-        /* ========== DROPDOWNS ========== */
+        /* ===== DROPDOWNS ===== */
         .dropdown-menu {
             background: var(--light-card);
             border: 1px solid var(--border-light);
@@ -482,30 +465,119 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         .dark-mode .dropdown-item { color: var(--dark-text); }
         .dropdown-item:hover { background: rgba(255,165,0,0.1); }
 
-        /* ========== RESPONSIVE ========== */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar {
-                left: -100%;
-            }
-            .sidebar.active {
-                left: 0;
-            }
+            .sidebar { left: -100%; }
+            .sidebar.active { left: 0; }
+            .main-content { margin-left: 0 !important; width: 100% !important; }
+            .search-bar { width: 250px; }
+        }
+        @media (max-width: 768px) {
+            .top-navbar { flex-direction: column; align-items: stretch; }
+            .search-bar { width: 100%; }
+            .nav-icons { justify-content: flex-end; }
+            .table th, .table td { padding: 10px 8px; font-size: 14px; }
+        }
+
+        /* Movie grid (specific to movies.php) */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .movie-card {
+            background: var(--light-card);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+        .dark-mode .movie-card {
+            background: var(--dark-card);
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255,165,0,0.2);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .movie-card .card-body {
+            padding: 12px;
+        }
+        .movie-card .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--light-text);
+        }
+        .dark-mode .movie-card .card-title {
+            color: var(--dark-text);
+        }
+        .movie-card .card-meta {
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        .movie-card .card-buttons {
+            display: flex;
+            gap: 8px;
+        }
+    </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
             .main-content {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-            .search-bar {
-                width: 250px;
-            }
-        }
-        @media (max-width: 768px) {
             .top-navbar {
-                flex-direction: column;
-                align-items: stretch;
+                flex-wrap: wrap;
             }
-            .search-bar { width: 100%; }
-            .nav-icons { justify-content: flex-end; }
-            .table th, .table td { padding: 10px 8px; font-size: 14px; }
         }
     </style>
 </head>
@@ -513,113 +585,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
     <!-- Sidebar Overlay (mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo-area">
-            <div class="logo">
-                <i class="bi bi-camera-reels me-2"></i>
-                <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
-            </div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
-        </div>
-
-    <div class="nav">
-        <!-- Dashboard -->
-        <a href="dashboard.php" class="nav-link" title="Dashboard">
-            <i class="bi bi-speedometer2"></i>
-            <span>Dashboard</span>
-        </a>
-
-        <!-- Movies -->
-        <a href="movies.php" class="nav-link" title="Movies">
-            <i class="bi bi-film"></i>
-            <span>Movies</span>
-        </a>
-
-        <!-- Theatres (with submenu) -->
-        <div class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="false" aria-controls="theatresSubmenu" title="Theatres">
-                <i class="bi bi-building"></i>
-                <span>Theatres</span>
-                <i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <div class="collapse" id="theatresSubmenu">
-                <a href="theatres.php" class="nav-link submenu-link" title="All Theatres">
-                    <i class="bi bi-list-ul"></i>
-                    <span>All Theatres</span>
-                </a>
-                <a href="add_theatre.php" class="nav-link submenu-link" title="Add Theatre">
-                    <i class="bi bi-plus-circle"></i>
-                    <span>Add Theatre</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- Bookings (direct link) -->
-        <a href="bookings.php" class="nav-link" title="Bookings">
-            <i class="bi bi-ticket"></i>
-            <span>Bookings</span>
-        </a>
-
-        <!-- Users (with submenu) -->
-            <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button"
-                    aria-expanded="false" aria-controls="usersSubmenu" title="Users">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <div class="collapse" id="usersSubmenu">
-                    <a href="users.php" class="nav-link submenu-link" title="All Users">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Users</span>
-                    </a>
-                    <a href="add_user.php" class="nav-link submenu-link" title="Add User">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add User</span>
-                    </a>
-                </div>
-            </div>
-
-        <!-- Analytics -->
-        <a href="analytics.php" class="nav-link" title="Analytics">
-            <i class="bi bi-graph-up"></i>
-            <span>Analytics</span>
-        </a>
-
-        <!-- Messages -->
-        <a href="messages.php" class="nav-link" title="Messages">
-            <i class="bi bi-chat-dots"></i>
-            <span>Messages</span>
-        </a>
-
-        <!-- Settings (with submenu) -->
-        <div class="nav-item">
-            <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
-                <i class="bi bi-gear"></i>
-                <span>Settings</span>
-                <i class="bi bi-chevron-down ms-auto"></i>
-            </a>
-            <div class="collapse" id="settingsSubmenu">
-                <a href="settings.php" class="nav-link submenu-link" title="General Settings">
-                    <i class="bi bi-sliders2"></i>
-                    <span>General</span>
-                </a>
-                <a href="email_settings.php" class="nav-link submenu-link" title="Email Settings">
-                    <i class="bi bi-envelope"></i>
-                    <span>Email</span>
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="bottom-section">
-        <a href="../logout.php" class="nav-link" title="Logout">
-            <i class="bi bi-box-arrow-right"></i>
-            <span>Logout</span>
-        </a>
-    </div>
-</div>
+    <?php include 'sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
@@ -627,12 +593,10 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
             <div class="top-navbar">
                 <div class="d-flex align-items-center flex-grow-1">
                     <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <i class="bi bi-search"></i>
-                    </div>
+                    
                 </div>
                 <div class="nav-icons">
+                    <!-- Notification Bell Dropdown -->
                     <div class="dropdown d-inline-block">
                         <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
                             <i class="bi bi-bell"></i>
@@ -646,85 +610,123 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
                             <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
                         </ul>
                     </div>
+
                     <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
                     <i class="bi bi-person-circle avatar-icon"></i>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h2>Analytics Overview</h2>
-                <select class="form-select w-auto" id="periodSelect">
-                    <option value="7">Last 7 days</option>
-                    <option value="30" selected>Last 30 days</option>
-                    <option value="90">Last 90 days</option>
-                </select>
+                <h2>Welcome back, <?= htmlspecialchars($admin_name) ?>!</h2>
+                <p class="text-muted mb-0"><?= date('M j, Y') ?></p>
             </div>
 
-            <!-- KPI Cards -->
+            <!-- Stats Cards -->
             <div class="row g-4 mb-4">
                 <div class="col-sm-6 col-xl-3">
                     <div class="card">
                         <div class="card-title">Total Revenue</div>
-                        <div class="card-value">$<?= number_format($revenue_total, 2) ?></div>
+                        <div class="card-value">$<?= number_format($total_revenue, 2) ?></div>
                         <small class="text-success">+12.5%</small>
                     </div>
                 </div>
                 <div class="col-sm-6 col-xl-3">
                     <div class="card">
-                        <div class="card-title">Bookings</div>
-                        <div class="card-value"><?= number_format($bookings_total) ?></div>
+                        <div class="card-title">Total Users</div>
+                        <div class="card-value"><?= number_format($total_users) ?></div>
                         <small class="text-success">+8.2%</small>
                     </div>
                 </div>
                 <div class="col-sm-6 col-xl-3">
                     <div class="card">
-                        <div class="card-title">Avg. Ticket</div>
-                        <div class="card-value">$<?= number_format($avg_ticket, 2) ?></div>
+                        <div class="card-title">Total Bookings</div>
+                        <div class="card-value"><?= number_format($total_bookings) ?></div>
                         <small class="text-warning">+3.1%</small>
                     </div>
                 </div>
                 <div class="col-sm-6 col-xl-3">
                     <div class="card">
-                        <div class="card-title">Conversion</div>
-                        <div class="card-value"><?= $conversion_rate ?>%</div>
-                        <small class="text-success">+1.2%</small>
+                        <div class="card-title">Movies</div>
+                        <div class="card-value"><?= number_format($total_movies) ?></div>
+                        <small class="text-success">+5 new</small>
                     </div>
                 </div>
             </div>
 
             <!-- Charts Row -->
             <div class="row g-4 mb-4">
-                <div class="col-lg-6">
+                <div class="col-lg-8">
                     <div class="card">
-                        <h5 class="mb-3">Daily Bookings (Last 7 Days)</h5>
-                        <div style="height:250px;"><canvas id="dailyBookingsChart"></canvas></div>
+                        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                            <h5 class="mb-0">Revenue Overview (Last 7 Days)</h5>
+                            <select class="form-select w-auto" style="min-width:150px;" id="revenueRange">
+                                <option>Last 7 days</option>
+                                <option>Last 30 days</option>
+                                <option>Last 90 days</option>
+                            </select>
+                        </div>
+                        <div style="height:250px;">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-4">
                     <div class="card">
-                        <h5 class="mb-3">Revenue by Movie (Top 5)</h5>
-                        <div style="height:250px;"><canvas id="revenueByMovieChart"></canvas></div>
+                        <h5 class="mb-3">Booking Sources</h5>
+                        <div style="height:250px;">
+                            <canvas id="sourceChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h5 class="mb-3">User Growth (Last 4 Weeks)</h5>
-                        <div style="height:250px;"><canvas id="userGrowthChart"></canvas></div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <h5 class="mb-3">Booking Status Distribution</h5>
-                        <div style="height:250px;"><canvas id="statusPieChart"></canvas></div>
-                    </div>
+            <!-- Recent Bookings Table -->
+            <div class="card">
+                <h5 class="mb-3">Recent Bookings</h5>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Movie</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($recent_bookings && $recent_bookings->num_rows > 0): ?>
+                                <?php $display_booking_id = 1; ?>
+                                <?php while ($row = $recent_bookings->fetch_assoc()): ?>
+                                    <tr>
+                                        <td data-label="Booking ID">#BK-<?= str_pad($display_booking_id++, 4, '0', STR_PAD_LEFT) ?></td>
+                                        <td data-label="Customer"><?= htmlspecialchars($row['customer']) ?></td>
+                                        <td data-label="Movie"><?= htmlspecialchars($row['movie']) ?></td>
+                                        <td data-label="Date"><?= date('Y-m-d', strtotime($row['show_date'])) ?></td>
+                                        <td data-label="Amount">$<?= number_format($row['total_price'], 2) ?></td>
+                                        <td data-label="Status">
+                                            <?php
+                                            $class = 'badge-info';
+                                            if ($row['status'] == 'confirmed') $class = 'badge-success';
+                                            elseif ($row['status'] == 'pending') $class = 'badge-warning';
+                                            elseif ($row['status'] == 'cancelled') $class = 'badge-danger';
+                                            ?>
+                                            <span class="badge <?= $class ?>"><?= ucfirst($row['status']) ?></span>
+                                        </td>
+                                    </tr>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <tr><td colspan="6" class="text-center">No recent bookings found.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
             <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
@@ -755,12 +757,16 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
                     }
                 });
         }
+
         document.getElementById('markAllRead')?.addEventListener('click', (e) => {
             e.preventDefault();
             fetch('mark_notifications_read.php', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => { if (data.success) updateNotifications(); });
+                .then(data => {
+                    if (data.success) updateNotifications();
+                });
         });
+
         updateNotifications();
         setInterval(updateNotifications, 30000);
 
@@ -768,7 +774,7 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const menuToggle = document.getElementById('menuToggle');
-        const sidebarToggleBtn = document.getElementById('sidebarToggle');
+        const sidebarToggleBtn = document.getElementById('sidebarToggle'); // chevron inside sidebar
 
         function toggleSidebar() {
             if (window.innerWidth >= 992) {
@@ -779,7 +785,11 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
                 overlay.classList.toggle('active');
             }
         }
-        if (menuToggle) menuToggle.addEventListener('click', toggleSidebar);
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleSidebar);
+        }
+
         if (sidebarToggleBtn) {
             sidebarToggleBtn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -789,12 +799,14 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
                 }
             });
         }
+
         if (overlay) {
             overlay.addEventListener('click', function() {
                 sidebar.classList.remove('active');
                 overlay.classList.remove('active');
             });
         }
+
         document.querySelectorAll('.sidebar .nav-link').forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth < 992) {
@@ -803,108 +815,58 @@ $status_colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#FFA500'];
                 }
             });
         });
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
 
-            if (['theatres.php', 'add_theatre.php', 'edit_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
+        // ========== DARK MODE ==========
+        document.getElementById('themeToggle').addEventListener('click', function () {
+            document.body.classList.toggle('dark-mode');
+            const icon = this.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('bi-moon');
+                icon.classList.toggle('bi-sun');
             }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
-                    }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
-                });
-            });
-
-            updateActiveStates();
-        })();
+        });
 
         // ========== CHARTS ==========
-        new Chart(document.getElementById('dailyBookingsChart'), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($daily_labels) ?>,
-                datasets: [{ label: 'Bookings', data: <?= json_encode($daily_data) ?>, backgroundColor: '#FFA500' }]
-            },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-        new Chart(document.getElementById('revenueByMovieChart'), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($movie_revenue_labels) ?>,
-                datasets: [{ label: 'Revenue ($)', data: <?= json_encode($movie_revenue_data) ?>, backgroundColor: '#FFD966' }]
-            },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
-        });
-        new Chart(document.getElementById('userGrowthChart'), {
+        new Chart(document.getElementById('revenueChart'), {
             type: 'line',
             data: {
-                labels: <?= json_encode($user_growth_labels) ?>,
+                labels: <?= json_encode($labels) ?>,
                 datasets: [{
-                    label: 'New Users',
-                    data: <?= json_encode($user_growth_data) ?>,
+                    label: 'Revenue ($)',
+                    data: <?= json_encode($revenue_data) ?>,
                     borderColor: '#FFA500',
                     backgroundColor: 'rgba(255,165,0,0.1)',
-                    tension: 0.3,
+                    tension: 0.4,
                     fill: true
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
-        });
-        new Chart(document.getElementById('statusPieChart'), {
-            type: 'pie',
-            data: {
-                labels: <?= json_encode($status_labels) ?>,
-                datasets: [{
-                    data: <?= json_encode($status_data) ?>,
-                    backgroundColor: <?= json_encode(array_slice($status_colors, 0, count($status_labels))) ?>
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
         });
 
-        document.getElementById('periodSelect').addEventListener('change', function () {
-            alert('Period changed to ' + this.value + ' days. (Implement AJAX to refresh data)');
+        new Chart(document.getElementById('sourceChart'), {
+            type: 'pie',
+            data: {
+                labels: <?= json_encode($sources) ?>,
+                datasets: [{
+                    data: <?= json_encode($source_counts) ?>,
+                    backgroundColor: ['#FFA500', '#FFD966', '#cc7f00', '#FFB347', '#FF8C42']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom' } }
+            }
         });
     </script>
 </body>
 </html>
+
+
+
+
+

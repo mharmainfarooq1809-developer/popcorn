@@ -4,56 +4,50 @@ require_once '../db_connect.php';
 require_once '../settings_init.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
-    header("Location: ../login.php");
+    header('Location: ../login.php');
     exit;
 }
 
-$error = $success = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim($_POST['name']);
-    $city = trim($_POST['city']);
-    $location = trim($_POST['location']);
-    $rating = floatval($_POST['rating']);
-    $price = floatval($_POST['price']);
-    $facilities = $_POST['facilities'] ?? [];
-    $image_url = trim($_POST['image_url']);
+$message = '';
+$error = '';
 
-    if (empty($name) || empty($city) || empty($location)) {
-        $error = "Name, City, and Location are required.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $city = trim($_POST['city'] ?? '');
+    $location = trim($_POST['location'] ?? '');
+    $rating = (float)($_POST['rating'] ?? 0);
+    $price = (float)($_POST['price'] ?? 0);
+    $image_url = trim($_POST['image_url'] ?? '');
+    $facilities = $_POST['facilities'] ?? [];
+
+    if ($name === '' || $city === '' || $location === '') {
+        $error = 'Name, city and location are required.';
     } else {
-        $facilities_json = json_encode($facilities);
-        $stmt = $conn->prepare("INSERT INTO theatres (name, city, location, rating, price, facilities, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssddss", $name, $city, $location, $rating, $price, $facilities_json, $image_url);
-        if ($stmt->execute()) {
-            $success = "Theatre added successfully.";
-            $theatre_id = $conn->insert_id;
-            $theatre_name = $conn->real_escape_string($name);
-            $conn->query("INSERT INTO notifications (user_id, type, message, link, created_at) VALUES (1, 'theatre', 'New theatre added: $theatre_name', 'Admin_Dashboard/edit_theatre.php?id=$theatre_id', NOW())");
+        $facilities_json = json_encode(array_values($facilities));
+        $stmt = $conn->prepare('INSERT INTO theatres (name, city, location, rating, price, facilities, image_url) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        if ($stmt) {
+            $stmt->bind_param('sssddss', $name, $city, $location, $rating, $price, $facilities_json, $image_url);
+            if ($stmt->execute()) {
+                header('Location: theatres.php?added=1');
+                exit;
+            }
+            $error = 'Failed to add theatre.';
+            $stmt->close();
         } else {
-            $error = "Error: " . $conn->error;
+            $error = 'Database error.';
         }
-        $stmt->close();
     }
 }
-
-$facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
 ?>
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Theatre · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
-    <?php if (!empty($settings['theme_color'])): ?>
-        <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
-        </style>
-    <?php endif; ?>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Add Theatre � <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
+   <style>
         /* ========== UNIFIED ADMIN CSS (same as dashboard) ========== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -68,7 +62,7 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
             background-color: #0B1623;
             color: #F2F2F2;
         }
-        :root {
+        :root { 
             --primary: #FFA500;
             --primary-dark: #cc7f00;
             --primary-gold: #FFD966;
@@ -145,7 +139,10 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
         .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
         .sidebar .toggle-btn:hover { color: var(--primary); }
 
-        .sidebar .nav { padding: 12px 0 96px; }
+        .sidebar .nav {
+            padding: 12px 0 96px;
+            display: block;
+        }
         .sidebar .nav-link {
             display: flex;
             align-items: center;
@@ -305,7 +302,7 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
         }
         .avatar-icon:hover { color: var(--primary-dark); }
 
-        /* ===== CARDS & FORMS ===== */
+        /* ===== CARDS ===== */
         .card {
             border: none;
             border-radius: 20px;
@@ -319,36 +316,13 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
             background: var(--dark-card);
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        .form-label {
-            font-weight: 600;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-        .dark-mode .form-label { color: #adb5bd; }
-        .form-control, .form-select, .form-check-input {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
-            color: var(--light-text);
-            border-radius: 10px;
-            padding: 10px 15px;
-            transition: var(--transition);
-        }
-        .dark-mode .form-control, .dark-mode .form-select, .dark-mode .form-check-input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
-        }
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255,165,0,0.2);
-            outline: none;
-        }
-        .form-check-input:checked {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
 
-        /* ===== BUTTONS ===== */
+        .badge-success { background: rgba(40,167,69,0.15); color: #28a745; }
+        .badge-warning { background: rgba(255,193,7,0.15); color: #ffc107; }
+        .badge-danger { background: rgba(220,53,69,0.15); color: #dc3545; }
+        .badge-info { background: rgba(23,162,184,0.15); color: #17a2b8; }
+        .badge-primary { background: rgba(255,165,0,0.15); color: var(--primary); }
+
         .btn-primary {
             background: linear-gradient(145deg, var(--primary), var(--primary-dark));
             color: #fff;
@@ -362,31 +336,72 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(255,165,0,0.5);
         }
-        .btn-secondary {
-            background: var(--border-light);
-            color: var(--light-text);
-            margin-left: 10px;
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
         }
-        .btn-secondary:hover {
-            background: var(--border-dark);
+        .btn-outline-primary:hover {
+            background: var(--primary);
             color: #fff;
         }
-
-        /* ===== ALERTS ===== */
-        .alert-success {
-            background: rgba(40,167,69,0.15);
-            color: #28a745;
-            border: none;
-            border-radius: 10px;
-            padding: 9px 16px;
-        }
-        .alert-danger {
-            background: rgba(220,53,69,0.15);
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
             color: #dc3545;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 20px;
+            background: transparent;
         }
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+        .btn-sm {
+            padding: 6px 16px;
+            font-size: 13px;
+        }
+
+        /* ===== TABLES ===== */
+        .table-responsive {
+            overflow-x: auto;
+            min-width: 100%;
+            border-radius: 20px;
+            background: var(--light-card);
+            padding: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+        }
+        .dark-mode .table-responsive {
+            background: var(--dark-card);
+            border-color: var(--border-dark);
+        }
+        .table {
+            width: 100%;
+            margin-bottom: 0;
+            color: var(--light-text);
+            background: transparent;
+        }
+        .dark-mode .table { color: var(--dark-text); }
+        .table th {
+            background: rgba(0,0,0,0.02);
+            border-bottom: 2px solid var(--border-light);
+            font-weight: 600;
+            color: #6c757d;
+            padding: 15px 12px;
+            white-space: nowrap;
+        }
+        .dark-mode .table th {
+            background: rgba(255,255,255,0.02);
+            border-bottom-color: var(--border-dark);
+            color: #adb5bd;
+        }
+        .table td {
+            border-bottom: 1px solid var(--border-light);
+            padding: 12px;
+            vertical-align: middle;
+        }
+        .dark-mode .table td { border-bottom-color: var(--border-dark); }
+        .table tbody tr:last-child td { border-bottom: none; }
+        .table tbody tr:hover { background: rgba(0,0,0,0.02); }
+        .dark-mode .table tbody tr:hover { background: rgba(255,255,255,0.02); }
 
         /* ===== FOOTER ===== */
         .footer {
@@ -434,351 +449,117 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
             .top-navbar { flex-direction: column; align-items: stretch; }
             .search-bar { width: 100%; }
             .nav-icons { justify-content: flex-end; }
+            .table th, .table td { padding: 10px 8px; font-size: 14px; }
+        }
+    </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
-
 <body>
-    <!-- Sidebar Overlay (mobile) -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- Sidebar (with submenus and active link) -->
-    <div class="sidebar" id="sidebar">
-        <div class="logo-area">
-            <div class="logo"><i class="bi bi-camera-reels me-2"></i><span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span></div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
-        </div>
-
-        <div class="nav">
-            <!-- Dashboard -->
-            <a href="dashboard.php" class="nav-link" title="Dashboard">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
-
-            <!-- Movies -->
-            <a href="movies.php" class="nav-link" title="Movies">
-                <i class="bi bi-film"></i>
-                <span>Movies</span>
-            </a>
-
-            <!-- Theatres (with submenu) – active sub-item -->
-            <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="true" aria-controls="theatresSubmenu" title="Theatres">
-                    <i class="bi bi-building"></i>
-                    <span>Theatres</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <div class="collapse show" id="theatresSubmenu">
-                    <a href="theatres.php" class="nav-link submenu-link" title="All Theatres">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Theatres</span>
-                    </a>
-                    <a href="add_theatre.php" class="nav-link submenu-link active" title="Add Theatre">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add Theatre</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Bookings (direct link) -->
-        <a href="bookings.php" class="nav-link" title="Bookings">
-            <i class="bi bi-ticket"></i>
-            <span>Bookings</span>
-        </a>
-
-            <!-- Users (with submenu) -->
-            <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button"
-                    aria-expanded="false" aria-controls="usersSubmenu" title="Users">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <div class="collapse" id="usersSubmenu">
-                    <a href="users.php" class="nav-link submenu-link" title="All Users">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Users</span>
-                    </a>
-                    <a href="add_user.php" class="nav-link submenu-link" title="Add User">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add User</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Analytics -->
-            <a href="analytics.php" class="nav-link" title="Analytics">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </a>
-
-            <!-- Messages -->
-            <a href="messages.php" class="nav-link" title="Messages">
-                <i class="bi bi-chat-dots"></i>
-                <span>Messages</span>
-            </a>
-
-            <!-- Settings (with submenu) -->
-            <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
-                    <i class="bi bi-gear"></i>
-                    <span>Settings</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <div class="collapse" id="settingsSubmenu">
-                    <a href="settings.php" class="nav-link submenu-link" title="General Settings">
-                        <i class="bi bi-sliders2"></i>
-                        <span>General</span>
-                    </a>
-                    <a href="email_settings.php" class="nav-link submenu-link" title="Email Settings">
-                        <i class="bi bi-envelope"></i>
-                        <span>Email</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div class="bottom-section">
-            <a href="../logout.php" class="nav-link" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
-        </div>
+<?php include 'sidebar.php'; ?>
+<div class="main-content">
+    <div class="top-navbar">
+        <div class="d-flex align-items-center"><i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i><h4 class="m-0">Add Theatre</h4></div>
+        <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="container-fluid">
-            <div class="top-navbar">
-                <div class="d-flex align-items-center flex-grow-1">
-                    <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <i class="bi bi-search"></i>
-                    </div>
-                </div>
-                <div class="nav-icons">
-                    <!-- Notification Bell Dropdown -->
-                    <div class="dropdown d-inline-block">
-                        <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge" id="notificationBadge" style="display: none;">0</span>
-                        </div>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
-                            <li><h6 class="dropdown-header">Notifications</h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li id="notificationList" style="max-height: 300px; overflow-y: auto;"></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
-                        </ul>
-                    </div>
+    <?php if ($message): ?><div class="alert alert-success"><?= htmlspecialchars($message) ?></div><?php endif; ?>
+    <?php if ($error): ?><div class="alert alert-danger"><?= htmlspecialchars($error) ?></div><?php endif; ?>
 
-                    <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
-                    <i class="bi bi-person-circle avatar-icon"></i>
+    <div class="card p-4">
+        <form method="post">
+            <div class="row g-3">
+                <div class="col-md-4"><label class="form-label">Name</label><input class="form-control" name="name" required></div>
+                <div class="col-md-4"><label class="form-label">City</label><input class="form-control" name="city" required></div>
+                <div class="col-md-4"><label class="form-label">Location</label><input class="form-control" name="location" required></div>
+                <div class="col-md-3"><label class="form-label">Rating</label><input type="number" step="0.1" min="0" max="5" class="form-control" name="rating" value="4.0"></div>
+                <div class="col-md-3"><label class="form-label">Price</label><input type="number" step="0.01" min="0" class="form-control" name="price" value="500"></div>
+                <div class="col-md-6"><label class="form-label">Image URL</label><input class="form-control" name="image_url"></div>
+                <div class="col-12">
+                    <label class="form-label d-block">Facilities</label>
+                    <?php foreach (['3D','IMAX','Dolby Atmos','VIP Seats','Food Court','Parking'] as $fac): ?>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" name="facilities[]" value="<?= $fac ?>" id="fac_<?= md5($fac) ?>">
+                            <label class="form-check-label" for="fac_<?= md5($fac) ?>"><?= $fac ?></label>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-
-            <h2 class="mb-4">Add New Theatre</h2>
-
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            <?php if ($success): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-            <?php endif; ?>
-
-            <form method="post" class="card p-4">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Theatre Name *</label>
-                        <input type="text" name="name" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">City *</label>
-                        <input type="text" name="city" class="form-control" required>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label">Address / Location *</label>
-                        <input type="text" name="location" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Rating (0-5)</label>
-                        <input type="number" step="0.1" min="0" max="5" name="rating" class="form-control" value="4.0">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Average Ticket Price ($)</label>
-                        <input type="number" step="0.01" min="0" name="price" class="form-control" value="15.00">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Image URL</label>
-                        <input type="url" name="image_url" class="form-control" placeholder="https://...">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label">Facilities</label>
-                        <div class="row">
-                            <?php foreach ($facility_options as $fac): ?>
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="facilities[]" value="<?= $fac ?>" id="fac_<?= $fac ?>">
-                                        <label class="form-check-label" for="fac_<?= $fac ?>"><?= $fac ?></label>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Add Theatre</button>
-                        <a href="theatres.php" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </div>
-            </form>
-        </div>
+            <div class="mt-4 d-flex gap-2">
+                <button class="btn btn-primary" type="submit">Save Theatre</button>
+                <a class="btn btn-outline-secondary" href="theatres.php">Back</a>
+            </div>
+        </form>
     </div>
-
-    <!-- Footer -->
-    <footer class="footer text-center">
-        <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // ========== NOTIFICATIONS ==========
-        function updateNotifications() {
-            fetch('get_notifications.php')
-                .then(res => res.json())
-                .then(data => {
-                    const badge = document.getElementById('notificationBadge');
-                    const list = document.getElementById('notificationList');
-                    if (data.notifications && data.notifications.length > 0) {
-                        badge.textContent = data.notifications.length;
-                        badge.style.display = 'flex';
-                        list.innerHTML = '';
-                        data.notifications.forEach(notif => {
-                            const item = document.createElement('li');
-                            item.innerHTML = `<a class="dropdown-item" href="${notif.link}">${notif.message}<br><small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small></a>`;
-                            list.appendChild(item);
-                        });
-                    } else {
-                        badge.style.display = 'none';
-                        list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
-                    }
-                });
-        }
-
-        document.getElementById('markAllRead')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            fetch('mark_notifications_read.php', { method: 'POST' })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) updateNotifications();
-                });
-        });
-
-        updateNotifications();
-        setInterval(updateNotifications, 30000);
-
-        // ========== SIDEBAR TOGGLE (Unified) ==========
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebarToggleBtn = document.getElementById('sidebarToggle'); // chevron inside sidebar
-
-        function toggleSidebar() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.toggle('collapsed');
-                document.body.classList.toggle('sidebar-collapsed');
-            } else {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (window.innerWidth >= 992) {
-                    sidebar.classList.toggle('collapsed');
-                    document.body.classList.toggle('sidebar-collapsed');
-                }
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-        }
-
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
-        });
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
-
-            if (['theatres.php', 'add_theatre.php', 'edit_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
-                    }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
-                });
-            });
-
-            updateActiveStates();
-        })();
-    </script>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const mobileToggle = document.getElementById('mobileMenuToggle');
+const overlay = document.getElementById('sidebarOverlay');
+if (sidebar && sidebarToggle) {
+  sidebarToggle.addEventListener('click', () => { sidebar.classList.toggle('collapsed'); document.body.classList.toggle('sidebar-collapsed'); });
+}
+if (mobileToggle && sidebar && overlay) {
+  mobileToggle.addEventListener('click', () => { sidebar.classList.add('active'); overlay.classList.add('active'); });
+  overlay.addEventListener('click', () => { sidebar.classList.remove('active'); overlay.classList.remove('active'); });
+}
+const themeToggle = document.getElementById('themeToggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', function(){ document.body.classList.toggle('dark-mode'); const i=this.querySelector('i'); if(i){i.classList.toggle('bi-moon'); i.classList.toggle('bi-sun');} });
+}
+</script>
 </body>
 </html>

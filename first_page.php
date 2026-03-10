@@ -1624,6 +1624,7 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             <a href="booking.php">Booking</a>
             <a href="about.php">About</a>
             <a href="user_dashboard.php">Dashboard</a>
+            <a href="logout.php">Logout</a>
         </nav>
     </header>
 
@@ -1831,9 +1832,7 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             <!-- Left column: Dynamic Voting (moved here) -->
             <div class="main-column reveal">
                 <div class="section-header" style="margin-bottom: 25px;">
-                    <h2>Vote For Movie <span style="color: var(--popcorn-orange); font-size: 14px;">?? Audience
-                            Choice</span></h2>
-                    <a href="#" class="view-all">Leaderboard <i class="fas fa-chart-line"></i></a>
+                    <h2>Vote For Movie <span style="color: var(--popcorn-orange); font-size: 14px;"> Audience Choice</span></h2>
                 </div>
                 <div class="vote-card" id="voteCard">
                     <div class="vote-header">
@@ -1844,7 +1843,6 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
                         <div class="text-center py-4">Loading...</div>
                     </div>
                     <div class="vote-footer">
-                        <a href="#" class="view-all">Cast your vote <i class="fas fa-arrow-right"></i></a>
                         <span class="vote-total" id="voteTotal">0 votes</span>
                     </div>
                 </div>

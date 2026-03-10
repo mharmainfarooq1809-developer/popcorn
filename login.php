@@ -736,7 +736,7 @@ if (!empty($errors) || isset($reg_success)) {
             <div class="overlay">
                 <!-- Left content: visible when overlay on left (register form visible) -->
                 <div class="overlay-content" data-state="left">
-                    <h3 class="overlay-title">New here?</h3>
+                    <h3 class="overlay-title">New here</h3>
                     <p class="overlay-desc">Create an account and unlock a universe of possibilities.</p>
                     <button class="overlay-btn" id="switchToLogin">Sign in</button>
                 </div>

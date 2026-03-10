@@ -126,7 +126,10 @@ while ($row = $movie_counts->fetch_assoc()) {
         }
         .dark-mode .sidebar .toggle-btn { color:var(--dark-text); }
         .sidebar .toggle-btn:hover { color:var(--primary); }
-        .sidebar .nav { padding: 12px 0 96px; }
+        .sidebar .nav {
+            padding: 12px 0 96px;
+            display: block;
+        }
         .sidebar .nav-link {
             display:flex;
             align-items:center;
@@ -171,6 +174,14 @@ while ($row = $movie_counts->fetch_assoc()) {
             margin-bottom:30px;
             flex-wrap:wrap;
             gap:15px;
+        }
+        .menu-toggle-mobile {
+            font-size: 24px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        @media (min-width: 992px) {
+            .menu-toggle-mobile { display: none; }
         }
         .search-bar {
             position:relative;
@@ -344,15 +355,73 @@ while ($row = $movie_counts->fetch_assoc()) {
             .search-bar { width:100%; }
         }
     </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+        @media (min-width: 992px) {
+            body.sidebar-collapsed .main-content {
+                margin-left: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+                width: calc(100% - var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px))) !important;
+            }
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 <body>
     <?php include 'sidebar.php'; ?>
 
     <div class="main-content">
         <div class="top-navbar">
-            <div class="search-bar">
-                <input type="text" id="searchVotes" placeholder="Search votes...">
-                <i class="bi bi-search"></i>
+            <div class="d-flex align-items-center flex-grow-1">
+                <i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i>
             </div>
             <div class="nav-icons">
                 <div class="dropdown d-inline-block">
@@ -428,9 +497,10 @@ while ($row = $movie_counts->fetch_assoc()) {
                     </thead>
                     <tbody>
                         <?php if ($votes->num_rows > 0): ?>
+                            <?php $serial = 1; ?>
                             <?php while ($v = $votes->fetch_assoc()): ?>
                                 <tr>
-                                    <td><?= $v['vote_id'] ?></td>
+                                    <td><?= $serial++ ?></td>
                                     <td><?= htmlspecialchars($v['user_name']) ?></td>
                                     <td><?= htmlspecialchars($v['user_email']) ?></td>
                                     <td><?= htmlspecialchars($v['movie_title']) ?></td>
@@ -453,10 +523,29 @@ while ($row = $movie_counts->fetch_assoc()) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Sidebar toggle
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        });
+        // Sidebar toggle (same behavior as other admin pages)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileToggle = document.getElementById('mobileMenuToggle');
+        const overlay = document.getElementById('sidebarOverlay');
+        if (sidebar && sidebarToggle) {
+            sidebarToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                document.body.classList.toggle('sidebar-collapsed');
+            });
+            // Keep body class in sync if sidebar starts collapsed
+            document.body.classList.toggle('sidebar-collapsed', sidebar.classList.contains('collapsed'));
+        }
+        if (mobileToggle && sidebar && overlay) {
+            mobileToggle.addEventListener('click', function () {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            });
+            overlay.addEventListener('click', function () {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+        }
 
         // Dark mode toggle
         document.getElementById('themeToggle').addEventListener('click', function() {
@@ -466,33 +555,39 @@ while ($row = $movie_counts->fetch_assoc()) {
             icon.classList.toggle('bi-sun');
         });
 
-        // Search filter
-        document.getElementById('searchVotes').addEventListener('input', function() {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#votesTable tbody tr');
-            rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(filter) ? '' : 'none';
+        // Search filter (guarded; search bar may be removed)
+        const searchVotes = document.getElementById('searchVotes');
+        if (searchVotes) {
+            searchVotes.addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#votesTable tbody tr');
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(filter) ? '' : 'none';
+                });
             });
-        });
+        }
 
         // Chart
-        new Chart(document.getElementById('votesChart'), {
-            type: 'bar',
-            data: {
-                labels: <?= json_encode($movie_labels) ?>,
-                datasets: [{
-                    label: 'Votes',
-                    data: <?= json_encode($movie_data) ?>,
-                    backgroundColor: '#FFA500'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } }
-            }
-        });
+        const votesChartEl = document.getElementById('votesChart');
+        if (votesChartEl) {
+            new Chart(votesChartEl, {
+                type: 'bar',
+                data: {
+                    labels: <?= json_encode($movie_labels) ?>,
+                    datasets: [{
+                        label: 'Votes',
+                        data: <?= json_encode($movie_data) ?>,
+                        backgroundColor: '#FFA500'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
 
         // Delete vote
         function deleteVote(voteId) {
@@ -560,3 +655,6 @@ while ($row = $movie_counts->fetch_assoc()) {
     </script>
 </body>
 </html>
+
+
+

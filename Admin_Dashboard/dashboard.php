@@ -152,7 +152,10 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
         .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
         .sidebar .toggle-btn:hover { color: var(--primary); }
 
-        .sidebar .nav { padding: 12px 0 96px; }
+        .sidebar .nav {
+            padding: 12px 0 96px;
+            display: block;
+        }
         .sidebar .nav-link {
             display: flex;
             align-items: center;
@@ -524,6 +527,59 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
             gap: 8px;
         }
     </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar Overlay (mobile) -->
@@ -537,10 +593,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
             <div class="top-navbar">
                 <div class="d-flex align-items-center flex-grow-1">
                     <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <i class="bi bi-search"></i>
-                    </div>
+                    
                 </div>
                 <div class="nav-icons">
                     <!-- Notification Bell Dropdown -->
@@ -812,3 +865,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
     </script>
 </body>
 </html>
+
+
+
+

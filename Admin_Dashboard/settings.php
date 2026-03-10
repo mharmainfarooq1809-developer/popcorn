@@ -63,21 +63,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Delete custom setting
-if (isset($_GET['delete_key'])) {
-    $key_to_delete = $_GET['delete_key'];
-    $protected = ['site_name', 'site_logo', 'site_keywords', 'footer_text', 'theme_color', 'contact_email', 'contact_phone', 'address', 'facebook_url', 'twitter_url', 'instagram_url', 'maintenance_mode']; // removed SMTP fields
-    if (!in_array($key_to_delete, $protected)) {
-        $stmt = $conn->prepare("DELETE FROM settings WHERE setting_key = ?");
-        $stmt->bind_param("s", $key_to_delete);
-        $stmt->execute();
-        $stmt->close();
-        header("Location: settings.php?deleted=1");
-        exit;
-    } else {
-        $error = "Cannot delete protected setting.";
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -228,6 +213,7 @@ if (isset($_GET['delete_key'])) {
 
         .sidebar .nav {
             padding: 12px 0 96px;
+            display: block;
         }
 
         .sidebar .nav-link {
@@ -579,24 +565,6 @@ if (isset($_GET['delete_key'])) {
             color: var(--primary);
         }
 
-        /* ===== CUSTOM FIELDS ===== */
-        .custom-field-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .delete-btn {
-            color: #dc3545;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-
-        .delete-btn:hover {
-            color: #b02a37;
-        }
-
         /* ===== ALERTS ===== */
         .alert-success {
             background: rgba(40, 167, 69, 0.15);
@@ -693,6 +661,59 @@ if (isset($_GET['delete_key'])) {
             }
         }
     </style>
+    <style id="admin-sidebar-unify">
+        /* Unified admin sidebar animation + responsive behavior */
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+        }
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+            margin: 0;
+        }
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Remove admin search bars everywhere */
+        .search-bar {
+            display: none !important;
+        }
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        /* Extra safety for small screens */
+        @media (max-width: 991.98px) {
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .top-navbar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -740,6 +761,7 @@ if (isset($_GET['delete_key'])) {
                         <i class="bi bi-plus-circle"></i>
                         <span>Add Theatre</span>
                     </a>
+                    
                 </div>
             </div>
 
@@ -781,6 +803,11 @@ if (isset($_GET['delete_key'])) {
                 <span>Messages</span>
             </a>
 
+        <a href="votes.php" class="nav-link" title="Voting">
+            <i class="bi bi-bar-chart"></i>
+            <span>Voting</span>
+        </a>
+
             <!-- Settings (with submenu) -->
             <div class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
@@ -816,10 +843,7 @@ if (isset($_GET['delete_key'])) {
             <div class="top-navbar">
                 <div class="d-flex align-items-center flex-grow-1">
                     <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search...">
-                        <i class="bi bi-search"></i>
-                    </div>
+                    
                 </div>
                 <div class="nav-icons">
                     <!-- Notification Bell Dropdown -->
@@ -862,12 +886,6 @@ if (isset($_GET['delete_key'])) {
             <?php if ($error): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($error) ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            <?php endif; ?>
-            <?php if (isset($_GET['deleted'])): ?>
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    Custom setting deleted.
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
@@ -975,33 +993,6 @@ if (isset($_GET['delete_key'])) {
                             <input type="url" class="form-control" name="instagram_url"
                                 value="<?= htmlspecialchars($settings['instagram_url'] ?? '') ?>">
                         </div>
-                    </div>
-
-                    <!-- CUSTOM SETTINGS -->
-                    <h4 class="mt-4 mb-3">Custom Settings</h4>
-                    <div id="custom-fields-container">
-                        <?php
-                        $predefined = ['site_name', 'site_logo', 'site_keywords', 'footer_text', 'theme_color', 'contact_email', 'contact_phone', 'address', 'facebook_url', 'twitter_url', 'instagram_url', 'maintenance_mode'];
-                        foreach ($settings as $key => $value):
-                            if (!in_array($key, $predefined) && !empty($key)):
-                                ?>
-                                <div class="custom-field-row" id="row-<?= htmlspecialchars($key) ?>">
-                                    <input type="text" class="form-control" name="<?= htmlspecialchars($key) ?>"
-                                        value="<?= htmlspecialchars($value) ?>" placeholder="Key" readonly
-                                        style="background:#f0f0f0; width:200px;">
-                                    <input type="text" class="form-control" value="<?= htmlspecialchars($value) ?>"
-                                        placeholder="Value" onchange="updateCustomField(this, '<?= htmlspecialchars($key) ?>')">
-                                    <a href="?delete_key=<?= urlencode($key) ?>" class="delete-btn"
-                                        onclick="return confirm('Delete this custom setting?')"><i class="bi bi-trash"></i></a>
-                                </div>
-                                <?php
-                            endif;
-                        endforeach;
-                        ?>
-                    </div>
-                    <div class="mt-2">
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addCustomField()"><i
-                                class="bi bi-plus"></i> Add Custom Setting</button>
                     </div>
 
                     <hr class="my-4">
@@ -1150,11 +1141,11 @@ if (isset($_GET['delete_key'])) {
         (function () {
             const currentFile = window.location.pathname.split('/').pop();
 
-            if (['theatres.php', 'add_theatre.php', 'edit_theatre.php'].includes(currentFile)) {
+            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
                 const submenu = document.getElementById('theatresSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php'].includes(currentFile)) {
+            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
                 const submenu = document.getElementById('usersSubmenu');
                 if (submenu) submenu.classList.add('show');
             }
@@ -1201,24 +1192,6 @@ if (isset($_GET['delete_key'])) {
 
             updateActiveStates();
         })();
-
-        // ========== CUSTOM FIELDS ==========
-        function addCustomField() {
-            const container = document.getElementById('custom-fields-container');
-            const newRow = document.createElement('div');
-            newRow.className = 'custom-field-row';
-            newRow.innerHTML = `
-                <input type="text" class="form-control" name="new_key_${Date.now()}" placeholder="New key" style="width:200px;">
-                <input type="text" class="form-control" name="new_value_${Date.now()}" placeholder="Value">
-                <span class="delete-btn" onclick="this.parentElement.remove()"><i class="bi bi-x-circle"></i></span>
-            `;
-            container.appendChild(newRow);
-        }
-
-        function updateCustomField(input, originalKey) {
-            // placeholder – you can implement if needed
-        }
-
         // ========== HERO SLIDER MANAGEMENT (jQuery) ==========
         $(document).ready(function () {
             $("#hero-slides-container").sortable({
@@ -1335,3 +1308,11 @@ if (isset($_GET['delete_key'])) {
 </body>
 
 </html>
+
+
+
+
+
+
+
+

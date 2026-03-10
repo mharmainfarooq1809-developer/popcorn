@@ -1154,6 +1154,7 @@ if (!$no_movies) {
             <a href="booking.php" class="active">Booking</a>
             <a href="about.php">About</a>
             <a href="user_dashboard.php">Dashboard</a>
+            <a href="logout.php">Logout</a>
         </nav>
     </header>
 

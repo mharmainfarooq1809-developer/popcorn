@@ -544,13 +544,13 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
 
     <!-- Movie Rows (dynamic via JavaScript) -->
     <section class="movie-section">
-        <h2 class="fade-up">?? Trending Now</h2>
+        <h2 class="fade-up">Trending Now</h2>
         <div class="movie-row fade-up" id="trendingRow"></div>
 
-        <h2 class="fade-up">? Popular on Popcorn Hub</h2>
+        <h2 class="fade-up">Popular on Popcorn Hub</h2>
         <div class="movie-row fade-up" id="popularRow"></div>
 
-        <h2 class="fade-up">?? New Releases</h2>
+        <h2 class="fade-up">New Releases</h2>
         <div class="movie-row fade-up" id="newReleasesRow"></div>
     </section>
 
