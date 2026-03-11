@@ -1,0 +1,163 @@
+/* ===== HEADINGS WITH TOGGLE EFFECT ===== */
+.card-header-with-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px 0;
+    border-bottom: 1px solid transparent;
+}
+
+.card-header-with-toggle:hover {
+    border-bottom-color: var(--primary);
+}
+
+.card-header-with-toggle h4,
+.card-header-with-toggle h5,
+.card-header-with-toggle h6 {
+    margin-bottom: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #212529;
+    transition: color 0.3s ease;
+}
+
+.card-header-with-toggle:hover h4,
+.card-header-with-toggle:hover h5,
+.card-header-with-toggle:hover h6 {
+    color: #FFA500;
+}
+
+.card-header-with-toggle i {
+    font-size: 20px;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.card-header-with-toggle:hover i {
+    color: #FFA500;
+    transform: translateX(5px);
+}
+
+.card-header-with-toggle.active i {
+    transform: rotate(90deg);
+    color: #FFA500;
+}
+
+/* Dark mode styles */
+body.dark-mode .card-header-with-toggle h4,
+body.dark-mode .card-header-with-toggle h5,
+body.dark-mode .card-header-with-toggle h6 {
+    color: #FFFFFF;
+}
+
+body.dark-mode .card-header-with-toggle:hover h4,
+body.dark-mode .card-header-with-toggle:hover h5,
+body.dark-mode .card-header-with-toggle:hover h6 {
+    color: #FFD966;
+}
+
+body.dark-mode .card-header-with-toggle i {
+    color: #AAAAAA;
+}
+
+body.dark-mode .card-header-with-toggle:hover i {
+    color: #FFD966;
+}
+
+body.dark-mode .card-header-with-toggle.active i {
+    color: #FFD966;
+}
+
+/* Toggle content animation */
+.toggle-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease;
+}
+
+.toggle-content.show {
+    max-height: 1000px;
+    opacity: 1;
+    margin-top: 20px;
+}
+
+/* Alternative style - with select dropdown */
+.card-header-with-select {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 5px 0;
+}
+
+.card-header-with-select h5 {
+    margin-bottom: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #212529;
+}
+
+body.dark-mode .card-header-with-select h5 {
+    color: #FFFFFF;
+}
+
+.card-header-with-select select {
+    min-width: 150px;
+    background: #FFFFFF;
+    border: 1px solid #E9ECEF;
+    border-radius: 40px;
+    padding: 8px 16px;
+    color: #212529;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.card-header-with-select select:hover {
+    border-color: #FFA500;
+}
+
+.card-header-with-select select:focus {
+    outline: none;
+    border-color: #FFA500;
+    box-shadow: 0 0 0 4px rgba(255,165,0,0.2);
+}
+
+/* Dark mode for select header */
+body.dark-mode .card-header-with-select select {
+    background: #0F1C2B;
+    border-color: #3A414D;
+    color: #FFFFFF;
+}
+
+body.dark-mode .card-header-with-select select:hover {
+    border-color: #FFD966;
+}
+
+body.dark-mode .card-header-with-select select option {
+    background: #0F1C2B;
+    color: #FFFFFF;
+}
+
+/* Animation for content */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.toggle-content.show {
+    animation: slideDown 0.3s ease;
+}
+

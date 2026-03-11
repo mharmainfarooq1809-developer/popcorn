@@ -12,7 +12,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 $admin_name = $_SESSION['user_name'] ?? 'Admin';
 
 // Get booking ID from URL
-$booking_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$booking_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if (!$booking_id) {
     header("Location: bookings.php");
     exit;
@@ -60,7 +60,8 @@ if (!$booking) {
 }
 
 // Status badge function
-function statusBadge($status) {
+function statusBadge($status)
+{
     switch ($status) {
         case 'confirmed':
             return '<span class="badge badge-success">Confirmed</span>';
@@ -82,21 +83,23 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking #BK-<?= str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT) ?> · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Booking #BK-<?= str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT) ?> ·
+        <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
+            :root {
+                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
+            }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* ================= FULL PREMIUM ADMIN CSS ================= */
+        /* ========== UNIFIED ADMIN STYLES ========== */
         * {
             margin: 0;
             padding: 0;
-            box-sizing: border-box
+            box-sizing: border-box;
         }
 
         body {
@@ -105,53 +108,106 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             color: #212529;
             transition: all 0.3s ease;
             overflow-x: hidden;
-            line-height: 1.6
+            line-height: 1.6;
         }
 
         body.dark-mode {
             background-color: #0B1623;
-            color: #F2F2F2
+            color: #FFFFFF;
         }
 
         :root {
             --primary: #FFA500;
             --primary-dark: #cc7f00;
             --primary-gold: #FFD966;
-            --secondary: #FFB347;
-            --light-bg: #F8F9FA;
-            --dark-bg: #0B1623;
             --light-card: #FFFFFF;
-            --dark-card: #0F1C2B;
+            --dark-card: #1a2634;
             --light-text: #212529;
-            --dark-text: #F2F2F2;
+            --dark-text: #FFFFFF;
             --border-light: #E9ECEF;
             --border-dark: #3A414D;
-            --sidebar-width: 260px;
-            --sidebar-collapsed: 80px;
-            --transition: all 0.3s ease
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 80px;
+            --transition: all 0.3s ease;
         }
 
+        /* ===== HEADINGS ===== */
+        h1, h2, h3, h4, h5, h6 {
+            color: #212529;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6 {
+            color: #FFFFFF;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .page-title {
+            color: #FFFFFF;
+        }
+
+        /* Text utilities */
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #AAAAAA !important;
+        }
+
+        /* ===== SIDEBAR OVERLAY ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        /* ===== SIDEBAR ===== */
         .sidebar {
             position: fixed;
             top: 0;
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: var(--light-card);
+            background: #FFFFFF;
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
+            transition: transform var(--transition), width var(--transition);
             z-index: 1000;
             overflow-y: auto;
-            border-right: 1px solid var(--border-light)
+            border-right: 1px solid #E9ECEF;
+            transform: translateX(-100%);
         }
 
-        .dark-mode .sidebar {
-            background: var(--dark-card);
-            border-right-color: var(--border-dark)
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        body.dark-mode .sidebar {
+            background: #1a2634;
+            border-right-color: #3A414D;
         }
 
         .sidebar.collapsed {
-            width: var(--sidebar-collapsed)
+            width: var(--sidebar-collapsed-width);
         }
 
         .sidebar .logo-area {
@@ -159,44 +215,44 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-light)
+            border-bottom: 1px solid #E9ECEF;
         }
 
-        .dark-mode .sidebar .logo-area {
-            border-bottom-color: var(--border-dark)
+        body.dark-mode .sidebar .logo-area {
+            border-bottom-color: #3A414D;
         }
 
         .sidebar .logo {
             font-size: 22px;
             font-weight: 700;
-            color: var(--primary-gold);
+            color: #FFD966;
             white-space: nowrap;
-            overflow: hidden
+            overflow: hidden;
         }
 
         .sidebar.collapsed .logo span {
-            display: none
+            display: none;
         }
 
         .sidebar .toggle-btn {
             background: none;
             border: none;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
             font-size: 20px;
-            transition: color 0.2s
+            transition: color 0.2s;
         }
 
-        .dark-mode .sidebar .toggle-btn {
-            color: var(--dark-text)
+        body.dark-mode .sidebar .toggle-btn {
+            color: #FFFFFF;
         }
 
         .sidebar .toggle-btn:hover {
-            color: var(--primary)
+            color: var(--primary);
         }
 
         .sidebar .nav {
-            padding: 20px 0;
+            padding: 12px 0 96px;
             display: block;
         }
 
@@ -204,41 +260,72 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             display: flex;
             align-items: center;
             padding: 9px 16px;
-            color: var(--light-text);
+            color: #212529;
             text-decoration: none;
             border-radius: 0 30px 30px 0;
             margin-right: 10px;
             transition: var(--transition);
-            white-space: nowrap
+            white-space: nowrap;
         }
 
-        .dark-mode .sidebar .nav-link {
-            color: var(--dark-text)
+        body.dark-mode .sidebar .nav-link {
+            color: #FFFFFF;
         }
 
-        .sidebar .nav-link i,
-        .sidebar .nav-link svg {
-            font-size: 17px; min-width: 24px;
-            text-align: center
+        .sidebar .nav-link i {
+            font-size: 17px;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .sidebar .nav-link span {
+            transition: opacity 0.2s;
+            opacity: 1;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .sidebar.collapsed .nav-link span {
-            display: none
+            opacity: 0;
+            width: 0;
         }
 
         .sidebar .nav-link:hover {
             background: rgba(255, 165, 0, 0.1);
-            color: var(--primary)
+            color: var(--primary);
         }
 
         .sidebar .nav-link.active {
             background: var(--primary);
-            color: #fff
+            color: #fff;
         }
 
-        .dark-mode .sidebar .nav-link.active {
+        body.dark-mode .sidebar .nav-link.active {
             background: var(--primary-dark);
-            color: #fff
+        }
+
+        /* Submenu */
+        .nav-item {
+            width: 100%;
+        }
+
+        .nav-link[data-bs-toggle="collapse"] {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-link[data-bs-toggle="collapse"] i.bi-chevron-down {
+            transition: transform 0.3s;
+        }
+
+        .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .submenu-link {
+            padding-left: 42px !important;
+            font-size: 13px;
         }
 
         .sidebar .bottom-section {
@@ -247,92 +334,76 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             left: 0;
             width: 100%;
             padding: 14px;
-            border-top: 1px solid var(--border-light);
-            background: inherit
+            border-top: 1px solid #E9ECEF;
+            background: inherit;
         }
 
-        .dark-mode .sidebar .bottom-section {
-            border-top-color: var(--border-dark)
+        body.dark-mode .sidebar .bottom-section {
+            border-top-color: #3A414D;
         }
 
+        /* ===== MAIN CONTENT ===== */
         .main-content {
-            margin-left: var(--sidebar-width);
-            padding: 20px 30px;
-            transition: var(--transition);
-            min-height: 100vh
+            margin-left: 0;
+            padding: 20px;
+            transition: margin-left var(--transition);
+            min-height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
         }
 
-        .sidebar.collapsed+.main-content {
-            margin-left: var(--sidebar-collapsed)
+        @media (min-width: 992px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-width);
+                width: calc(100% - var(--sidebar-width));
+            }
+
+            body.sidebar-collapsed .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+                width: calc(100% - var(--sidebar-collapsed-width));
+            }
         }
 
+        /* ===== TOP NAVBAR ===== */
         .top-navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 30px;
+            padding: 10px 0 20px;
             flex-wrap: wrap;
-            gap: 15px
+            gap: 15px;
         }
 
-        .search-bar {
-            position: relative;
-            width: 300px
+        .menu-toggle, .menu-toggle-mobile {
+            font-size: 24px;
+            cursor: pointer;
         }
 
-        .search-bar input {
-            width: 100%;
-            padding: 12px 40px 12px 20px;
-            border-radius: 40px;
-            border: 1px solid var(--border-light);
-            background: var(--light-card);
-            color: var(--light-text);
-            transition: var(--transition);
-            font-family: 'Heebo', sans-serif
-        }
-
-        .dark-mode .search-bar input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text)
-        }
-
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.2)
-        }
-
-        .search-bar i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-            pointer-events: none
+        @media (min-width: 992px) {
+            .menu-toggle-mobile {
+                display: none;
+            }
         }
 
         .nav-icons {
             display: flex;
             align-items: center;
-            gap: 20px
+            gap: 20px;
         }
 
         .nav-icons .icon {
             position: relative;
             font-size: 22px;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
-            transition: color 0.2s
         }
 
-        .dark-mode .nav-icons .icon {
-            color: var(--dark-text)
-        }
-
-        .nav-icons .icon:hover {
-            color: var(--primary)
+        body.dark-mode .nav-icons .icon {
+            color: #FFFFFF;
         }
 
         .nav-icons .badge {
@@ -348,41 +419,56 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600
         }
 
         .avatar-icon {
             font-size: 2.2rem;
             color: var(--primary);
             cursor: pointer;
-            transition: color 0.2s;
         }
+
         .avatar-icon:hover {
             color: var(--primary-dark);
         }
 
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 22px;
+            color: #212529;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #FFFFFF;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* ===== CARDS ===== */
         .card {
             border: none;
             border-radius: 20px;
-            padding: 14px;
-            background: var(--light-card);
+            padding: 20px;
+            background: #FFFFFF;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
-            margin-bottom: 20px
+            margin-bottom: 20px;
+            width: 100%;
+            overflow: hidden;
         }
 
-        .dark-mode .card {
-            background: var(--dark-card);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2)
+        body.dark-mode .card {
+            background: #1a2634;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
         .card-title {
             font-size: 18px;
             font-weight: 700;
-            color: var(--light-text);
+            color: #212529;
             margin-bottom: 15px;
             position: relative;
-            padding-left: 12px
+            padding-left: 12px;
         }
 
         .card-title::before {
@@ -393,124 +479,79 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             bottom: 6px;
             width: 4px;
             background: var(--primary);
-            border-radius: 4px
+            border-radius: 4px;
         }
 
-        .dark-mode .card-title {
-            color: var(--dark-text)
+        body.dark-mode .card-title {
+            color: #FFFFFF;
         }
 
+        /* ===== BADGES ===== */
         .badge {
             display: inline-block;
             padding: 5px 12px;
             border-radius: 30px;
             font-size: 12px;
             font-weight: 600;
-            text-align: center
+            text-align: center;
         }
 
         .badge-success {
             background: rgba(40, 167, 69, 0.15);
-            color: #28a745
+            color: #28a745;
         }
 
         .badge-warning {
             background: rgba(255, 193, 7, 0.15);
-            color: #ffc107
+            color: #b17f00;
         }
 
         .badge-danger {
             background: rgba(220, 53, 69, 0.15);
-            color: #dc3545
+            color: #dc3545;
         }
 
         .badge-info {
             background: rgba(23, 162, 184, 0.15);
-            color: #17a2b8
+            color: #17a2b8;
         }
 
-        .badge-primary {
-            background: rgba(255, 165, 0, 0.15);
-            color: var(--primary)
+        body.dark-mode .badge-success {
+            background: rgba(40, 167, 69, 0.25);
+            color: #7acf7a;
         }
 
-        .btn {
-            display: inline-block;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            font-size: 14px;
-            text-decoration: none;
-            text-align: center;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer
+        body.dark-mode .badge-warning {
+            background: rgba(255, 193, 7, 0.25);
+            color: #ffdb7c;
         }
 
-        .btn-primary {
-            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(255, 165, 0, 0.3)
+        body.dark-mode .badge-danger {
+            background: rgba(220, 53, 69, 0.25);
+            color: #ff8a92;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5)
+        body.dark-mode .badge-info {
+            background: rgba(23, 162, 184, 0.25);
+            color: #6ed4ff;
         }
 
-        .btn-outline-primary {
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            background: transparent
-        }
-
-        .btn-outline-primary:hover {
-            background: var(--primary);
-            color: #fff
-        }
-
-        .btn-outline-secondary {
-            border: 1px solid #6c757d;
-            color: #6c757d;
-            background: transparent
-        }
-
-        .btn-outline-secondary:hover {
-            background: #6c757d;
-            color: #fff
-        }
-
-        .btn-outline-danger {
-            border: 1px solid #dc3545;
-            color: #dc3545;
-            background: transparent
-        }
-
-        .btn-outline-danger:hover {
-            background: #dc3545;
-            color: #fff
-        }
-
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 13px
-        }
-
+        /* ===== INFO GRID ===== */
         .info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px
+            gap: 15px;
         }
 
         .info-item {
-            background: rgba(0,0,0,0.02);
+            background: rgba(0, 0, 0, 0.02);
             padding: 12px 15px;
             border-radius: 12px;
-            border-left: 3px solid var(--primary)
+            border-left: 3px solid var(--primary);
         }
 
-        .dark-mode .info-item {
-            background: rgba(255,255,255,0.02)
+        body.dark-mode .info-item {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .info-label {
@@ -518,150 +559,312 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             color: #6c757d;
             margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px
+            letter-spacing: 0.5px;
         }
 
-        .dark-mode .info-label {
-            color: #adb5bd
+        body.dark-mode .info-label {
+            color: #AAAAAA;
         }
 
         .info-value {
             font-size: 18px;
             font-weight: 700;
-            color: var(--light-text)
+            color: #212529;
         }
 
-        .dark-mode .info-value {
-            color: var(--dark-text)
+        body.dark-mode .info-value {
+            color: #FFFFFF;
         }
 
-        /* ================= PRINT STYLES ================= */
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(255, 165, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
+        }
+
+        .btn-outline-primary {
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .btn-outline-primary {
+            border-color: #FFD966;
+            color: #FFD966;
+        }
+
+        body.dark-mode .btn-outline-primary:hover {
+            background: #FFD966;
+            color: #1a2634;
+        }
+
+        .btn-outline-secondary {
+            border: 1px solid #E9ECEF;
+            color: #212529;
+            background: transparent;
+        }
+
+        body.dark-mode .btn-outline-secondary {
+            border-color: #3A414D;
+            color: #FFFFFF;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--primary);
+            color: #FFFFFF;
+            border-color: var(--primary);
+        }
+
+        .btn-outline-danger {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            background: transparent;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .btn-outline-danger {
+            border-color: #ff8a92;
+            color: #ff8a92;
+        }
+
+        body.dark-mode .btn-outline-danger:hover {
+            background: #ff8a92;
+            color: #1a2634;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        /* ===== HEADERS WITH TOGGLE ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            margin-bottom: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== DROPDOWNS ===== */
+        .dropdown-menu {
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .dropdown-menu {
+            background: #1a2634;
+            border-color: #3A414D;
+        }
+
+        .dropdown-item {
+            color: #212529;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        body.dark-mode .dropdown-item {
+            color: #FFFFFF;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #FFFFFF;
+            border-top: 1px solid #E9ECEF;
+            padding: 20px 0;
+            margin-top: 40px;
+            color: #6c757d;
+        }
+
+        body.dark-mode .footer {
+            background: #1a2634;
+            border-top-color: #3A414D;
+            color: #AAAAAA;
+        }
+
+        /* ===== PRINT STYLES ===== */
         @media print {
-            .sidebar, .top-navbar, .footer, .btn, .btn-group, .dropdown, .nav-icons, .avatar-icon, .theme-toggle, .search-bar, .bottom-section, [onclick] {
+            .sidebar,
+            .top-navbar,
+            .footer,
+            .btn,
+            .btn-group,
+            .dropdown,
+            .nav-icons,
+            .avatar-icon,
+            .theme-toggle,
+            .bottom-section,
+            .header-actions .btn:not(:last-child) {
                 display: none !important;
             }
+
             .main-content {
                 margin-left: 0 !important;
                 padding: 0 !important;
             }
+
             .card {
                 box-shadow: none !important;
                 border: 1px solid #ddd !important;
                 page-break-inside: avoid;
             }
+
             body {
                 background: white;
                 color: black;
             }
+
             .info-label, .info-value {
                 color: black !important;
             }
         }
 
-        .footer {
-            background: var(--light-card);
-            border-top: 1px solid var(--border-light);
-            padding: 30px 0;
-            margin-top: 60px;
-            color: #6c757d
-        }
-
-        .dark-mode .footer {
-            background: var(--dark-card);
-            border-top-color: var(--border-dark);
-            color: #adb5bd
-        }
-
-        @media (max-width:992px) {
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
             .sidebar {
-                left: -100%
+                left: -100%;
             }
 
-            .sidebar.active {
-                left: 0
-            }
-
-            .main-content {
-                margin-left: 0 !important
-            }
-
-            .search-bar {
-                width: 250px
-            }
-        }
-
-        @media (max-width:768px) {
-            .top-navbar {
+             .top-navbar {
                 flex-direction: column;
-                align-items: stretch
-            }
-
-            .search-bar {
-                width: 100%
+                align-items: stretch;
             }
 
             .nav-icons {
-                justify-content: flex-end
+                justify-content: flex-end;
             }
-        }
-    </style>
-    <style id="admin-sidebar-unify">
-        /* Unified admin sidebar animation + responsive behavior */
-        .sidebar {
-            transition: width 0.28s ease, transform 0.28s ease;
-            will-change: width, transform;
-        }
-        .main-content {
-            transition: margin-left 0.28s ease, width 0.28s ease;
-        }
-        .sidebar .logo span,
-        .sidebar .nav-link span {
-            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
-            max-width: 180px;
-            overflow: hidden;
-        }
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-        }
-        .sidebar.collapsed .logo span,
-        .sidebar.collapsed .nav-link span {
-            opacity: 0;
-            max-width: 0;
-            margin: 0;
-        }
-        #sidebarToggle i {
-            transition: transform 0.25s ease;
-        }
-        body.sidebar-collapsed #sidebarToggle i {
-            transform: rotate(180deg);
-        }
 
-        /* Remove admin search bars everywhere */
-        .search-bar {
-            display: none !important;
-        }
-        .top-navbar {
-            justify-content: flex-end;
-            gap: 12px;
-        }
+            .sidebar.active {
+                left: 0;
+            }
 
-        /* Extra safety for small screens */
-        @media (max-width: 991.98px) {
             .main-content {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-            .top-navbar {
-                flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
             }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
+    </style>
+    <style id="admin-sidebar-unify">
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width) !important;
+        }
+
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+        }
+
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        .search-bar {
+            display: none !important;
+        }
+
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
         }
     </style>
 </head>
 
 <body>
-    <!-- Sidebar Overlay (mobile) -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar -->
@@ -671,112 +874,54 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 <i class="bi bi-camera-reels me-2"></i>
                 <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
             </div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
         </div>
 
         <div class="nav">
-            <!-- Dashboard -->
-            <a href="dashboard.php" class="nav-link" title="Dashboard">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
+            <a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a href="movies.php" class="nav-link"><i class="bi bi-film"></i><span>Movies</span></a>
 
-            <!-- Movies -->
-            <a href="movies.php" class="nav-link" title="Movies">
-                <i class="bi bi-film"></i>
-                <span>Movies</span>
-            </a>
-
-            <!-- Theatres (with submenu) -->
+            <!-- Theatres submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button"
-                    aria-expanded="false" aria-controls="theatresSubmenu" title="Theatres">
-                    <i class="bi bi-building"></i>
-                    <span>Theatres</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-building"></i><span>Theatres</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="theatresSubmenu">
-                    <a href="theatres.php" class="nav-link submenu-link" title="All Theatres">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Theatres</span>
-                    </a>
-                    <a href="add_theatre.php" class="nav-link submenu-link" title="Add Theatre">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add Theatre</span>
-                    </a>
-                    
+                    <a href="theatres.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Theatres</span></a>
+                    <a href="add_theatre.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add Theatre</span></a>
                 </div>
             </div>
 
-            <!-- Bookings (direct link) -->
-        <a href="bookings.php" class="nav-link" title="Bookings">
-            <i class="bi bi-ticket"></i>
-            <span>Bookings</span>
-        </a>
+            <a href="bookings.php" class="nav-link active"><i class="bi bi-ticket"></i><span>Bookings</span></a>
 
-            <!-- Users (with submenu) -->
+            <!-- Users submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button"
-                    aria-expanded="false" aria-controls="usersSubmenu" title="Users">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-people"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="usersSubmenu">
-                    <a href="users.php" class="nav-link submenu-link" title="All Users">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Users</span>
-                    </a>
-                    <a href="add_user.php" class="nav-link submenu-link" title="Add User">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add User</span>
-                    </a>
+                    <a href="users.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Users</span></a>
+                    <a href="add_user.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add User</span></a>
                 </div>
             </div>
 
-            <!-- Analytics -->
-            <a href="analytics.php" class="nav-link" title="Analytics">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </a>
+            <a href="analytics.php" class="nav-link"><i class="bi bi-graph-up"></i><span>Analytics</span></a>
+            <a href="messages.php" class="nav-link"><i class="bi bi-chat-dots"></i><span>Messages</span></a>
+            <a href="votes.php" class="nav-link"><i class="bi bi-bar-chart"></i><span>Voting</span></a>
 
-            <!-- Messages -->
-            <a href="messages.php" class="nav-link" title="Messages">
-                <i class="bi bi-chat-dots"></i>
-                <span>Messages</span>
-            </a>
-
-        <a href="votes.php" class="nav-link" title="Voting">
-            <i class="bi bi-bar-chart"></i>
-            <span>Voting</span>
-        </a>
-
-            <!-- Settings (with submenu) -->
+            <!-- Settings submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
-                    aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
-                    <i class="bi bi-gear"></i>
-                    <span>Settings</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="settingsSubmenu">
-                    <a href="settings.php" class="nav-link submenu-link" title="General Settings">
-                        <i class="bi bi-sliders2"></i>
-                        <span>General</span>
-                    </a>
-                    <a href="email_settings.php" class="nav-link submenu-link" title="Email Settings">
-                        <i class="bi bi-envelope"></i>
-                        <span>Email</span>
-                    </a>
+                    <a href="settings.php" class="nav-link submenu-link"><i class="bi bi-sliders2"></i><span>General</span></a>
+                    <a href="email_settings.php" class="nav-link submenu-link"><i class="bi bi-envelope"></i><span>Email</span></a>
                 </div>
             </div>
         </div>
 
         <div class="bottom-section">
-            <a href="../logout.php" class="nav-link" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
+            <a href="../logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i><span>Logout</span></a>
         </div>
     </div>
 
@@ -784,17 +929,19 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
     <div class="main-content">
         <!-- Top Navbar -->
         <div class="top-navbar">
-            
+            <div class="d-flex align-items-center">
+                <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
+            </div>
             <div class="nav-icons">
                 <div class="dropdown d-inline-block">
-                    <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                    <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
                         <span class="badge" id="notificationBadge" style="display: none;">0</span>
                     </div>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
+                    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
                         <li><h6 class="dropdown-header">Notifications</h6></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li id="notificationList">Loading...</li>
+                        <li id="notificationList"></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
                     </ul>
@@ -805,16 +952,16 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
         </div>
 
         <!-- Page Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="page-header">
             <div>
                 <h2>Booking #BK-<?= str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT) ?></h2>
                 <p class="text-muted mb-0"><?= date('F j, Y \a\t g:i A', strtotime($booking['booking_date'])) ?></p>
             </div>
-            <div>
-                <a href="bookings.php" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left"></i> Back</a>
-                <button class="btn btn-outline-primary me-2" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="header-actions">
+                <a href="bookings.php" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+                <button class="btn btn-outline-primary" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>
+                <div class="dropdown d-inline-block">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         Update Status
                     </button>
                     <ul class="dropdown-menu">
@@ -823,25 +970,27 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                         <li><a class="dropdown-item" href="#" onclick="updateStatus('cancelled')">Cancel</a></li>
                     </ul>
                 </div>
-                <button class="btn btn-outline-danger ms-2" onclick="deleteBooking(<?= $booking['booking_id'] ?>)"><i class="bi bi-trash"></i> Delete</button>
+                <button class="btn btn-outline-danger" onclick="deleteBooking(<?= $booking['booking_id'] ?>)">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
             </div>
         </div>
 
-        <!-- Booking Details Card -->
+        <!-- Booking Details -->
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-lg-8">
                 <!-- Movie & Showtime Card -->
                 <div class="card">
                     <h3 class="card-title">Movie & Showtime</h3>
-                    <div class="row">
+                    <div class="row g-3">
                         <div class="col-md-4">
-                            <img src="<?= htmlspecialchars($booking['image_url'] ?? 'https://via.placeholder.com/300x450?text=No+Poster') ?>" 
-                                 alt="<?= htmlspecialchars($booking['movie_title']) ?>" 
-                                 class="img-fluid rounded" style="max-height: 200px; width: auto;">
+                            <img src="<?= htmlspecialchars($booking['image_url'] ?? 'https://via.placeholder.com/300x450?text=No+Poster') ?>"
+                                alt="<?= htmlspecialchars($booking['movie_title']) ?>" class="img-fluid rounded"
+                                style="max-height: 200px; width: auto; object-fit: cover;">
                         </div>
                         <div class="col-md-8">
                             <h4><?= htmlspecialchars($booking['movie_title']) ?></h4>
-                            <div class="info-grid">
+                            <div class="info-grid mt-3">
                                 <div class="info-item">
                                     <div class="info-label">Year</div>
                                     <div class="info-value"><?= htmlspecialchars($booking['year'] ?? 'N/A') ?></div>
@@ -859,7 +1008,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                             <div class="info-grid">
                                 <div class="info-item">
                                     <div class="info-label">Date</div>
-                                    <div class="info-value"><?= htmlspecialchars($booking['show_date']) ?></div>
+                                    <div class="info-value"><?= date('M j, Y', strtotime($booking['show_date'])) ?></div>
                                 </div>
                                 <div class="info-item">
                                     <div class="info-label">Time</div>
@@ -875,7 +1024,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 </div>
 
                 <!-- Seat & Pricing Card -->
-                <div class="card mt-3">
+                <div class="card">
                     <h3 class="card-title">Seats & Pricing</h3>
                     <div class="info-grid">
                         <div class="info-item">
@@ -899,7 +1048,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                             <div class="info-value">$<?= number_format($booking['total_price'], 2) ?></div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Discount Applied</div>
+                            <div class="info-label">Discount</div>
                             <div class="info-value"><?= $booking['discount_applied'] ? 'Yes' : 'No' ?></div>
                         </div>
                         <div class="info-item">
@@ -910,19 +1059,19 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 </div>
             </div>
 
-            <!-- Customer Info Card -->
-            <div class="col-md-4">
+            <div class="col-lg-4">
+                <!-- Customer Info Card -->
                 <div class="card">
                     <h3 class="card-title">Customer Information</h3>
-                    <div class="info-item">
+                    <div class="info-item mb-2">
                         <div class="info-label">Name</div>
                         <div class="info-value"><?= htmlspecialchars($booking['customer_name']) ?></div>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item mb-2">
                         <div class="info-label">Email</div>
                         <div class="info-value"><?= htmlspecialchars($booking['customer_email']) ?></div>
                     </div>
-                    <div class="info-item">
+                    <div class="info-item mb-2">
                         <div class="info-label">Loyalty Points</div>
                         <div class="info-value"><?= $booking['customer_points'] ?></div>
                     </div>
@@ -933,17 +1082,14 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 </div>
 
                 <!-- Quick Actions Card -->
-                <div class="card mt-3">
+                <div class="card">
                     <h3 class="card-title">Quick Actions</h3>
                     <div class="d-grid gap-2">
                         <a href="<?= htmlspecialchars($messageLink) ?>" class="btn btn-outline-primary">
                             <i class="bi bi-envelope"></i> Message Customer
                         </a>
                         <a href="user_dashboard.php?user_id=<?= $booking['user_id'] ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-person"></i> View User
-                        </a>
-                        <a href="edit_booking.php?id=<?= $booking['booking_id'] ?>" class="btn btn-outline-primary">
-                            <i class="bi bi-pencil"></i> Edit Booking
+                            <i class="bi bi-person"></i> View User Profile
                         </a>
                     </div>
                 </div>
@@ -954,31 +1100,13 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="admin_toggle.js"></script>
     <script>
-        // Sidebar toggle
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', function () {
-                document.getElementById('sidebar').classList.toggle('collapsed');
-            });
-        }
-
-        // Dark mode toggle
-        document.getElementById('themeToggle').addEventListener('click', function () {
-            document.body.classList.toggle('dark-mode');
-            const icon = this.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('bi-moon');
-                icon.classList.toggle('bi-sun');
-            }
-        });
-
         // Notifications
         function updateNotifications() {
             fetch('get_notifications.php')
@@ -987,13 +1115,16 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                     const badge = document.getElementById('notificationBadge');
                     const list = document.getElementById('notificationList');
                     if (badge && list) {
-                        if (data.notifications && data.notifications.length > 0) {
+                        if (data.notifications?.length) {
                             badge.textContent = data.notifications.length;
                             badge.style.display = 'flex';
                             list.innerHTML = '';
                             data.notifications.forEach(notif => {
                                 const item = document.createElement('li');
-                                item.innerHTML = `<a class="dropdown-item" href="${notif.link}">${notif.message}<br><small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small></a>`;
+                                item.innerHTML = `<a class="dropdown-item" href="${notif.link || '#'}">
+                                    ${notif.message}<br>
+                                    <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
+                                </a>`;
                                 list.appendChild(item);
                             });
                         } else {
@@ -1008,64 +1139,9 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
             e.preventDefault();
             fetch('mark_notifications_read.php', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.success) updateNotifications();
-                });
+                .then(data => { if (data.success) updateNotifications(); });
         });
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
 
-            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
-                    }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
-                });
-            });
-
-            updateActiveStates();
-        })();
         updateNotifications();
         setInterval(updateNotifications, 30000);
 
@@ -1077,15 +1153,15 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: 'id=<?= $booking['booking_id'] ?>&status=' + newStatus
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(err => alert('Request failed: ' + err));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(err => alert('Request failed: ' + err));
         }
 
         // Delete booking
@@ -1096,23 +1172,17 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: 'id=' + id
                 })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        window.location.href = 'bookings.php';
-                    } else {
-                        alert('Delete failed: ' + data.error);
-                    }
-                })
-                .catch(err => alert('Error: ' + err));
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = 'bookings.php';
+                        } else {
+                            alert('Delete failed: ' + data.error);
+                        }
+                    })
+                    .catch(err => alert('Error: ' + err));
             }
         }
     </script>
 </body>
 </html>
-
-
-
-
-
-

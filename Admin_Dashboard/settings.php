@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../db_connect.php';
-
 require_once '../settings_init.php'; // load global settings
 
 // Only admin can access
@@ -39,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $new_filename = 'logo_' . time() . '.' . $file_ext;
             $destination = $upload_dir . $new_filename;
             if (move_uploaded_file($_FILES['site_logo']['tmp_name'], $destination)) {
-                $_POST['site_logo'] = 'uploads/' . $new_filename; // store relative path
+                $_POST['site_logo'] = 'uploads/' . $new_filename;
             } else {
                 $error = 'Logo upload failed.';
             }
@@ -51,7 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Save all posted fields
     if (empty($error)) {
         foreach ($_POST as $key => $value) {
-            // Do NOT skip site_logo – we want to save the new path
             $value = trim($value);
             $stmt = $conn->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
             $stmt->bind_param("ss", $key, $value);
@@ -62,7 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $settings = get_settings($conn, true);
     }
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -74,20 +71,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
-                ;
-            }
-
-            .btn-primary {
-                background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* ========== UNIFIED ADMIN CSS (same as dashboard) ========== */
+        /* ========== UNIFIED ADMIN STYLES ========== */
         *,
         *::before,
         *::after {
@@ -107,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body.dark-mode {
             background-color: #0B1623;
-            color: #F2F2F2;
+            color: #FFFFFF;
         }
 
         :root {
@@ -117,12 +108,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --light-card: #FFFFFF;
             --dark-card: #0F1C2B;
             --light-text: #212529;
-            --dark-text: #F2F2F2;
+            --dark-text: #FFFFFF;
             --border-light: #E9ECEF;
             --border-dark: #3A414D;
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 80px;
             --transition: all 0.3s ease;
+        }
+
+        /* ===== HEADINGS ===== */
+        h1, h2, h3, h4, h5, h6 {
+            color: #212529;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6 {
+            color: #FFFFFF;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .page-title {
+            color: #FFFFFF;
+        }
+
+        /* Section headers inside cards */
+        .card h4 {
+            color: #212529;
+            font-weight: 600;
+        }
+
+        body.dark-mode .card h4 {
+            color: #FFFFFF;
+        }
+
+        .card h6 {
+            color: #212529;
+            font-weight: 600;
+        }
+
+        body.dark-mode .card h6 {
+            color: #FFFFFF;
+        }
+
+        /* Form labels */
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .form-label {
+            color: #FFFFFF;
+        }
+
+        /* Text muted */
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #AAAAAA !important;
         }
 
         /* ===== SIDEBAR OVERLAY ===== */
@@ -148,12 +203,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: var(--light-card);
+            background: #FFFFFF;
             box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
             transition: transform var(--transition), width var(--transition);
             z-index: 1000;
             overflow-y: auto;
-            border-right: 1px solid var(--border-light);
+            border-right: 1px solid #E9ECEF;
             transform: translateX(-100%);
         }
 
@@ -161,9 +216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transform: translateX(0);
         }
 
-        .dark-mode .sidebar {
-            background: var(--dark-card);
-            border-right-color: var(--border-dark);
+        body.dark-mode .sidebar {
+            background: #0F1C2B;
+            border-right-color: #3A414D;
         }
 
         .sidebar.collapsed {
@@ -175,17 +230,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #E9ECEF;
         }
 
-        .dark-mode .sidebar .logo-area {
-            border-bottom-color: var(--border-dark);
+        body.dark-mode .sidebar .logo-area {
+            border-bottom-color: #3A414D;
         }
 
         .sidebar .logo {
             font-size: 22px;
             font-weight: 700;
-            color: var(--primary-gold);
+            color: #FFD966;
             white-space: nowrap;
             overflow: hidden;
         }
@@ -197,14 +252,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .sidebar .toggle-btn {
             background: none;
             border: none;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
             font-size: 20px;
-            transition: color 0.2s;
         }
 
-        .dark-mode .sidebar .toggle-btn {
-            color: var(--dark-text);
+        body.dark-mode .sidebar .toggle-btn {
+            color: #FFFFFF;
         }
 
         .sidebar .toggle-btn:hover {
@@ -220,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             padding: 9px 16px;
-            color: var(--light-text);
+            color: #212529;
             text-decoration: none;
             border-radius: 0 30px 30px 0;
             margin-right: 10px;
@@ -228,8 +282,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             white-space: nowrap;
         }
 
-        .dark-mode .sidebar .nav-link {
-            color: var(--dark-text);
+        body.dark-mode .sidebar .nav-link {
+            color: #FFFFFF;
         }
 
         .sidebar .nav-link i {
@@ -239,9 +293,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .sidebar .nav-link span {
-            transition: opacity 0.2s, width 0.2s;
+            transition: opacity 0.2s;
             opacity: 1;
-            width: auto;
             overflow: hidden;
             white-space: nowrap;
         }
@@ -261,7 +314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #fff;
         }
 
-        .dark-mode .sidebar .nav-link.active {
+        body.dark-mode .sidebar .nav-link.active {
             background: var(--primary-dark);
         }
 
@@ -289,30 +342,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 13px;
         }
 
-        .submenu-link i {
-            font-size: 14px;
-            min-width: 20px;
-        }
-
         .sidebar .bottom-section {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             padding: 14px;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid #E9ECEF;
             background: inherit;
         }
 
-        .dark-mode .sidebar .bottom-section {
-            border-top-color: var(--border-dark);
+        body.dark-mode .sidebar .bottom-section {
+            border-top-color: #3A414D;
         }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 0;
-            padding: 20px 30px;
-            transition: margin-left var(--transition), width var(--transition);
+            padding: 20px;
+            transition: margin-left var(--transition);
             min-height: 100vh;
             width: 100%;
             overflow-x: hidden;
@@ -334,64 +382,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        @media (max-width: 991px) {
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-
         /* ===== TOP NAVBAR ===== */
         .top-navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 30px;
+            padding: 10px 0 20px;
             flex-wrap: wrap;
             gap: 15px;
         }
 
-        .menu-toggle {
+        .menu-toggle, .menu-toggle-mobile {
             font-size: 24px;
             cursor: pointer;
-            display: inline-block;
         }
 
-        .search-bar {
-            position: relative;
-            width: 300px;
-            max-width: 100%;
-        }
-
-        .search-bar input {
-            width: 100%;
-            padding: 12px 40px 12px 20px;
-            border-radius: 40px;
-            border: 1px solid var(--border-light);
-            background: var(--light-card);
-            color: var(--light-text);
-            transition: var(--transition);
-        }
-
-        .dark-mode .search-bar input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
-        }
-
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.2);
-        }
-
-        .search-bar i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
+        @media (min-width: 992px) {
+            .menu-toggle-mobile {
+                display: none;
+            }
         }
 
         .nav-icons {
@@ -403,17 +412,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .nav-icons .icon {
             position: relative;
             font-size: 22px;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
-            transition: color 0.2s;
         }
 
-        .dark-mode .nav-icons .icon {
-            color: var(--dark-text);
-        }
-
-        .nav-icons .icon:hover {
-            color: var(--primary);
+        body.dark-mode .nav-icons .icon {
+            color: #FFFFFF;
         }
 
         .nav-icons .badge {
@@ -435,11 +439,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 2.2rem;
             color: var(--primary);
             cursor: pointer;
-            transition: color 0.2s;
         }
 
         .avatar-icon:hover {
             color: var(--primary-dark);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 22px;
+            color: #212529;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #FFFFFF;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
         }
 
         /* ===== CARDS & FORMS ===== */
@@ -447,42 +464,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: none;
             border-radius: 20px;
             padding: 25px;
-            background: var(--light-card);
+            background: #FFFFFF;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            transition: var(--transition);
             margin-bottom: 20px;
+            width: 100%;
+            overflow: hidden;
         }
 
-        .dark-mode .card {
-            background: var(--dark-card);
+        body.dark-mode .card {
+            background: #0F1C2B;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-
-        .dark-mode .form-label {
-            color: #adb5bd;
         }
 
         .form-control,
         .form-select {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
-            color: var(--light-text);
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            color: #212529;
             border-radius: 10px;
             padding: 10px 15px;
             transition: var(--transition);
         }
 
-        .dark-mode .form-control,
-        .dark-mode .form-select {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #0F1C2B;
+            border-color: #3A414D;
+            color: #FFFFFF;
         }
 
         .form-control:focus,
@@ -490,6 +498,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.2);
             outline: none;
+        }
+
+        .form-check-input {
+            background-color: #FFFFFF;
+            border-color: #E9ECEF;
+        }
+
+        body.dark-mode .form-check-input {
+            background-color: #0F1C2B;
+            border-color: #3A414D;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .form-check-label {
+            color: #212529;
+        }
+
+        body.dark-mode .form-check-label {
+            color: #FFFFFF;
+        }
+
+        /* ===== HEADINGS WITH TOGGLE EFFECT ===== */
+        .card-header-with-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            border-bottom: 1px solid transparent;
+        }
+
+        .card-header-with-toggle:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        .card-header-with-toggle h2 {
+            margin-bottom: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+            transition: color 0.3s ease;
+        }
+
+        .card-header-with-toggle:hover h2 {
+            color: #FFA500;
+        }
+
+        .card-header-with-toggle i {
+            font-size: 24px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .card-header-with-toggle:hover i {
+            color: #FFA500;
+            transform: translateX(5px);
+        }
+
+        .card-header-with-toggle.active i {
+            transform: rotate(90deg);
+            color: #FFA500;
+        }
+
+        /* Dark mode styles */
+        body.dark-mode .card-header-with-toggle h2 {
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .card-header-with-toggle:hover h2 {
+            color: #FFD966;
+        }
+
+        body.dark-mode .card-header-with-toggle i {
+            color: #AAAAAA;
+        }
+
+        body.dark-mode .card-header-with-toggle:hover i {
+            color: #FFD966;
+        }
+
+        body.dark-mode .card-header-with-toggle.active i {
+            color: #FFD966;
+        }
+
+        /* Toggle content animation */
+        .toggle-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+        }
+
+        .toggle-content.show {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 20px;
+        }
+
+        /* Alternative style - with select dropdown */
+        .card-header-with-select {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-header-with-select h5 {
+            margin-bottom: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .card-header-with-select h5 {
+            color: #FFFFFF;
+        }
+
+        .card-header-with-select select {
+            min-width: 150px;
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #212529;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .card-header-with-select select {
+            background: #0F1C2B;
+            border-color: #3A414D;
+            color: #FFFFFF;
+        }
+
+        body.dark-mode .card-header-with-select select option {
+            background: #0F1C2B;
+            color: #FFFFFF;
         }
 
         /* ===== BUTTONS ===== */
@@ -504,7 +658,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
         }
 
@@ -514,11 +668,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: transparent;
             border-radius: 40px;
             padding: 8px 20px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .btn-outline-primary:hover {
             background: var(--primary);
             color: #fff;
+        }
+
+        body.dark-mode .btn-outline-primary {
+            border-color: #FFD966;
+            color: #FFD966;
+        }
+
+        body.dark-mode .btn-outline-primary:hover {
+            background: #FFD966;
+            color: #0F1C2B;
         }
 
         .btn-outline-danger {
@@ -527,11 +695,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: transparent;
             border-radius: 40px;
             padding: 6px 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .btn-outline-danger:hover {
             background: #dc3545;
             color: #fff;
+        }
+
+        body.dark-mode .btn-outline-danger {
+            border-color: #ff8a92;
+            color: #ff8a92;
+        }
+
+        body.dark-mode .btn-outline-danger:hover {
+            background: #ff8a92;
+            color: #0F1C2B;
         }
 
         .btn-sm {
@@ -548,11 +730,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid transparent;
         }
 
+        body.dark-mode .hero-slide-row {
+            background: #1a2634;
+        }
+
         .hero-slide-row:hover {
             background: #e9ecef;
             border-color: var(--primary);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transform: scale(1.01);
+        }
+
+        body.dark-mode .hero-slide-row:hover {
+            background: #2a3644;
         }
 
         .hero-slide-row .bi-grip-vertical {
@@ -561,8 +751,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: move;
         }
 
+        body.dark-mode .hero-slide-row .bi-grip-vertical {
+            color: #6c757d;
+        }
+
         .hero-slide-row .bi-grip-vertical:hover {
             color: var(--primary);
+        }
+
+        /* Inputs inside hero rows */
+        .hero-slide-row .form-control {
+            background: #FFFFFF;
+            color: #212529;
+        }
+
+        body.dark-mode .hero-slide-row .form-control {
+            background: #0F1C2B;
+            color: #FFFFFF;
+            border-color: #3A414D;
         }
 
         /* ===== ALERTS ===== */
@@ -571,7 +777,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: #28a745;
             border: none;
             border-radius: 10px;
-            padding: 9px 16px;
+            padding: 12px 20px;
         }
 
         .alert-danger {
@@ -582,48 +788,107 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 12px 20px;
         }
 
+        body.dark-mode .alert-success {
+            background: rgba(40, 167, 69, 0.25);
+            color: #7acf7a;
+        }
+
+        body.dark-mode .alert-danger {
+            background: rgba(220, 53, 69, 0.25);
+            color: #ff8a92;
+        }
+
         /* ===== FOOTER ===== */
         .footer {
-            background: var(--light-card);
-            border-top: 1px solid var(--border-light);
-            padding: 30px 0;
-            margin-top: 60px;
+            background: #FFFFFF;
+            border-top: 1px solid #E9ECEF;
+            padding: 20px 0;
+            margin-top: 40px;
             color: #6c757d;
         }
 
-        .dark-mode .footer {
-            background: var(--dark-card);
-            border-top-color: var(--border-dark);
-            color: #adb5bd;
+        body.dark-mode .footer {
+            background: #0F1C2B;
+            border-top-color: #3A414D;
+            color: #AAAAAA;
         }
 
         /* ===== DROPDOWNS ===== */
         .dropdown-menu {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             max-height: 400px;
             overflow-y: auto;
         }
 
-        .dark-mode .dropdown-menu {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
+        body.dark-mode .dropdown-menu {
+            background: #0F1C2B;
+            border-color: #3A414D;
         }
 
         .dropdown-item {
-            color: var(--light-text);
-            white-space: normal;
-            word-wrap: break-word;
+            color: #212529;
+            padding: 10px 20px;
         }
 
-        .dark-mode .dropdown-item {
-            color: var(--dark-text);
+        body.dark-mode .dropdown-item {
+            color: #FFFFFF;
         }
 
         .dropdown-item:hover {
             background: rgba(255, 165, 0, 0.1);
+        }
+
+        .dropdown-header {
+            color: #6c757d;
+        }
+
+        body.dark-mode .dropdown-header {
+            color: #AAAAAA;
+        }
+
+        /* ===== REMOVE CHECKBOX STYLING ===== */
+        .remove-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #212529;
+            white-space: nowrap;
+        }
+
+        body.dark-mode .remove-checkbox {
+            color: #FFFFFF;
+        }
+
+        .remove-checkbox input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        /* ===== CURRENT LOGO DISPLAY ===== */
+        .current-logo {
+            margin-top: 10px;
+        }
+
+        .current-logo img {
+            max-height: 60px;
+            border-radius: 8px;
+            border: 1px solid #E9ECEF;
+        }
+
+        body.dark-mode .current-logo img {
+            border-color: #3A414D;
+        }
+
+        .current-logo span.text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .current-logo span.text-muted {
+            color: #AAAAAA !important;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -640,243 +905,184 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-
-            .search-bar {
-                width: 250px;
-            }
         }
 
         @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
+            }
+
             .top-navbar {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .search-bar {
-                width: 100%;
-            }
-
             .nav-icons {
                 justify-content: flex-end;
+            }
+
+            .card-header-with-toggle h2 {
+                font-size: 20px;
+            }
+
+            .card-header-with-toggle,
+            .card-header-with-select {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .remove-checkbox {
+                margin-top: 10px;
+            }
+
+            .btn-primary.w-100 {
+                width: 100%;
             }
         }
     </style>
     <style id="admin-sidebar-unify">
-        /* Unified admin sidebar animation + responsive behavior */
         .sidebar {
             transition: width 0.28s ease, transform 0.28s ease;
             will-change: width, transform;
         }
+
         .main-content {
             transition: margin-left 0.28s ease, width 0.28s ease;
         }
+
         .sidebar .logo span,
         .sidebar .nav-link span {
-            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            transition: opacity 0.22s ease, max-width 0.22s ease;
             max-width: 180px;
             overflow: hidden;
         }
+
         .sidebar.collapsed {
-            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            width: var(--sidebar-collapsed-width) !important;
         }
+
         .sidebar.collapsed .logo span,
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             max-width: 0;
-            margin: 0;
         }
+
         #sidebarToggle i {
             transition: transform 0.25s ease;
         }
+
         body.sidebar-collapsed #sidebarToggle i {
             transform: rotate(180deg);
         }
 
-        /* Remove admin search bars everywhere */
         .search-bar {
             display: none !important;
         }
+
         .top-navbar {
             justify-content: flex-end;
             gap: 12px;
-        }
-
-        /* Extra safety for small screens */
-        @media (max-width: 991.98px) {
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-            }
-            .top-navbar {
-                flex-wrap: wrap;
-            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Sidebar Overlay (mobile) – if your sidebar.php includes it, you can remove this -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-
-    <!-- Sidebar (with title attributes for tooltips when collapsed) -->
+    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="logo-area">
             <div class="logo">
                 <i class="bi bi-camera-reels me-2"></i>
                 <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
             </div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
         </div>
 
         <div class="nav">
-            <!-- Dashboard -->
-            <a href="dashboard.php" class="nav-link" title="Dashboard">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
+            <a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a href="movies.php" class="nav-link"><i class="bi bi-film"></i><span>Movies</span></a>
 
-            <!-- Movies -->
-            <a href="movies.php" class="nav-link" title="Movies">
-                <i class="bi bi-film"></i>
-                <span>Movies</span>
-            </a>
-
-            <!-- Theatres (with submenu) -->
+            <!-- Theatres submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button"
-                    aria-expanded="false" aria-controls="theatresSubmenu" title="Theatres">
-                    <i class="bi bi-building"></i>
-                    <span>Theatres</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-building"></i><span>Theatres</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="theatresSubmenu">
-                    <a href="theatres.php" class="nav-link submenu-link" title="All Theatres">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Theatres</span>
-                    </a>
-                    <a href="add_theatre.php" class="nav-link submenu-link" title="Add Theatre">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add Theatre</span>
-                    </a>
-                    
+                    <a href="theatres.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Theatres</span></a>
+                    <a href="add_theatre.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add Theatre</span></a>
                 </div>
             </div>
 
-            <!-- Bookings (direct link) -->
-            <a href="bookings.php" class="nav-link" title="Bookings">
-                <i class="bi bi-ticket"></i>
-                <span>Bookings</span>
-            </a>
+            <a href="bookings.php" class="nav-link"><i class="bi bi-ticket"></i><span>Bookings</span></a>
 
-            <!-- Users (with submenu) -->
+            <!-- Users submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button" aria-expanded="false"
-                    aria-controls="usersSubmenu" title="Users">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-people"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="usersSubmenu">
-                    <a href="users.php" class="nav-link submenu-link" title="All Users">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Users</span>
-                    </a>
-                    <a href="add_user.php" class="nav-link submenu-link" title="Add User">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add User</span>
-                    </a>
+                    <a href="users.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Users</span></a>
+                    <a href="add_user.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add User</span></a>
                 </div>
             </div>
 
-            <!-- Analytics -->
-            <a href="analytics.php" class="nav-link" title="Analytics">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </a>
+            <a href="analytics.php" class="nav-link"><i class="bi bi-graph-up"></i><span>Analytics</span></a>
+            <a href="messages.php" class="nav-link"><i class="bi bi-chat-dots"></i><span>Messages</span></a>
+            <a href="votes.php" class="nav-link"><i class="bi bi-bar-chart"></i><span>Voting</span></a>
 
-            <!-- Messages -->
-            <a href="messages.php" class="nav-link" title="Messages">
-                <i class="bi bi-chat-dots"></i>
-                <span>Messages</span>
-            </a>
-
-        <a href="votes.php" class="nav-link" title="Voting">
-            <i class="bi bi-bar-chart"></i>
-            <span>Voting</span>
-        </a>
-
-            <!-- Settings (with submenu) -->
+            <!-- Settings submenu - expanded and active -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button"
-                    aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
-                    <i class="bi bi-gear"></i>
-                    <span>Settings</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link active" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="true">
+                    <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
-                <div class="collapse" id="settingsSubmenu">
-                    <a href="settings.php" class="nav-link submenu-link" title="General Settings">
-                        <i class="bi bi-sliders2"></i>
-                        <span>General</span>
-                    </a>
-                    <a href="email_settings.php" class="nav-link submenu-link" title="Email Settings">
-                        <i class="bi bi-envelope"></i>
-                        <span>Email</span>
-                    </a>
+                <div class="collapse show" id="settingsSubmenu">
+                    <a href="settings.php" class="nav-link submenu-link active"><i class="bi bi-sliders2"></i><span>General</span></a>
+                    <a href="email_settings.php" class="nav-link submenu-link"><i class="bi bi-envelope"></i><span>Email</span></a>
                 </div>
             </div>
         </div>
 
         <div class="bottom-section">
-            <a href="../logout.php" class="nav-link" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
+            <a href="../logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i><span>Logout</span></a>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="container-fluid">
-            <div class="top-navbar">
-                <div class="d-flex align-items-center flex-grow-1">
-                    <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    
-                </div>
-                <div class="nav-icons">
-                    <!-- Notification Bell Dropdown -->
-                    <div class="dropdown d-inline-block">
-                        <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown"
-                            aria-expanded="false" role="button">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge" id="notificationBadge" style="display: none;">0</span>
-                        </div>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
-                            style="width: 300px;">
-                            <li>
-                                <h6 class="dropdown-header">Notifications</h6>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li id="notificationList" style="max-height: 300px; overflow-y: auto;"></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as
-                                    read</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
-                    <i class="bi bi-person-circle avatar-icon"></i>
-                </div>
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
             </div>
+            <div class="nav-icons">
+                <!-- Notification Bell Dropdown -->
+                <div class="dropdown d-inline-block">
+                    <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li id="notificationList"></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
+                    </ul>
+                </div>
 
-            <h2 class="mb-4">Website Settings</h2>
+                <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
+                <i class="bi bi-person-circle avatar-icon"></i>
+            </div>
+        </div>
 
+        <!-- Page Header with Toggle -->
+        <div class="card-header-with-toggle" data-target="settingsSection" data-default-expanded="true">
+            <h2>Website Settings</h2>
+            <i class="bi bi-chevron-right"></i>
+        </div>
+
+        <!-- Settings Section -->
+        <div class="toggle-content show" id="settingsSection">
             <?php if ($message): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <?= htmlspecialchars($message) ?>
@@ -893,18 +1099,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- MAIN SETTINGS FORM -->
             <div class="card">
                 <form method="post" enctype="multipart/form-data" id="settingsForm">
-
                     <!-- MAINTENANCE MODE -->
                     <div class="mb-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" name="maintenance_mode"
                                 id="maintenance_mode" value="1" <?php echo ($settings['maintenance_mode'] ?? '0') == '1' ? 'checked' : ''; ?>>
-                            <label class="form-check-label" for="maintenance_mode">Maintenance Mode (show "Under
-                                Construction" page to visitors)</label>
+                            <label class="form-check-label" for="maintenance_mode">Maintenance Mode</label>
                         </div>
-                        <small class="text-muted d-block">When enabled, all frontend pages will display a maintenance
-                            message. Admin area remains accessible.</small>
+                        <small class="text-muted d-block">When enabled, all frontend pages will display a maintenance message.</small>
                     </div>
+
                     <!-- GENERAL SETTINGS -->
                     <h4 class="mb-3">General</h4>
                     <div class="row g-3">
@@ -924,8 +1128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                             <div class="current-logo mt-2">
                                 <?php if (!empty($settings['site_logo'])): ?>
-                                    <img src="../<?= htmlspecialchars($settings['site_logo']) ?>" alt="Current Logo"
-                                        style="max-height:60px;">
+                                    <img src="../<?= htmlspecialchars($settings['site_logo']) ?>" alt="Current Logo">
                                 <?php else: ?>
                                     <span class="text-muted">No logo uploaded.</span>
                                 <?php endif; ?>
@@ -1002,43 +1205,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <!-- HERO SLIDER MANAGEMENT -->
             <div class="card mt-4">
-                <h4 class="mb-3">Hero Slider Slides</h4>
-                <div id="hero-slides-container">
-                    <?php
-                    $slides = $conn->query("SELECT * FROM hero_slides ORDER BY slide_order ASC, id ASC");
-                    if ($slides->num_rows > 0):
-                        while ($slide = $slides->fetch_assoc()):
-                            ?>
-                            <div class="hero-slide-row d-flex flex-wrap align-items-center gap-2 mb-2"
-                                data-id="<?= $slide['id'] ?>">
-                                <i class="bi bi-grip-vertical"></i>
-                                <input type="text" class="form-control" style="width:250px;"
-                                    value="<?= htmlspecialchars($slide['title']) ?>" placeholder="Title">
-                                <input type="text" class="form-control" style="width:300px;"
-                                    value="<?= htmlspecialchars($slide['image_url']) ?>" placeholder="Image URL">
-                                <button type="button" class="btn btn-sm btn-outline-primary update-slide">Update</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger delete-slide"
-                                    data-id="<?= $slide['id'] ?>">Delete</button>
-                            </div>
-                            <?php
-                        endwhile;
-                    else:
-                        echo '<p class="text-muted">No slides yet. Add one below.</p>';
-                    endif;
-                    ?>
+                <div class="card-header-with-toggle" data-target="heroSlidesSection" data-default-expanded="true">
+                    <h4>Hero Slider Slides</h4>
+                    <i class="bi bi-chevron-right"></i>
                 </div>
+                <div class="toggle-content show" id="heroSlidesSection">
+                    <div id="hero-slides-container">
+                        <?php
+                        $slides = $conn->query("SELECT * FROM hero_slides ORDER BY slide_order ASC, id ASC");
+                        if ($slides->num_rows > 0):
+                            while ($slide = $slides->fetch_assoc()):
+                                ?>
+                                <div class="hero-slide-row d-flex flex-wrap align-items-center gap-2 mb-2"
+                                    data-id="<?= $slide['id'] ?>">
+                                    <i class="bi bi-grip-vertical"></i>
+                                    <input type="text" class="form-control" style="width:250px;"
+                                        value="<?= htmlspecialchars($slide['title']) ?>" placeholder="Title">
+                                    <input type="text" class="form-control" style="width:300px;"
+                                        value="<?= htmlspecialchars($slide['image_url']) ?>" placeholder="Image URL">
+                                    <button type="button" class="btn btn-sm btn-outline-primary update-slide">Update</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger delete-slide"
+                                        data-id="<?= $slide['id'] ?>">Delete</button>
+                                </div>
+                                <?php
+                            endwhile;
+                        else:
+                            echo '<p class="text-muted">No slides yet. Add one below.</p>';
+                        endif;
+                        ?>
+                    </div>
 
-                <hr>
-                <h6>Add New Slide</h6>
-                <div class="row g-2">
-                    <div class="col-md-5">
-                        <input type="text" class="form-control" id="new_slide_title" placeholder="Title">
-                    </div>
-                    <div class="col-md-5">
-                        <input type="text" class="form-control" id="new_slide_image" placeholder="Image URL">
-                    </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-primary" id="add_slide_btn">Add</button>
+                    <hr>
+                    <h6>Add New Slide</h6>
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="new_slide_title" placeholder="Title">
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" class="form-control" id="new_slide_image" placeholder="Image URL">
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-primary" id="add_slide_btn">Add</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1057,6 +1265,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="admin_toggle.js"></script>
     <script>
         // ========== NOTIFICATIONS ==========
         function updateNotifications() {
@@ -1065,18 +1274,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 .then(data => {
                     const badge = document.getElementById('notificationBadge');
                     const list = document.getElementById('notificationList');
-                    if (data.notifications && data.notifications.length > 0) {
-                        badge.textContent = data.notifications.length;
-                        badge.style.display = 'flex';
-                        list.innerHTML = '';
-                        data.notifications.forEach(notif => {
-                            const item = document.createElement('li');
-                            item.innerHTML = `<a class="dropdown-item" href="${notif.link}">${notif.message}<br><small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small></a>`;
-                            list.appendChild(item);
-                        });
-                    } else {
-                        badge.style.display = 'none';
-                        list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                    if (badge && list) {
+                        if (data.notifications?.length) {
+                            badge.textContent = data.notifications.length;
+                            badge.style.display = 'flex';
+                            list.innerHTML = '';
+                            data.notifications.forEach(notif => {
+                                const item = document.createElement('li');
+                                const link = notif.link ? notif.link : '#';
+                                item.innerHTML = `<a class="dropdown-item" href="${link}">
+                                    ${notif.message}<br>
+                                    <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
+                                </a>`;
+                                list.appendChild(item);
+                            });
+                        } else {
+                            badge.style.display = 'none';
+                            list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                        }
                     }
                 });
         }
@@ -1085,234 +1300,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             e.preventDefault();
             fetch('mark_notifications_read.php', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.success) updateNotifications();
-                });
+                .then(data => { if (data.success) updateNotifications(); });
         });
 
         updateNotifications();
         setInterval(updateNotifications, 30000);
 
-        // ========== SIDEBAR TOGGLE (Unified) ==========
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebarToggleBtn = document.getElementById('sidebarToggle'); // chevron inside sidebar
-
-        function toggleSidebar() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.toggle('collapsed');
-                document.body.classList.toggle('sidebar-collapsed');
-            } else {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                if (window.innerWidth >= 992) {
-                    sidebar.classList.toggle('collapsed');
-                    document.body.classList.toggle('sidebar-collapsed');
-                }
+       // ========== HERO SLIDER MANAGEMENT (jQuery) ==========
+$(document).ready(function () {
+    $("#hero-slides-container").sortable({
+        handle: '.bi-grip-vertical',
+        update: function () {
+            const order = [];
+            $('#hero-slides-container .hero-slide-row').each(function (index) {
+                order.push({ id: $(this).data('id'), order: index });
             });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function () {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-        }
-
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.addEventListener('click', function () {
-                if (window.innerWidth < 992) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
-        });
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
-
-            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
+            fetch('reorder_hero_slides.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(order)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Order saved');
+                    } else {
+                        alert('Error saving order: ' + (data.error || 'Unknown'));
                     }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
+                })
+                .catch(error => {
+                    alert('Network error while saving order: ' + error);
                 });
-            });
+        }
+    });
 
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
+    $(document).on('click', '.update-slide', function () {
+        const row = $(this).closest('.hero-slide-row');
+        const id = row.data('id');
+        const title = row.find('input').eq(0).val();
+        const image = row.find('input').eq(1).val();
+
+        fetch('save_hero_slide.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ id, title, image })
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Slide updated');
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown'));
+                }
+            })
+            .catch(error => {
+                alert('Fetch error: ' + error.message);
+            });
+    });
+
+    // FIXED DELETE FUNCTION
+    $(document).on('click', '.delete-slide', function () {
+        const id = $(this).data('id');
+        const row = $(this).closest('.hero-slide-row');
+        
+        if (!confirm('Delete this slide?')) return;
+        
+        // Show loading state
+        const originalText = $(this).text();
+        $(this).text('Deleting...').prop('disabled', true);
+        
+        fetch('delete_hero_slide.php', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({ id: id })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Fade out and remove the row
+                row.fadeOut(300, function() { 
+                    $(this).remove(); 
+                    
+                    // Show message if no slides left
+                    if ($('#hero-slides-container .hero-slide-row').length === 0) {
+                        $('#hero-slides-container').html('<p class="text-muted">No slides yet. Add one below.</p>');
+                    }
                 });
-            });
-
-            updateActiveStates();
-        })();
-        // ========== HERO SLIDER MANAGEMENT (jQuery) ==========
-        $(document).ready(function () {
-            $("#hero-slides-container").sortable({
-                handle: '.bi-grip-vertical',
-                update: function () {
-                    const order = [];
-                    $('#hero-slides-container .hero-slide-row').each(function (index) {
-                        order.push({ id: $(this).data('id'), order: index });
-                    });
-                    fetch('reorder_hero_slides.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(order)
-                    })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                console.log('Order saved');
-                            } else {
-                                alert('Error saving order: ' + (data.error || 'Unknown'));
-                            }
-                        })
-                        .catch(error => {
-                            alert('Network error while saving order: ' + error);
-                        });
-                }
-            });
-
-            $(document).on('click', '.update-slide', function () {
-                const row = $(this).closest('.hero-slide-row');
-                const id = row.data('id');
-                const title = row.find('input').eq(0).val();
-                const image = row.find('input').eq(1).val();
-
-                fetch('save_hero_slide.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ id, title, image })
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            alert('Slide updated');
-                        } else {
-                            alert('Error: ' + (data.error || 'Unknown'));
-                        }
-                    })
-                    .catch(error => {
-                        alert('Fetch error: ' + error.message);
-                    });
-            });
-
-            $(document).on('click', '.delete-slide', function () {
-                if (!confirm('Delete this slide?')) return;
-                const id = $(this).data('id');
-                fetch('delete_hero_slide.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ id })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            $(this).closest('.hero-slide-row').fadeOut(300, function () { $(this).remove(); });
-                        } else {
-                            alert('Error deleting slide: ' + (data.error || 'Unknown'));
-                        }
-                    })
-                    .catch(error => {
-                        alert('Network error while deleting: ' + error);
-                    });
-            });
-
-            $('#add_slide_btn').click(function () {
-                const title = $('#new_slide_title').val();
-                const image = $('#new_slide_image').val();
-                if (!title || !image) {
-                    alert('Title and image are required');
-                    return;
-                }
-
-                fetch('save_hero_slide.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: new URLSearchParams({ title, image })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const newRow = `
-                            <div class="hero-slide-row d-flex flex-wrap align-items-center gap-2 mb-2" data-id="${data.id}">
-                                <i class="bi bi-grip-vertical"></i>
-                                <input type="text" class="form-control" style="width:250px;" value="${title}" placeholder="Title">
-                                <input type="text" class="form-control" style="width:300px;" value="${image}" placeholder="Image URL">
-                                <button type="button" class="btn btn-sm btn-outline-primary update-slide">Update</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger delete-slide" data-id="${data.id}">Delete</button>
-                            </div>
-                        `;
-                            $('#hero-slides-container').append(newRow);
-                            $('#new_slide_title, #new_slide_image').val('');
-                        } else {
-                            alert('Error adding slide: ' + (data.error || 'Unknown'));
-                        }
-                    })
-                    .catch(error => {
-                        alert('Network error while adding: ' + error);
-                    });
-            });
+            } else {
+                alert('Error deleting slide: ' + (data.error || 'Unknown error'));
+                // Reset button
+                $(this).text(originalText).prop('disabled', false);
+            }
+        })
+        .catch(error => {
+            console.error('Delete error:', error);
+            alert('Network error while deleting: ' + error.message);
+            // Reset button
+            $(this).text(originalText).prop('disabled', false);
         });
+    });
+
+    $('#add_slide_btn').click(function () {
+        const title = $('#new_slide_title').val();
+        const image = $('#new_slide_image').val();
+        if (!title || !image) {
+            alert('Title and image are required');
+            return;
+        }
+
+        fetch('save_hero_slide.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ title, image })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const newRow = `
+                    <div class="hero-slide-row d-flex flex-wrap align-items-center gap-2 mb-2" data-id="${data.id}">
+                        <i class="bi bi-grip-vertical"></i>
+                        <input type="text" class="form-control" style="width:250px;" value="${title}" placeholder="Title">
+                        <input type="text" class="form-control" style="width:300px;" value="${image}" placeholder="Image URL">
+                        <button type="button" class="btn btn-sm btn-outline-primary update-slide">Update</button>
+                        <button type="button" class="btn btn-sm btn-outline-danger delete-slide" data-id="${data.id}">Delete</button>
+                    </div>
+                `;
+                    $('#hero-slides-container').append(newRow);
+                    $('#new_slide_title, #new_slide_image').val('');
+                } else {
+                    alert('Error adding slide: ' + (data.error || 'Unknown'));
+                }
+            })
+            .catch(error => {
+                alert('Network error while adding: ' + error);
+            });
+    });
+});
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
-

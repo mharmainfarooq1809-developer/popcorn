@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($update_stmt->execute()) {
             $success = "Theatre updated successfully.";
             $update_stmt->close();
-            
+
             // Refresh theatre data with a new statement
             $refresh_stmt = $conn->prepare("SELECT * FROM theatres WHERE id = ?");
             $refresh_stmt->bind_param("i", $theatre_id);
@@ -74,15 +74,23 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
     <title>Edit Theatre · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
+            :root {
+                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
+            }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* ========== UNIFIED ADMIN CSS (same as dashboard) ========== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ========== UNIFIED ADMIN STYLES ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Heebo', sans-serif;
             background-color: #F8F9FA;
@@ -91,23 +99,70 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             overflow-x: hidden;
             line-height: 1.6;
         }
+
         body.dark-mode {
             background-color: #0B1623;
-            color: #F2F2F2;
+            color: #FFFFFF;
         }
+
         :root {
             --primary: #FFA500;
             --primary-dark: #cc7f00;
             --primary-gold: #FFD966;
             --light-card: #FFFFFF;
-            --dark-card: #0F1C2B;
+            --dark-card: #1a2634;
             --light-text: #212529;
-            --dark-text: #F2F2F2;
+            --dark-text: #FFFFFF;
             --border-light: #E9ECEF;
             --border-dark: #3A414D;
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 80px;
             --transition: all 0.3s ease;
+        }
+
+        /* ===== HEADINGS ===== */
+        h1, h2, h3, h4, h5, h6 {
+            color: #212529;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6 {
+            color: #FFFFFF;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .page-title {
+            color: #FFFFFF;
+        }
+
+        /* Form labels */
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .form-label {
+            color: #FFFFFF;
+        }
+
+        /* Text muted */
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #AAAAAA !important;
         }
 
         /* ===== SIDEBAR OVERLAY ===== */
@@ -118,10 +173,13 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
-        .sidebar-overlay.active { display: block; }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -130,91 +188,142 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: var(--light-card);
-            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            background: #FFFFFF;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
             transition: transform var(--transition), width var(--transition);
             z-index: 1000;
             overflow-y: auto;
-            border-right: 1px solid var(--border-light);
+            border-right: 1px solid #E9ECEF;
             transform: translateX(-100%);
         }
-        .sidebar.active { transform: translateX(0); }
-        .dark-mode .sidebar {
-            background: var(--dark-card);
-            border-right-color: var(--border-dark);
+
+        .sidebar.active {
+            transform: translateX(0);
         }
-        .sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+
+        body.dark-mode .sidebar {
+            background: #1a2634;
+            border-right-color: #3A414D;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
 
         .sidebar .logo-area {
             padding: 24px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #E9ECEF;
         }
-        .dark-mode .sidebar .logo-area { border-bottom-color: var(--border-dark); }
+
+        body.dark-mode .sidebar .logo-area {
+            border-bottom-color: #3A414D;
+        }
+
         .sidebar .logo {
             font-size: 22px;
             font-weight: 700;
-            color: var(--primary-gold);
+            color: #FFD966;
             white-space: nowrap;
             overflow: hidden;
         }
-        .sidebar.collapsed .logo span { display: none; }
+
+        .sidebar.collapsed .logo span {
+            display: none;
+        }
+
         .sidebar .toggle-btn {
             background: none;
             border: none;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
             font-size: 20px;
-            transition: color 0.2s;
         }
-        .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
-        .sidebar .toggle-btn:hover { color: var(--primary); }
+
+        body.dark-mode .sidebar .toggle-btn {
+            color: #FFFFFF;
+        }
+
+        .sidebar .toggle-btn:hover {
+            color: var(--primary);
+        }
 
         .sidebar .nav {
             padding: 12px 0 96px;
-            display: block;
         }
+
         .sidebar .nav-link {
             display: flex;
             align-items: center;
             padding: 9px 16px;
-            color: var(--light-text);
+            color: #212529;
             text-decoration: none;
             border-radius: 0 30px 30px 0;
             margin-right: 10px;
             transition: var(--transition);
             white-space: nowrap;
         }
-        .dark-mode .sidebar .nav-link { color: var(--dark-text); }
-        .sidebar .nav-link i { font-size: 17px; min-width: 24px; text-align: center; }
+
+        body.dark-mode .sidebar .nav-link {
+            color: #FFFFFF;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 17px;
+            min-width: 24px;
+        }
+
         .sidebar .nav-link span {
-            transition: opacity 0.2s, width 0.2s;
+            transition: opacity 0.2s;
             opacity: 1;
-            width: auto;
             overflow: hidden;
             white-space: nowrap;
         }
+
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             width: 0;
         }
-        .sidebar .nav-link:hover { background: rgba(255,165,0,0.1); color: var(--primary); }
-        .sidebar .nav-link.active { background: var(--primary); color: #fff; }
-        .dark-mode .sidebar .nav-link.active { background: var(--primary-dark); }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 165, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        body.dark-mode .sidebar .nav-link.active {
+            background: var(--primary-dark);
+        }
 
         /* Submenu */
-        .nav-item { width: 100%; }
+        .nav-item {
+            width: 100%;
+        }
+
         .nav-link[data-bs-toggle="collapse"] {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .nav-link[data-bs-toggle="collapse"] i.bi-chevron-down { transition: transform 0.3s; }
-        .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down { transform: rotate(180deg); }
-        .submenu-link { padding-left: 42px !important; font-size: 13px; }
-        .submenu-link i { font-size: 14px; min-width: 20px; }
+
+        .nav-link[data-bs-toggle="collapse"] i.bi-chevron-down {
+            transition: transform 0.3s;
+        }
+
+        .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .submenu-link {
+            padding-left: 42px !important;
+            font-size: 13px;
+        }
 
         .sidebar .bottom-section {
             position: absolute;
@@ -222,35 +331,38 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             left: 0;
             width: 100%;
             padding: 14px;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid #E9ECEF;
             background: inherit;
         }
-        .dark-mode .sidebar .bottom-section { border-top-color: var(--border-dark); }
+
+        body.dark-mode .sidebar .bottom-section {
+            border-top-color: #3A414D;
+        }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 0;
-            padding: 20px 30px;
-            transition: margin-left var(--transition), width var(--transition);
+            padding: 20px;
+            transition: margin-left var(--transition);
             min-height: 100vh;
             width: 100%;
             overflow-x: hidden;
         }
 
         @media (min-width: 992px) {
-            .sidebar { transform: translateX(0); }
+            .sidebar {
+                transform: translateX(0);
+            }
+
             .main-content {
                 margin-left: var(--sidebar-width);
                 width: calc(100% - var(--sidebar-width));
             }
+
             body.sidebar-collapsed .main-content {
                 margin-left: var(--sidebar-collapsed-width);
                 width: calc(100% - var(--sidebar-collapsed-width));
             }
-        }
-
-        @media (max-width: 991px) {
-            .main-content { margin-left: 0; width: 100%; }
         }
 
         /* ===== TOP NAVBAR ===== */
@@ -258,61 +370,39 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 30px;
+            padding: 10px 0 20px;
             flex-wrap: wrap;
             gap: 15px;
         }
-        .menu-toggle {
+
+        .menu-toggle, .menu-toggle-mobile {
             font-size: 24px;
             cursor: pointer;
-            display: inline-block;
         }
-        .search-bar {
-            position: relative;
-            width: 300px;
-            max-width: 100%;
+
+        @media (min-width: 992px) {
+            .menu-toggle-mobile {
+                display: none;
+            }
         }
-        .search-bar input {
-            width: 100%;
-            padding: 12px 40px 12px 20px;
-            border-radius: 40px;
-            border: 1px solid var(--border-light);
-            background: var(--light-card);
-            color: var(--light-text);
-            transition: var(--transition);
-        }
-        .dark-mode .search-bar input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
-        }
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255,165,0,0.2);
-        }
-        .search-bar i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
+
         .nav-icons {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+
         .nav-icons .icon {
             position: relative;
             font-size: 22px;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .dark-mode .nav-icons .icon { color: var(--dark-text); }
-        .nav-icons .icon:hover { color: var(--primary); }
+
+        body.dark-mode .nav-icons .icon {
+            color: #FFFFFF;
+        }
+
         .nav-icons .badge {
             position: absolute;
             top: -5px;
@@ -327,55 +417,91 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             align-items: center;
             justify-content: center;
         }
+
         .avatar-icon {
             font-size: 2.2rem;
             color: var(--primary);
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .avatar-icon:hover { color: var(--primary-dark); }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 22px;
+            color: #212529;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #FFFFFF;
+        }
 
         /* ===== CARDS & FORMS ===== */
         .card {
             border: none;
             border-radius: 20px;
-            padding: 14px;
-            background: var(--light-card);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: var(--transition);
+            padding: 25px;
+            background: #FFFFFF;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
+            width: 100%;
+            overflow: hidden;
         }
-        .dark-mode .card {
-            background: var(--dark-card);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+        body.dark-mode .card {
+            background: #1a2634;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
-        .form-label {
-            font-weight: 600;
-            color: #6c757d;
-            margin-bottom: 5px;
-        }
-        .dark-mode .form-label { color: #adb5bd; }
-        .form-control, .form-select, .form-check-input {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
-            color: var(--light-text);
+
+        .form-control,
+        .form-select {
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            color: #212529;
             border-radius: 10px;
             padding: 10px 15px;
             transition: var(--transition);
         }
-        .dark-mode .form-control, .dark-mode .form-select, .dark-mode .form-check-input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #1a2634;
+            border-color: #3A414D;
+            color: #FFFFFF;
         }
-        .form-control:focus, .form-select:focus {
+
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255,165,0,0.2);
+            box-shadow: 0 0 0 4px rgba(255, 165, 0, 0.2);
             outline: none;
         }
+
+        textarea.form-control {
+            min-height: 60px;
+            resize: vertical;
+        }
+
+        /* Checkbox styling */
+        .form-check-input {
+            background-color: #FFFFFF;
+            border-color: #E9ECEF;
+        }
+
+        body.dark-mode .form-check-input {
+            background-color: #1a2634;
+            border-color: #3A414D;
+        }
+
         .form-check-input:checked {
             background-color: var(--primary);
             border-color: var(--primary);
+        }
+
+        .form-check-label {
+            color: #212529;
+        }
+
+        body.dark-mode .form-check-label {
+            color: #FFFFFF;
         }
 
         /* Image preview styles */
@@ -384,294 +510,337 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             text-align: center;
             display: none;
         }
+
         .image-preview-container.show {
             display: block;
         }
+
         .image-preview {
             max-width: 100%;
             max-height: 200px;
             border-radius: 10px;
-            border: 2px solid var(--border-light);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 2px solid #E9ECEF;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             object-fit: contain;
             background: #f8f9fa;
         }
-        .dark-mode .image-preview {
-            border-color: var(--border-dark);
-            background: #1a1a1a;
+
+        body.dark-mode .image-preview {
+            border-color: #3A414D;
+            background: #2a3644;
         }
+
         .image-info {
             font-size: 12px;
             margin-top: 8px;
-            padding: 5px 10px;
-            background: var(--border-light);
+            padding: 5px 15px;
+            background: #E9ECEF;
             border-radius: 20px;
             display: inline-block;
-            color: var(--light-text);
+            color: #212529;
         }
-        .dark-mode .image-info {
-            background: var(--border-dark);
-            color: var(--dark-text);
+
+        body.dark-mode .image-info {
+            background: #2a3644;
+            color: #FFFFFF;
         }
 
         /* ===== BUTTONS ===== */
         .btn-primary {
             background: linear-gradient(145deg, var(--primary), var(--primary-dark));
-            color: #fff;
+            color: #FFFFFF;
             border: none;
             border-radius: 40px;
             padding: 10px 24px;
-            box-shadow: 0 4px 14px rgba(255,165,0,0.3);
+            box-shadow: 0 4px 14px rgba(255, 165, 0, 0.3);
             transition: all 0.2s;
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,165,0,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
         }
+
         .btn-secondary {
-            background: var(--border-light);
-            color: var(--light-text);
-            margin-left: 10px;
+            background: #E9ECEF;
+            color: #212529;
+            border: none;
             border-radius: 40px;
             padding: 10px 24px;
-            border: none;
+            margin-left: 10px;
+            transition: all 0.2s;
         }
+
+        body.dark-mode .btn-secondary {
+            background: #2a3644;
+            color: #FFFFFF;
+        }
+
         .btn-secondary:hover {
-            background: var(--border-dark);
-            color: #fff;
+            background: var(--primary);
+            color: #FFFFFF;
         }
 
         /* ===== ALERTS ===== */
         .alert-success {
-            background: rgba(40,167,69,0.15);
+            background: rgba(40, 167, 69, 0.15);
             color: #28a745;
             border: none;
             border-radius: 10px;
-            padding: 9px 16px;
+            padding: 12px 20px;
         }
+
         .alert-danger {
-            background: rgba(220,53,69,0.15);
+            background: rgba(220, 53, 69, 0.15);
             color: #dc3545;
             border: none;
             border-radius: 10px;
             padding: 12px 20px;
         }
 
+        body.dark-mode .alert-success {
+            background: rgba(40, 167, 69, 0.25);
+            color: #7acf7a;
+        }
+
+        body.dark-mode .alert-danger {
+            background: rgba(220, 53, 69, 0.25);
+            color: #ff8a92;
+        }
+
         /* ===== FOOTER ===== */
         .footer {
-            background: var(--light-card);
-            border-top: 1px solid var(--border-light);
-            padding: 30px 0;
-            margin-top: 60px;
+            background: #FFFFFF;
+            border-top: 1px solid #E9ECEF;
+            padding: 20px 0;
+            margin-top: 40px;
             color: #6c757d;
         }
-        .dark-mode .footer {
-            background: var(--dark-card);
-            border-top-color: var(--border-dark);
-            color: #adb5bd;
+
+        body.dark-mode .footer {
+            background: #1a2634;
+            border-top-color: #3A414D;
+            color: #AAAAAA;
         }
 
         /* ===== DROPDOWNS ===== */
         .dropdown-menu {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             max-height: 400px;
             overflow-y: auto;
         }
-        .dark-mode .dropdown-menu {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
+
+        body.dark-mode .dropdown-menu {
+            background: #1a2634;
+            border-color: #3A414D;
         }
+
         .dropdown-item {
-            color: var(--light-text);
-            white-space: normal;
-            word-wrap: break-word;
+            color: #212529;
+            padding: 10px 20px;
         }
-        .dark-mode .dropdown-item { color: var(--dark-text); }
-        .dropdown-item:hover { background: rgba(255,165,0,0.1); }
+
+        body.dark-mode .dropdown-item {
+            color: #FFFFFF;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        /* ===== HEADINGS WITH TOGGLE EFFECT ===== */
+        .card-header-with-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            padding: 5px 0;
+            border-bottom: 1px solid transparent;
+        }
+
+        .card-header-with-toggle:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        .card-header-with-toggle h2 {
+            margin-bottom: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .card-header-with-toggle h2 {
+            color: #FFFFFF;
+        }
+
+        .card-header-with-toggle i {
+            font-size: 24px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .card-header-with-toggle:hover i {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .card-header-with-toggle.active i {
+            transform: rotate(90deg);
+            color: var(--primary);
+        }
+
+        body.dark-mode .card-header-with-toggle i {
+            color: #AAAAAA;
+        }
+
+        body.dark-mode .card-header-with-toggle:hover i {
+            color: #FFD966;
+        }
+
+        /* Toggle content animation */
+        .toggle-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+        }
+
+        .toggle-content.show {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 20px;
+        }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 992px) {
-            .sidebar { left: -100%; }
-            .sidebar.active { left: 0; }
-            .main-content { margin-left: 0 !important; width: 100% !important; }
-            .search-bar { width: 250px; }
-        }
         @media (max-width: 768px) {
-            .top-navbar { flex-direction: column; align-items: stretch; }
-            .search-bar { width: 100%; }
-            .nav-icons { justify-content: flex-end; }
+            .main-content {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .btn-secondary {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .col-auto {
+                width: 50%;
+            }
         }
     </style>
     <style id="admin-sidebar-unify">
-        /* Unified admin sidebar animation + responsive behavior */
         .sidebar {
             transition: width 0.28s ease, transform 0.28s ease;
             will-change: width, transform;
         }
+
         .main-content {
             transition: margin-left 0.28s ease, width 0.28s ease;
         }
+
         .sidebar .logo span,
         .sidebar .nav-link span {
-            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
+            transition: opacity 0.22s ease, max-width 0.22s ease;
             max-width: 180px;
             overflow: hidden;
         }
+
         .sidebar.collapsed {
-            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
+            width: var(--sidebar-collapsed-width) !important;
         }
+
         .sidebar.collapsed .logo span,
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             max-width: 0;
-            margin: 0;
         }
+
         #sidebarToggle i {
             transition: transform 0.25s ease;
         }
+
         body.sidebar-collapsed #sidebarToggle i {
             transform: rotate(180deg);
         }
 
-        /* Remove admin search bars everywhere */
         .search-bar {
             display: none !important;
         }
+
         .top-navbar {
             justify-content: flex-end;
             gap: 12px;
-        }
-
-        /* Extra safety for small screens */
-        @media (max-width: 991.98px) {
-            .main-content {
-                margin-left: 0 !important;
-                width: 100% !important;
-            }
-            .top-navbar {
-                flex-wrap: wrap;
-            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Sidebar Overlay (mobile) -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Sidebar (with submenus and active link) -->
+    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="logo-area">
-            <div class="logo"><i class="bi bi-camera-reels me-2"></i><span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span></div>
+            <div class="logo">
+                <i class="bi bi-camera-reels me-2"></i>
+                <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
+            </div>
             <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
         </div>
 
         <div class="nav">
-            <!-- Dashboard -->
-            <a href="dashboard.php" class="nav-link" title="Dashboard">
-                <i class="bi bi-speedometer2"></i>
-                <span>Dashboard</span>
-            </a>
+            <a href="dashboard.php" class="nav-link"><i class="bi bi-speedometer2"></i><span>Dashboard</span></a>
+            <a href="movies.php" class="nav-link"><i class="bi bi-film"></i><span>Movies</span></a>
 
-            <!-- Movies -->
-            <a href="movies.php" class="nav-link" title="Movies">
-                <i class="bi bi-film"></i>
-                <span>Movies</span>
-            </a>
-
-            <!-- Theatres (with submenu) – active sub-item -->
+            <!-- Theatres submenu - expanded -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="true" aria-controls="theatresSubmenu" title="Theatres">
-                    <i class="bi bi-building"></i>
-                    <span>Theatres</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link active" data-bs-toggle="collapse" href="#theatresSubmenu" role="button" aria-expanded="true">
+                    <i class="bi bi-building"></i><span>Theatres</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse show" id="theatresSubmenu">
-                    <a href="theatres.php" class="nav-link submenu-link" title="All Theatres">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Theatres</span>
-                    </a>
-                    <a href="add_theatre.php" class="nav-link submenu-link" title="Add Theatre">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add Theatre</span>
-                    </a>
-                    
+                    <a href="theatres.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Theatres</span></a>
+                    <a href="add_theatre.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add Theatre</span></a>
                 </div>
             </div>
 
-            <!-- Bookings (direct link) -->
-            <a href="bookings.php" class="nav-link" title="Bookings">
-                <i class="bi bi-ticket"></i>
-                <span>Bookings</span>
-            </a>
+            <a href="bookings.php" class="nav-link"><i class="bi bi-ticket"></i><span>Bookings</span></a>
 
-            <!-- Users (with submenu) -->
+            <!-- Users submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button"
-                    aria-expanded="false" aria-controls="usersSubmenu" title="Users">
-                    <i class="bi bi-people"></i>
-                    <span>Users</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#usersSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-people"></i><span>Users</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="usersSubmenu">
-                    <a href="users.php" class="nav-link submenu-link" title="All Users">
-                        <i class="bi bi-list-ul"></i>
-                        <span>All Users</span>
-                    </a>
-                    <a href="add_user.php" class="nav-link submenu-link" title="Add User">
-                        <i class="bi bi-plus-circle"></i>
-                        <span>Add User</span>
-                    </a>
+                    <a href="users.php" class="nav-link submenu-link"><i class="bi bi-list-ul"></i><span>All Users</span></a>
+                    <a href="add_user.php" class="nav-link submenu-link"><i class="bi bi-plus-circle"></i><span>Add User</span></a>
                 </div>
             </div>
 
-            <!-- Analytics -->
-            <a href="analytics.php" class="nav-link" title="Analytics">
-                <i class="bi bi-graph-up"></i>
-                <span>Analytics</span>
-            </a>
+            <a href="analytics.php" class="nav-link"><i class="bi bi-graph-up"></i><span>Analytics</span></a>
+            <a href="messages.php" class="nav-link"><i class="bi bi-chat-dots"></i><span>Messages</span></a>
+            <a href="votes.php" class="nav-link"><i class="bi bi-bar-chart"></i><span>Voting</span></a>
 
-            <!-- Messages -->
-            <a href="messages.php" class="nav-link" title="Messages">
-                <i class="bi bi-chat-dots"></i>
-                <span>Messages</span>
-            </a>
-
-            <a href="votes.php" class="nav-link" title="Voting">
-                <i class="bi bi-bar-chart"></i>
-                <span>Voting</span>
-            </a>
-
-            <!-- Settings (with submenu) -->
+            <!-- Settings submenu -->
             <div class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false" aria-controls="settingsSubmenu" title="Settings">
-                    <i class="bi bi-gear"></i>
-                    <span>Settings</span>
-                    <i class="bi bi-chevron-down ms-auto"></i>
+                <a class="nav-link" data-bs-toggle="collapse" href="#settingsSubmenu" role="button" aria-expanded="false">
+                    <i class="bi bi-gear"></i><span>Settings</span><i class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <div class="collapse" id="settingsSubmenu">
-                    <a href="settings.php" class="nav-link submenu-link" title="General Settings">
-                        <i class="bi bi-sliders2"></i>
-                        <span>General</span>
-                    </a>
-                    <a href="email_settings.php" class="nav-link submenu-link" title="Email Settings">
-                        <i class="bi bi-envelope"></i>
-                        <span>Email</span>
-                    </a>
+                    <a href="settings.php" class="nav-link submenu-link"><i class="bi bi-sliders2"></i><span>General</span></a>
+                    <a href="email_settings.php" class="nav-link submenu-link"><i class="bi bi-envelope"></i><span>Email</span></a>
                 </div>
             </div>
         </div>
 
         <div class="bottom-section">
-            <a href="../logout.php" class="nav-link" title="Logout">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
+            <a href="../logout.php" class="nav-link"><i class="bi bi-box-arrow-right"></i><span>Logout</span></a>
         </div>
     </div>
 
@@ -679,125 +848,147 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
     <div class="main-content">
         <div class="container-fluid">
             <div class="top-navbar">
-                <div class="d-flex align-items-center flex-grow-1">
+                <div class="d-flex align-items-center">
                     <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
+                    <i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i>
                 </div>
                 <div class="nav-icons">
-                    <!-- Notification Bell Dropdown -->
                     <div class="dropdown d-inline-block">
-                        <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                        <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                             <i class="bi bi-bell"></i>
                             <span class="badge" id="notificationBadge" style="display: none;">0</span>
                         </div>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
+                        <ul class="dropdown-menu dropdown-menu-end" style="width: 300px;">
                             <li><h6 class="dropdown-header">Notifications</h6></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li id="notificationList" style="max-height: 300px; overflow-y: auto;"></li>
+                            <li id="notificationList"></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
                         </ul>
                     </div>
-
                     <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
                     <i class="bi bi-person-circle avatar-icon"></i>
                 </div>
             </div>
 
-            <h2 class="mb-4">Edit Theatre: <?= htmlspecialchars($theatre['name']) ?></h2>
+            <!-- Page Header with Toggle -->
+            <div class="card-header-with-toggle" data-target="editTheatreSection" data-default-expanded="true">
+                <h2>Edit Theatre: <?= htmlspecialchars($theatre['name']) ?></h2>
+                <i class="bi bi-chevron-right"></i>
+            </div>
 
-            <?php if ($error): ?>
-                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-            <?php endif; ?>
-            <?php if ($success): ?>
-                <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
-            <?php endif; ?>
+            <!-- Edit Form Section -->
+            <div class="toggle-content show" id="editTheatreSection">
+                <?php if ($error): ?>
+                    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
+                <?php if ($success): ?>
+                    <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                <?php endif; ?>
 
-            <form method="post" class="card p-4">
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">Theatre Name *</label>
-                        <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($theatre['name']) ?>" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">City *</label>
-                        <input type="text" name="city" class="form-control" value="<?= htmlspecialchars($theatre['city']) ?>" required>
-                    </div>
-                    <div class="col-md-12">
-                        <label class="form-label">Address / Location *</label>
-                        <input type="text" name="location" class="form-control" value="<?= htmlspecialchars($theatre['location']) ?>" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Rating (0-5)</label>
-                        <input type="number" step="0.1" min="0" max="5" name="rating" class="form-control" value="<?= $theatre['rating'] ?>">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Average Ticket Price ($)</label>
-                        <input type="number" step="0.01" min="0" name="price" class="form-control" value="<?= $theatre['price'] ?>">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">Image URL or Data URL</label>
-                        <textarea name="image_url" id="image_url" class="form-control" rows="2" placeholder="Enter image URL or data:image URL"><?= htmlspecialchars($theatre['image_url'] ?? '') ?></textarea>
-                        <small class="text-muted">Supports: HTTPS, HTTP, data:image (base64)</small>
-                    </div>
-                    
-                    <!-- Image Preview Container -->
-                    <div class="col-md-12">
-                        <div class="image-preview-container" id="imagePreviewContainer">
-                            <img id="imagePreview" class="image-preview" src="<?= htmlspecialchars($theatre['image_url'] ?? '') ?>" alt="Preview">
-                            <div class="image-info" id="imageInfo"></div>
+                <form method="post" class="card">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Theatre Name *</label>
+                            <input type="text" name="name" class="form-control"
+                                value="<?= htmlspecialchars($theatre['name']) ?>" required>
                         </div>
-                    </div>
-                    
-                    <div class="col-md-12">
-                        <label class="form-label">Facilities</label>
-                        <div class="row">
-                            <?php foreach ($facility_options as $fac): ?>
-                                <div class="col-auto">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="facilities[]" value="<?= $fac ?>" id="fac_<?= $fac ?>" <?= in_array($fac, $current_facilities) ? 'checked' : '' ?>>
-                                        <label class="form-check-label" for="fac_<?= $fac ?>"><?= $fac ?></label>
+                        <div class="col-md-6">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-control"
+                                value="<?= htmlspecialchars($theatre['city']) ?>" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Address / Location *</label>
+                            <input type="text" name="location" class="form-control"
+                                value="<?= htmlspecialchars($theatre['location']) ?>" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rating (0-5)</label>
+                            <input type="number" step="0.1" min="0" max="5" name="rating" class="form-control"
+                                value="<?= $theatre['rating'] ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ticket Price ($)</label>
+                            <input type="number" step="0.01" min="0" name="price" class="form-control"
+                                value="<?= $theatre['price'] ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Image URL</label>
+                            <textarea name="image_url" id="image_url" class="form-control" rows="2"
+                                placeholder="Enter image URL"><?= htmlspecialchars($theatre['image_url'] ?? '') ?></textarea>
+                            <small class="text-muted">Supports: http://, https://, data:image</small>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="col-12">
+                            <div class="image-preview-container" id="imagePreviewContainer">
+                                <img id="imagePreview" class="image-preview"
+                                    src="<?= htmlspecialchars($theatre['image_url'] ?? '') ?>" alt="Preview">
+                                <div class="image-info" id="imageInfo"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Facilities</label>
+                            <div class="row g-2">
+                                <?php foreach ($facility_options as $fac): ?>
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="facilities[]"
+                                                value="<?= $fac ?>" id="fac_<?= $fac ?>"
+                                                <?= in_array($fac, $current_facilities) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="fac_<?= $fac ?>"><?= $fac ?></label>
+                                        </div>
                                     </div>
-                                </div>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">Update Theatre</button>
+                            <a href="theatres.php" class="btn btn-secondary">Cancel</a>
                         </div>
                     </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Update Theatre</button>
-                        <a href="theatres.php" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="admin_toggle.js"></script>
     <script>
-        // ========== NOTIFICATIONS ==========
+        // Notifications
         function updateNotifications() {
             fetch('get_notifications.php')
                 .then(res => res.json())
                 .then(data => {
                     const badge = document.getElementById('notificationBadge');
                     const list = document.getElementById('notificationList');
-                    if (data.notifications && data.notifications.length > 0) {
-                        badge.textContent = data.notifications.length;
-                        badge.style.display = 'flex';
-                        list.innerHTML = '';
-                        data.notifications.forEach(notif => {
-                            const item = document.createElement('li');
-                            item.innerHTML = `<a class="dropdown-item" href="${notif.link}">${notif.message}<br><small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small></a>`;
-                            list.appendChild(item);
-                        });
-                    } else {
-                        badge.style.display = 'none';
-                        list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                    if (badge && list) {
+                        if (data.notifications?.length) {
+                            badge.textContent = data.notifications.length;
+                            badge.style.display = 'flex';
+                            list.innerHTML = '';
+                            data.notifications.forEach(notif => {
+                                const item = document.createElement('li');
+                                item.innerHTML = `<a class="dropdown-item" href="${notif.link || '#'}">
+                                    ${notif.message}<br>
+                                    <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
+                                </a>`;
+                                list.appendChild(item);
+                            });
+                        } else {
+                            badge.style.display = 'none';
+                            list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                        }
                     }
                 });
         }
@@ -806,15 +997,13 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             e.preventDefault();
             fetch('mark_notifications_read.php', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.success) updateNotifications();
-                });
+                .then(data => { if (data.success) updateNotifications(); });
         });
 
         updateNotifications();
         setInterval(updateNotifications, 30000);
 
-        // ========== IMAGE PREVIEW FUNCTION ==========
+        // Image preview
         function isDataUrl(url) {
             return url && url.startsWith('data:');
         }
@@ -824,48 +1013,40 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             const previewContainer = document.getElementById('imagePreviewContainer');
             const previewImg = document.getElementById('imagePreview');
             const imageInfo = document.getElementById('imageInfo');
-            
+
             const url = urlInput.value.trim();
-            
+
             if (url) {
-                // Show preview container
                 previewContainer.classList.add('show');
                 previewImg.src = url;
-                
-                // Display info about the image source
+
                 if (isDataUrl(url)) {
-                    const dataUrlType = url.split(';')[0] || 'data:image';
                     const length = url.length;
-                    imageInfo.innerHTML = `📸 Data URL · Type: ${dataUrlType} · Length: ${length} characters`;
-                    imageInfo.style.color = '#28a745';
+                    imageInfo.innerHTML = `📸 Data URL · Length: ${length} characters`;
                 } else if (url.startsWith('http')) {
-                    imageInfo.innerHTML = `🌐 External URL: ${url.substring(0, 50)}${url.length > 50 ? '...' : ''}`;
-                    imageInfo.style.color = '#0066cc';
+                    imageInfo.innerHTML = `🌐 External URL`;
                 } else {
-                    imageInfo.innerHTML = `📁 Local path: ${url}`;
-                    imageInfo.style.color = '#6c757d';
+                    imageInfo.innerHTML = `📁 Local path`;
                 }
-                
-                // Handle image load error
+
                 previewImg.onerror = function() {
-                    imageInfo.innerHTML = '⚠️ Image failed to load. Please check the URL.';
+                    imageInfo.innerHTML = '⚠️ Image failed to load';
                     imageInfo.style.color = '#dc3545';
                 };
-                
+
                 previewImg.onload = function() {
+                    imageInfo.style.color = '';
                     if (!imageInfo.innerHTML.includes('⚠️')) {
-                        imageInfo.innerHTML += ` · Size: ${this.naturalWidth} x ${this.naturalHeight}px`;
+                        imageInfo.innerHTML += ` · ${this.naturalWidth} x ${this.naturalHeight}px`;
                     }
                 };
             } else {
-                // Hide preview container if no URL
                 previewContainer.classList.remove('show');
                 previewImg.src = '';
                 imageInfo.innerHTML = '';
             }
         }
 
-        // ========== IMAGE INPUT HANDLER WITH DEBOUNCE ==========
         let previewTimeout;
         const imageUrlInput = document.getElementById('image_url');
         if (imageUrlInput) {
@@ -875,126 +1056,7 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
             });
         }
 
-        // Run preview on page load
-        window.addEventListener('load', function() {
-            previewImage();
-        });
-
-        // ========== SIDEBAR TOGGLE (Unified) ==========
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebarToggleBtn = document.getElementById('sidebarToggle'); // chevron inside sidebar
-
-        function toggleSidebar() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.toggle('collapsed');
-                document.body.classList.toggle('sidebar-collapsed');
-            } else {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (window.innerWidth >= 992) {
-                    sidebar.classList.toggle('collapsed');
-                    document.body.classList.toggle('sidebar-collapsed');
-                }
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-        }
-
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
-        });
-
-        // ========== DARK MODE TOGGLE ==========
-        const themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', function() {
-                document.body.classList.toggle('dark-mode');
-                const icon = this.querySelector('i');
-                if (icon) {
-                    icon.classList.toggle('bi-moon');
-                    icon.classList.toggle('bi-sun');
-                }
-            });
-        }
-
-        // ========== KEEP RELATED SUBMENUS OPEN ==========
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
-
-            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
-                    }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
-                });
-            });
-
-            updateActiveStates();
-        })();
+        window.addEventListener('load', previewImage);
     </script>
 </body>
 </html>
-

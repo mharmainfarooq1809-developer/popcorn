@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once 'db_connect.php';
 require_once 'settings_init.php'; // load global settings
@@ -56,11 +56,11 @@ if (!$no_movies) {
     $default_movie = $movies[0];
     $default_movie_id = $default_movie['id'];
 
-    // Fetch showtimes with theatre price – adjust join condition if needed
+    // Fetch showtimes with theatre price
     $showtimes_query = $conn->prepare("
         SELECT s.*, t.price
         FROM showtimes s
-        LEFT JOIN theatres t ON s.theatre = t.name   -- change to t.id if needed
+        LEFT JOIN theatres t ON s.theatre = t.name
         WHERE s.movie_id = ? 
           AND s.status = 'active' 
           AND (s.show_date > CURDATE() OR (s.show_date = CURDATE() AND s.show_time >= CURTIME()))
@@ -70,7 +70,6 @@ if (!$no_movies) {
     $showtimes_query->execute();
     $showtimes_result = $showtimes_query->get_result();
     while ($st = $showtimes_result->fetch_assoc()) {
-        // Ensure price is set
         if ($st['price'] === null) $st['price'] = 15.00;
         $default_showtimes[] = $st;
     }
@@ -82,7 +81,7 @@ if (!$no_movies) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Booking Â· <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
@@ -202,6 +201,8 @@ if (!$no_movies) {
         .logo:hover {
             color: var(--popcorn-orange);
         }
+
+        .logo img { max-height: 60px; width: auto; display: block; }
 
         /* Mobile menu toggle */
         .menu-toggle {
@@ -892,10 +893,10 @@ if (!$no_movies) {
             color: var(--popcorn-gold);
         }
 
-        /* Payment methods */
+        /* Payment methods - UPDATED: Credit Card and e-Wallet only (JazzCash removed) */
         .payment-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 20px 0;
         }
@@ -944,13 +945,6 @@ if (!$no_movies) {
             display: block;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
         .form-group {
             margin-bottom: 20px;
         }
@@ -988,7 +982,14 @@ if (!$no_movies) {
             border-color: var(--error);
         }
 
-        /* Expiry row */
+        /* Card details specific styles */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
         .expiry-row {
             display: flex;
             gap: 10px;
@@ -1128,11 +1129,12 @@ if (!$no_movies) {
             .seat i {
                 font-size: 14px;
             }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
         }
-
-        /* logo image sizing */
-        .logo img { max-height: 60px; width: auto; display: block; }
-        @media (max-width: 768px) { .logo img { max-height: 45px; } }
     </style>
 </head>
 
@@ -1333,16 +1335,12 @@ if (!$no_movies) {
                     <span class="total-amount" id="totalAmount">$30.00</span>
                 </div>
 
-                <!-- Payment method -->
+                <!-- Payment methods - UPDATED: Credit Card and e-Wallet only (JazzCash removed) -->
                 <div class="section-subtitle"><i class="fas fa-credit-card"></i> Payment Method</div>
                 <div class="payment-grid">
                     <div class="payment-card selected" data-payment="card">
                         <i class="fas fa-credit-card"></i>
                         <span>Credit Card</span>
-                    </div>
-                    <div class="payment-card" data-payment="jazzcash">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>JazzCash</span>
                     </div>
                     <div class="payment-card" data-payment="ewallet">
                         <i class="fas fa-wallet"></i>
@@ -1392,25 +1390,14 @@ if (!$no_movies) {
                     </div>
                 </div>
 
-                <!-- Payment details: JazzCash -->
-                <div class="payment-details" id="jazzcashDetails">
-                    <div class="form-group">
-                        <label>JazzCash Number</label>
-                        <input type="text" id="jazzcashNumber" placeholder="03XXXXXXXXX" maxlength="11">
-                        <div id="jazzcash-error" class="validation-error">Enter a valid 11-digit JazzCash number (starting
-                            with 03).</div>
-                    </div>
-                </div>
-
                 <!-- Payment details: e-Wallet -->
                 <div class="payment-details" id="ewalletDetails">
                     <div class="form-group">
                         <label>Select e-Wallet Provider</label>
                         <select id="ewalletProvider">
                             <option value="">Choose provider</option>
-                            <option value="paytm">Paytm</option>
                             <option value="easypaisa">Easypaisa</option>
-                            <option value="skrill">Skrill</option>
+                            <option value="jazzcash">JazzCash</option>
                             <option value="payoneer">Payoneer</option>
                         </select>
                         <div id="provider-error" class="validation-error">Please select a provider.</div>
@@ -1448,7 +1435,7 @@ if (!$no_movies) {
 
     <footer>
         <div class="container">
-            <p><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub Cinemas. Secure payment • Best seat guarantee') ?></p>
+            <p><?= htmlspecialchars($settings['footer_text'] ?? 'Â© '.date('Y').' Popcorn Hub Cinemas. Secure payment Â· Best seat guarantee') ?></p>
         </div>
     </footer>
 
@@ -1497,10 +1484,10 @@ if (!$no_movies) {
 
         <?php if (!$no_movies): ?>
             // ================= BOOKING LOGIC =================
-            let selectedPayment = 'card';
+            let selectedPayment = 'card'; // Default to Credit Card
             let timerInterval = null;
             let selectedSeats = [];
-            let currentPrice = <?= $default_showtimes[0]['price'] ?? 15.00 ?>; // will be updated on showtime change
+            let currentPrice = <?= $default_showtimes[0]['price'] ?? 15.00 ?>;
             const discountEligible = <?= json_encode($discount_eligible) ?>;
 
             // Movies array from PHP
@@ -1520,9 +1507,8 @@ if (!$no_movies) {
                 const seatGrid = document.getElementById('seat-grid');
                 const seatContainer = document.querySelector('.seat-container');
                 if (seatGrid) {
-                    seatGrid.innerHTML = ''; // clear any seats
+                    seatGrid.innerHTML = '';
                 }
-                // Create a message element if it doesn't exist
                 let msgEl = document.getElementById('no-showtime-msg');
                 if (!msgEl) {
                     msgEl = document.createElement('div');
@@ -1532,23 +1518,21 @@ if (!$no_movies) {
                     msgEl.innerHTML = '<i class="fas fa-calendar-times fa-3x mb-3"></i><br>No showtimes available for this movie. Please select another movie.';
                     seatContainer?.appendChild(msgEl);
                 }
-                // Hide the seat grid (if any) and show the message
                 if (seatGrid) seatGrid.style.display = 'none';
                 msgEl.style.display = 'block';
             }
 
-            // Helper function to restore seat grid after showtimes are loaded
             function hideNoShowtimesMessage() {
                 const msgEl = document.getElementById('no-showtime-msg');
                 const seatGrid = document.getElementById('seat-grid');
                 if (msgEl) msgEl.style.display = 'none';
-                if (seatGrid) seatGrid.style.display = 'flex'; // or 'block' depending on your layout
+                if (seatGrid) seatGrid.style.display = 'flex';
             }
 
             // ================= FUNCTION DEFINITIONS =================
             function loadSeats(showtimeId) {
                 console.log('Loading seats for showtime:', showtimeId);
-                hideNoShowtimesMessage(); // ensure message is hidden
+                hideNoShowtimesMessage();
                 fetch('get_seats.php?showtime_id=' + showtimeId)
                     .then(response => response.json())
                     .then(data => {
@@ -1603,12 +1587,12 @@ if (!$no_movies) {
                 document.querySelectorAll('.datetime-card').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
                 currentShowtimeId = parseInt(card.dataset.showtimeId);
-                currentPrice = parseFloat(card.dataset.price) || 15.00; // update price
+                currentPrice = parseFloat(card.dataset.price) || 15.00;
                 document.getElementById('selectedShowtimeId').value = currentShowtimeId;
                 document.getElementById('movieTheatre').innerText = card.dataset.theatre;
                 console.log('Showtime selected, ID:', currentShowtimeId, 'Price:', currentPrice);
                 loadSeats(currentShowtimeId);
-                calculateTotal(); // recalculate total with new price
+                calculateTotal();
             }
 
             function getRequiredSeats() {
@@ -1666,7 +1650,6 @@ if (!$no_movies) {
                 if (discountEligible) {
                     total = total * 0.9;
                 }
-                // Optional: console.log('Calculating total: price='+currentPrice+', adults='+adults+', children='+children+', total='+total);
                 document.getElementById('totalAmount').textContent = '$' + total.toFixed(2);
             }
 
@@ -1683,7 +1666,6 @@ if (!$no_movies) {
             function validateName(name) { return /^[A-Za-z\s]{2,50}$/.test(name); }
             function validateCardNumber(num) { return /^\d{16}$/.test(num.replace(/\s/g, '')); }
             function validateCVV(cvv) { return /^\d{3,4}$/.test(cvv); }
-            function validateJazzCash(num) { return /^03\d{9}$/.test(num); }
             function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
             function validateAll() {
@@ -1750,15 +1732,6 @@ if (!$no_movies) {
                         document.getElementById('cvv-error').style.display = 'none';
                     }
                     if (!valid) return false;
-
-                } else if (selectedPayment === 'jazzcash') {
-                    const jazzNum = document.getElementById('jazzcashNumber').value.trim();
-                    if (!validateJazzCash(jazzNum)) {
-                        document.getElementById('jazzcash-error').style.display = 'block';
-                        return false;
-                    } else {
-                        document.getElementById('jazzcash-error').style.display = 'none';
-                    }
 
                 } else if (selectedPayment === 'ewallet') {
                     const provider = document.getElementById('ewalletProvider').value;
@@ -1842,7 +1815,7 @@ if (!$no_movies) {
                 if (validateAll()) startTimer();
             }
 
-            // Payment method selection
+            // Payment method selection - UPDATED for Credit Card and e-Wallet only
             document.querySelectorAll('.payment-card').forEach(card => {
                 card.addEventListener('click', function () {
                     document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
@@ -1850,13 +1823,10 @@ if (!$no_movies) {
                     selectedPayment = this.dataset.payment;
 
                     document.getElementById('cardDetails').classList.remove('active');
-                    document.getElementById('jazzcashDetails').classList.remove('active');
                     document.getElementById('ewalletDetails').classList.remove('active');
 
                     if (selectedPayment === 'card') {
                         document.getElementById('cardDetails').classList.add('active');
-                    } else if (selectedPayment === 'jazzcash') {
-                        document.getElementById('jazzcashDetails').classList.add('active');
                     } else if (selectedPayment === 'ewallet') {
                         document.getElementById('ewalletDetails').classList.add('active');
                     }
@@ -1931,7 +1901,6 @@ if (!$no_movies) {
                     posterDiv.innerText = 'NO IMAGE';
                 }
 
-                // Fetch fresh showtimes for this movie (including price)
                 fetch('get_showtimes.php?movie_id=' + currentMovieId)
                     .then(response => response.json())
                     .then(showtimes => {
@@ -1939,24 +1908,21 @@ if (!$no_movies) {
                         const grid = document.getElementById('showtimeGrid');
                         grid.innerHTML = '';
                         if (showtimes.length === 0) {
-                            // Show message in showtime grid
                             grid.innerHTML = '<p class="text-muted" style="text-align:center;">No upcoming showtimes for this movie.</p>';
                             document.getElementById('selectedShowtimeId').value = '';
                             currentShowtimeId = null;
-                            // Clear seat grid and show friendly message
                             const seatGrid = document.getElementById('seat-grid');
-                            seatGrid.innerHTML = ''; // clear any existing seats
-                            showNoShowtimesMessage(); // display the no-showtime message
+                            seatGrid.innerHTML = '';
+                            showNoShowtimesMessage();
                             return;
                         } else {
-                            // Hide the no-showtime message if visible
                             hideNoShowtimesMessage();
                         }
                         showtimes.forEach((st, index) => {
                             const card = document.createElement('div');
                             card.className = 'datetime-card' + (index === 0 ? ' selected' : '');
                             card.dataset.showtimeId = st.id;
-                            card.dataset.price = st.price || 15.00;  // <-- store price
+                            card.dataset.price = st.price || 15.00;
                             card.dataset.date = new Date(st.show_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                             card.dataset.time = new Date('1970-01-01T' + st.show_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
                             card.dataset.theatre = st.theatre || '';
@@ -1969,7 +1935,6 @@ if (!$no_movies) {
                             grid.appendChild(card);
                         });
 
-                        // Select first showtime
                         const firstCard = grid.querySelector('.datetime-card');
                         if (firstCard) {
                             selectShowtime(firstCard);
@@ -1990,7 +1955,6 @@ if (!$no_movies) {
                     console.log('Loading initial showtime:', currentShowtimeId);
                     loadSeats(currentShowtimeId);
                 } else {
-                    // No showtimes for the default movie – show a friendly message in the seat area
                     showNoShowtimesMessage();
                 }
             });

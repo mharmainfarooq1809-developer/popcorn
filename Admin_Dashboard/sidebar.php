@@ -109,60 +109,6 @@
     </div>
 </div>
 
-<script>
-    (function () {
-        const currentFile = window.location.pathname.split('/').pop();
-
-        if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
-            const submenu = document.getElementById('theatresSubmenu');
-            if (submenu) submenu.classList.add('show');
-        }
-        if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
-            const submenu = document.getElementById('usersSubmenu');
-            if (submenu) submenu.classList.add('show');
-        }
-        if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-            const submenu = document.getElementById('settingsSubmenu');
-            if (submenu) submenu.classList.add('show');
-        }
-
-        function clearActiveStates() {
-            document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-        }
-
-        function markActive(link) {
-            if (!link) return;
-            link.classList.add('active');
-            if (link.classList.contains('submenu-link')) {
-                const collapseEl = link.closest('.collapse');
-                if (collapseEl) {
-                    const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                    if (parentToggle) parentToggle.classList.add('active');
-                }
-            }
-        }
-
-        function updateActiveStates() {
-            clearActiveStates();
-            const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-            if (activeByHref) markActive(activeByHref);
-        }
-
-        document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-            toggle.addEventListener('click', function () {
-                clearActiveStates();
-                this.classList.add('active');
-            });
-        });
-
-        document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-            link.addEventListener('click', function () {
-                clearActiveStates();
-                markActive(this);
-            });
-        });
-
-        updateActiveStates();
-    })();
-</script>
+<!-- Unified Toggle CSS -->
+<link rel="stylesheet" href="admin_toggle.css">
 

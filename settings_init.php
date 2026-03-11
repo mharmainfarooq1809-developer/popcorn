@@ -1,4 +1,5 @@
 <?php
+
 // settings_init.php – load all settings into $settings array
 if (!isset($conn)) {
     // If db_connect hasn't been included yet, include it

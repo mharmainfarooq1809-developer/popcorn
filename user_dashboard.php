@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 session_start();
 require_once 'db_connect.php';
 require_once 'settings_init.php';
@@ -19,6 +19,58 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Handle ticket cancellation
+if (isset($_POST['cancel_booking'])) {
+    $booking_id = intval($_POST['booking_id']);
+    
+    // Start transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Check if booking belongs to user and is not already cancelled
+        $check = $conn->prepare("SELECT id, status, points_earned FROM bookings WHERE id = ? AND user_id = ?");
+        $check->bind_param("ii", $booking_id, $user_id);
+        $check->execute();
+        $booking = $check->get_result()->fetch_assoc();
+        
+        if (!$booking) {
+            throw new Exception("Booking not found or doesn't belong to you.");
+        }
+        
+        if ($booking['status'] === 'cancelled') {
+            throw new Exception("This booking is already cancelled.");
+        }
+        
+        if ($booking['status'] !== 'confirmed') {
+            throw new Exception("Only confirmed bookings can be cancelled.");
+        }
+        
+        // Update booking status to cancelled
+        $update = $conn->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ?");
+        $update->bind_param("i", $booking_id);
+        $update->execute();
+        
+        // Refund points (remove points earned from this booking)
+        if ($booking['points_earned'] > 0) {
+            $points_refund = -$booking['points_earned'];
+            $conn->prepare("UPDATE users SET points = points - ? WHERE id = ?")
+                ->execute([$booking['points_earned'], $user_id]);
+            
+            // Add to points history
+            $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, 'Booking cancelled')");
+            $history->bind_param("ii", $user_id, $points_refund);
+            $history->execute();
+        }
+        
+        $conn->commit();
+        $cancel_success = "Booking cancelled successfully. Points have been refunded.";
+        
+    } catch (Exception $e) {
+        $conn->rollback();
+        $cancel_error = $e->getMessage();
+    }
+}
+
 // Get user points and name
 $stmt = $conn->prepare("SELECT name, email, points FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -31,7 +83,7 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $history = $stmt->get_result();
 
-// Get recent bookings with full details – using LEFT JOIN to include bookings even if showtime/movie missing
+// Get recent bookings with full details
 $stmt = $conn->prepare("
     SELECT 
         b.id AS booking_id,
@@ -45,7 +97,8 @@ $stmt = $conn->prepare("
         COALESCE(m.title, 'Movie unavailable') AS movie_title,
         COALESCE(s.show_date, 'N/A') AS show_date,
         COALESCE(s.show_time, 'N/A') AS show_time,
-        COALESCE(s.theatre, 'N/A') AS theatre
+        COALESCE(s.theatre, 'N/A') AS theatre,
+        s.id AS showtime_id
     FROM bookings b
     LEFT JOIN showtimes s ON b.showtime_id = s.id
     LEFT JOIN movies m ON s.movie_id = m.id
@@ -57,7 +110,7 @@ $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $bookings = $stmt->get_result();
 
-// Get movies the user has voted for – with error handling in case table doesn't exist
+// Get movies the user has voted for
 try {
     $votes = $conn->prepare("
         SELECT m.title, m.genre, m.year, v.created_at AS voted_at
@@ -70,8 +123,7 @@ try {
     $votes->execute();
     $votedMovies = $votes->get_result();
 } catch (mysqli_sql_exception $e) {
-    // Table likely doesn't exist – treat as empty result
-    $votedMovies = $conn->query("SELECT 1 WHERE 1=0"); // empty result set
+    $votedMovies = $conn->query("SELECT 1 WHERE 1=0");
 }
 ?>
 <!DOCTYPE html>
@@ -80,7 +132,7 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Dashboard Â· <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
@@ -94,8 +146,10 @@ try {
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <!-- Font Awesome (for menu icon) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* ================= BASE & PARALLAX BACKGROUND ================= */
         * {
@@ -199,6 +253,8 @@ try {
             color: var(--popcorn-orange);
         }
 
+        .logo img { max-height: 60px; width: auto; display: block; }
+
         /* Mobile menu toggle */
         .menu-toggle {
             display: none;
@@ -250,6 +306,43 @@ try {
 
         .nav-links a.active::after {
             width: 100%;
+        }
+
+        /* ================= ALERTS ================= */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 4px solid #4CAF50;
+            color: #4CAF50;
+        }
+
+        .alert-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border-left: 4px solid #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        .alert i {
+            font-size: 20px;
+        }
+
+        .alert .close-btn {
+            margin-left: auto;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .alert .close-btn:hover {
+            opacity: 1;
         }
 
         /* ================= CARDS ================= */
@@ -375,14 +468,40 @@ try {
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             background: var(--popcorn-orange);
             color: #000;
             transition: 0.3s;
+            border: none;
+            cursor: pointer;
         }
         .btn-sm:hover {
             background: var(--popcorn-gold);
             transform: translateY(-2px);
+        }
+
+        .btn-sm.btn-danger {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        .btn-sm.btn-danger:hover {
+            background: rgba(220, 53, 69, 0.3);
+            color: #ff8a92;
+        }
+
+        .btn-sm:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         /* ================= VOTE SECTION ================= */
@@ -406,7 +525,7 @@ try {
             font-size: 14px;
         }
 
-        /* ================= FOOTER (FULL WIDTH) ================= */
+        /* ================= FOOTER ================= */
         footer {
             background: var(--deep-navy);
             border-top: 1px solid var(--gray-1);
@@ -470,11 +589,16 @@ try {
             .container {
                 padding: 100px 20px 40px;
             }
-        }
 
-        /* logo image sizing */
-        .logo img { max-height: 60px; width: auto; display: block; }
-        @media (max-width: 768px) { .logo img { max-height: 45px; } }
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-sm {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -504,8 +628,25 @@ try {
         <!-- Welcome Header -->
         <div style="margin-bottom: 30px;">
             <h1 style="font-size: 42px; font-weight: 800;">Welcome back, <?= htmlspecialchars($user['name']) ?>!</h1>
-            <p style="color: var(--light-gray);"><?= htmlspecialchars($user['email']) ?> · Your loyalty dashboard</p>
+            <p style="color: var(--light-gray);"><?= htmlspecialchars($user['email']) ?> Â· Your loyalty dashboard</p>
         </div>
+
+        <!-- Alert Messages -->
+        <?php if (isset($cancel_success)): ?>
+            <div class="alert alert-success" id="successAlert">
+                <i class="bi bi-check-circle-fill"></i>
+                <?= htmlspecialchars($cancel_success) ?>
+                <span class="close-btn" onclick="this.parentElement.style.display='none'"><i class="bi bi-x"></i></span>
+            </div>
+        <?php endif; ?>
+        
+        <?php if (isset($cancel_error)): ?>
+            <div class="alert alert-danger" id="errorAlert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <?= htmlspecialchars($cancel_error) ?>
+                <span class="close-btn" onclick="this.parentElement.style.display='none'"><i class="bi bi-x"></i></span>
+            </div>
+        <?php endif; ?>
 
         <!-- Points Card -->
         <div class="dashboard-card">
@@ -515,7 +656,7 @@ try {
                 <?php if ($user['points'] >= 10): ?>
                     <span
                         style="background: rgba(255,165,0,0.2); border-left: 4px solid var(--popcorn-orange); padding: 10px 16px; border-radius: 8px; color: var(--popcorn-gold);">
-                        <i class="bi bi-gift"></i> You have 10 points! 10% off your next booking.
+                        <i class="bi bi-gift"></i> You have 10+ points! 10% off your next booking.
                     </span>
                 <?php else: ?>
                     <span style="color: var(--light-gray);"><?= (10 - ($user['points'] % 10)) ?> more points until next
@@ -537,7 +678,7 @@ try {
                     <?php while ($vote = $votedMovies->fetch_assoc()): ?>
                         <div class="vote-item">
                             <span class="movie-title"><?= htmlspecialchars($vote['title']) ?></span>
-                            <span class="movie-meta"><?= $vote['genre'] ?> • <?= $vote['year'] ?></span>
+                            <span class="movie-meta"><?= $vote['genre'] ?> Â· <?= $vote['year'] ?></span>
                             <span class="vote-date"><?= date('M j, Y', strtotime($vote['voted_at'])) ?></span>
                         </div>
                     <?php endwhile; ?>
@@ -581,7 +722,7 @@ try {
             </div>
         </div>
 
-        <!-- Recent Bookings -->
+        <!-- Recent Bookings with Cancel Button -->
         <div class="dashboard-card">
             <h2 class="card-title">Recent Bookings</h2>
             <div class="table-responsive">
@@ -596,7 +737,7 @@ try {
                             <th>Total</th>
                             <th>Points</th>
                             <th>Status</th>
-                            <th>Ticket</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -606,6 +747,11 @@ try {
                                 if ($row['status'] == 'confirmed') $statusClass = 'status-confirmed';
                                 elseif ($row['status'] == 'pending') $statusClass = 'status-pending';
                                 elseif ($row['status'] == 'cancelled') $statusClass = 'status-cancelled';
+                                
+                                $canCancel = ($row['status'] === 'confirmed');
+                                $showtimeDate = $row['show_date'] != 'N/A' ? strtotime($row['show_date']) : 0;
+                                $isPastShow = $showtimeDate && $showtimeDate < strtotime('today');
+                                if ($isPastShow) $canCancel = false;
                             ?>
                                 <tr>
                                     <td><?= date('Y-m-d', strtotime($row['booking_date'])) ?></td>
@@ -617,7 +763,28 @@ try {
                                     <td><?= $row['points_earned'] ?></td>
                                     <td><span class="status-badge <?= $statusClass ?>"><?= ucfirst($row['status']) ?></span></td>
                                     <td>
-                                        <a href="ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm"><i class="bi bi-ticket-perforated"></i> View</a>
+                                        <div class="action-buttons">
+                                            <a href="ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm" title="View Ticket">
+                                                <i class="bi bi-ticket-perforated"></i> View
+                                            </a>
+                                            <?php if ($canCancel): ?>
+                                                <button class="btn-sm btn-danger" onclick="confirmCancel(<?= $row['booking_id'] ?>, '<?= htmlspecialchars($row['movie_title']) ?>')" title="Cancel Booking">
+                                                    <i class="bi bi-x-circle"></i> Cancel
+                                                </button>
+                                            <?php elseif ($row['status'] === 'cancelled'): ?>
+                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled>
+                                                    <i class="bi bi-check-circle"></i> Cancelled
+                                                </span>
+                                            <?php elseif ($isPastShow): ?>
+                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled title="Past shows cannot be cancelled">
+                                                    <i class="bi bi-clock-history"></i> Expired
+                                                </span>
+                                            <?php else: ?>
+                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled>
+                                                    <i class="bi bi-hourglass-split"></i> Pending
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                 </tr>
                             <?php endwhile; ?>
@@ -638,6 +805,12 @@ try {
             <p><?= htmlspecialchars($settings['footer_text'] ?? '&copy; '.date('Y').' '.($settings['site_name'] ?? 'Popcorn Hub').'. Your loyalty dashboard.') ?></p>
         </div>
     </footer>
+
+    <!-- Hidden form for cancellation -->
+    <form id="cancelForm" method="POST" style="display: none;">
+        <input type="hidden" name="booking_id" id="cancelBookingId">
+        <input type="hidden" name="cancel_booking" value="1">
+    </form>
 
     <!-- Scripts -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
@@ -660,7 +833,6 @@ try {
                 navLinks.classList.toggle('active');
                 menuToggle.innerHTML = navLinks.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             });
-            // Close menu when a link is clicked
             navLinks.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     navLinks.classList.remove('active');
@@ -669,20 +841,54 @@ try {
             });
         }
 
+        // Cancel confirmation with SweetAlert2
+        function confirmCancel(bookingId, movieTitle) {
+            Swal.fire({
+                title: 'Cancel Booking?',
+                html: `Are you sure you want to cancel your booking for <strong>${movieTitle}</strong>?<br><br>This action cannot be undone and your seats will be released.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ff4d4d',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, cancel it!',
+                cancelButtonText: 'No, keep it',
+                background: '#0F1C2B',
+                color: '#F2F2F2',
+                iconColor: '#ff4d4d'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('cancelBookingId').value = bookingId;
+                    document.getElementById('cancelForm').submit();
+                }
+            });
+        }
+
         // Smooth page transitions
-        document.querySelectorAll("a").forEach(link => {
+        document.querySelectorAll("a:not([target='_blank'])").forEach(link => {
             link.addEventListener("click", function (e) {
-                if (this.href && this.href.indexOf("#") === -1 && !this.hasAttribute('target')) {
+                if (this.href && this.href.indexOf("#") === -1 && !this.hasAttribute('target') && !this.classList.contains('btn-sm')) {
                     e.preventDefault();
                     document.body.classList.add("fade-out");
                     setTimeout(() => { window.location = this.href; }, 600);
                 }
             });
         });
+
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.style.display = 'none', 500);
+            });
+        }, 5000);
     </script>
     <style>
-        /* Page transition effect */
         body.fade-out { opacity: 0; transition: opacity 0.6s ease; }
+        .alert { transition: opacity 0.5s; }
+        .btn-sm { cursor: pointer; }
+        .btn-sm:disabled { cursor: not-allowed; }
     </style>
 </body>
 </html>

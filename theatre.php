@@ -27,7 +27,7 @@ while ($row = $theatres_result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?> · Theatres</title>
+    <title><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?> Â· Theatres</title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
@@ -267,7 +267,7 @@ while ($row = $theatres_result->fetch_assoc()) {
             margin: 0 auto 40px;
         }
 
-        /* Hero search bar – sleek and integrated */
+        /* Hero search bar ï¿½ sleek and integrated */
         .hero-search {
             max-width: 700px;
             margin: 0 auto;
@@ -746,9 +746,9 @@ while ($row = $theatres_result->fetch_assoc()) {
                             <label>City</label>
                             <select class="form-select mb-3" id="cityFilter">
                                 <option value="all">All Cities</option>
-                                <option value="New York">New York</option>
-                                <option value="London">London</option>
-                                <option value="Dubai">Dubai</option>
+                                <option value="Karachi">Karachi</option>
+                                <option value="Islamabad">Islamabad</option>
+                                <option value="Lahore">Lahore</option>
                             </select>
                             <label>Rating</label>
                             <select class="form-select mb-3" id="ratingFilter">
@@ -798,7 +798,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Amelia Clarke</h4>
-                                <p>“The IMAX experience was out of this world! Crystal clear picture and immersive sound.”</p>
+                                <p>The IMAX experience was out of this world! Crystal clear picture and immersive sound.</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -812,7 +812,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>James Wilson</h4>
-                                <p>“Best sound system I've ever heard. The VIP lounge is pure luxury.”</p>
+                                <p>Best sound system I've ever heard. The VIP lounge is pure luxury.</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -826,7 +826,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Sophia Martinez</h4>
-                                <p>“Luxury seating and amazing service. Perfect for date nights.”</p>
+                                <p>Luxury seating and amazing service. Perfect for date nights.</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -840,7 +840,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Oliver Brown</h4>
-                                <p>“Perfect for family movie nights. Clean, comfortable, and great value.”</p>
+                                <p>Perfect for family movie nights. Clean, comfortable, and great value.</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -854,7 +854,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Ethan Harris</h4>
-                                <p>“Crystal clear 3D – felt like I was in the movie. Highly recommended!”</p>
+                                <p>Crystal clear 3D â€“ felt like I was in the movie. Highly recommended!</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -868,7 +868,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Charlotte King</h4>
-                                <p>“The staff was incredibly friendly and helpful. A wonderful experience.”</p>
+                                <p>The staff was incredibly friendly and helpful. A wonderful experience.</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
@@ -1058,7 +1058,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                         <div class="card-body">
                             <h5 class="card-title">${t.name}</h5>
                             <p class="text-muted">${t.location}, ${t.city}</p>
-                            <p>? ${t.rating} | $${t.price}</p>
+                            <p><i class="fas fa-star text-warning"></i> ${t.rating} | $${t.price}</p>
                             <button class="btn btn-primary mt-auto view-details-btn" data-id="${t.id}">View Details</button>
                         </div>
                     </div>
@@ -1111,7 +1111,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                 <p><i class="fas fa-map-pin" style="color: var(--popcorn-orange);"></i> ${theatre.location}, ${theatre.city}</p>
                 <p><strong>Facilities:</strong> ${facilitiesList}</p>
                 <p><strong>Show Times:</strong> 12PM | 3PM | 6PM | 9PM</p>
-                <p><strong>Rating:</strong> ? ${theatre.rating} | <strong>Price:</strong> $${theatre.price}</p>
+                <p><strong>Rating:</strong> <i class="fas fa-star text-warning"></i> ${theatre.rating} | <strong>Price:</strong> $${theatre.price}</p>
                 <div class="text-center mt-3">
                     <a href="booking.php" class="btn btn-primary">Book Now</a>
                 </div>
@@ -1121,5 +1121,4 @@ while ($row = $theatres_result->fetch_assoc()) {
         }
     </script>
 </body>
-
 </html>

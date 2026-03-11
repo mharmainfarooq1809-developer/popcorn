@@ -52,14 +52,20 @@ function statusBadge($status) {
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
-        /* ========== UNIFIED ADMIN CSS (same as dashboard) ========== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ========== UNIFIED ADMIN STYLES ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Heebo', sans-serif;
             background-color: #F8F9FA;
@@ -68,10 +74,12 @@ function statusBadge($status) {
             overflow-x: hidden;
             line-height: 1.6;
         }
+
         body.dark-mode {
             background-color: #0B1623;
-            color: #F2F2F2;
+            color: #FFFFFF;
         }
+
         :root {
             --primary: #FFA500;
             --primary-dark: #cc7f00;
@@ -79,12 +87,45 @@ function statusBadge($status) {
             --light-card: #FFFFFF;
             --dark-card: #0F1C2B;
             --light-text: #212529;
-            --dark-text: #F2F2F2;
+            --dark-text: #FFFFFF;
             --border-light: #E9ECEF;
             --border-dark: #3A414D;
             --sidebar-width: 250px;
             --sidebar-collapsed-width: 80px;
             --transition: all 0.3s ease;
+        }
+
+        /* ===== HEADINGS ===== */
+        h1, h2, h3, h4, h5, h6 {
+            color: #212529;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode h1,
+        body.dark-mode h2,
+        body.dark-mode h3,
+        body.dark-mode h4,
+        body.dark-mode h5,
+        body.dark-mode h6 {
+            color: #FFFFFF;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .page-title {
+            color: #FFFFFF;
+        }
+
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #adb5bd !important;
         }
 
         /* ===== SIDEBAR OVERLAY ===== */
@@ -95,10 +136,13 @@ function statusBadge($status) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 999;
         }
-        .sidebar-overlay.active { display: block; }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -107,91 +151,144 @@ function statusBadge($status) {
             left: 0;
             height: 100vh;
             width: var(--sidebar-width);
-            background: var(--light-card);
-            box-shadow: 2px 0 20px rgba(0,0,0,0.05);
+            background: #FFFFFF;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
             transition: transform var(--transition), width var(--transition);
             z-index: 1000;
             overflow-y: auto;
-            border-right: 1px solid var(--border-light);
+            border-right: 1px solid #E9ECEF;
             transform: translateX(-100%);
         }
-        .sidebar.active { transform: translateX(0); }
-        .dark-mode .sidebar {
-            background: var(--dark-card);
-            border-right-color: var(--border-dark);
+
+        .sidebar.active {
+            transform: translateX(0);
         }
-        .sidebar.collapsed { width: var(--sidebar-collapsed-width); }
+
+        body.dark-mode .sidebar {
+            background: #0F1C2B;
+            border-right-color: #3A414D;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
 
         .sidebar .logo-area {
             padding: 24px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #E9ECEF;
         }
-        .dark-mode .sidebar .logo-area { border-bottom-color: var(--border-dark); }
+
+        body.dark-mode .sidebar .logo-area {
+            border-bottom-color: #3A414D;
+        }
+
         .sidebar .logo {
             font-size: 22px;
             font-weight: 700;
-            color: var(--primary-gold);
+            color: #FFD966;
             white-space: nowrap;
             overflow: hidden;
         }
-        .sidebar.collapsed .logo span { display: none; }
+
+        .sidebar.collapsed .logo span {
+            display: none;
+        }
+
         .sidebar .toggle-btn {
             background: none;
             border: none;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
             font-size: 20px;
-            transition: color 0.2s;
         }
-        .dark-mode .sidebar .toggle-btn { color: var(--dark-text); }
-        .sidebar .toggle-btn:hover { color: var(--primary); }
+
+        body.dark-mode .sidebar .toggle-btn {
+            color: #FFFFFF;
+        }
+
+        .sidebar .toggle-btn:hover {
+            color: var(--primary);
+        }
 
         .sidebar .nav {
             padding: 12px 0 96px;
             display: block;
         }
+
         .sidebar .nav-link {
             display: flex;
             align-items: center;
             padding: 9px 16px;
-            color: var(--light-text);
+            color: #212529;
             text-decoration: none;
             border-radius: 0 30px 30px 0;
             margin-right: 10px;
             transition: var(--transition);
             white-space: nowrap;
         }
-        .dark-mode .sidebar .nav-link { color: var(--dark-text); }
-        .sidebar .nav-link i { font-size: 17px; min-width: 24px; text-align: center; }
+
+        body.dark-mode .sidebar .nav-link {
+            color: #FFFFFF;
+        }
+
+        .sidebar .nav-link i {
+            font-size: 17px;
+            min-width: 24px;
+            text-align: center;
+        }
+
         .sidebar .nav-link span {
-            transition: opacity 0.2s, width 0.2s;
+            transition: opacity 0.2s;
             opacity: 1;
-            width: auto;
             overflow: hidden;
             white-space: nowrap;
         }
+
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             width: 0;
         }
-        .sidebar .nav-link:hover { background: rgba(255,165,0,0.1); color: var(--primary); }
-        .sidebar .nav-link.active { background: var(--primary); color: #fff; }
-        .dark-mode .sidebar .nav-link.active { background: var(--primary-dark); }
+
+        .sidebar .nav-link:hover {
+            background: rgba(255, 165, 0, 0.1);
+            color: var(--primary);
+        }
+
+        .sidebar .nav-link.active {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        body.dark-mode .sidebar .nav-link.active {
+            background: var(--primary-dark);
+        }
 
         /* Submenu */
-        .nav-item { width: 100%; }
+        .nav-item {
+            width: 100%;
+        }
+
         .nav-link[data-bs-toggle="collapse"] {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        .nav-link[data-bs-toggle="collapse"] i.bi-chevron-down { transition: transform 0.3s; }
-        .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down { transform: rotate(180deg); }
-        .submenu-link { padding-left: 42px !important; font-size: 13px; }
-        .submenu-link i { font-size: 14px; min-width: 20px; }
+
+        .nav-link[data-bs-toggle="collapse"] i.bi-chevron-down {
+            transition: transform 0.3s;
+        }
+
+        .nav-link[data-bs-toggle="collapse"][aria-expanded="true"] i.bi-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .submenu-link {
+            padding-left: 42px !important;
+            font-size: 13px;
+        }
 
         .sidebar .bottom-section {
             position: absolute;
@@ -199,97 +296,78 @@ function statusBadge($status) {
             left: 0;
             width: 100%;
             padding: 14px;
-            border-top: 1px solid var(--border-light);
+            border-top: 1px solid #E9ECEF;
             background: inherit;
         }
-        .dark-mode .sidebar .bottom-section { border-top-color: var(--border-dark); }
+
+        body.dark-mode .sidebar .bottom-section {
+            border-top-color: #3A414D;
+        }
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 0;
-            padding: 20px 30px;
-            transition: margin-left var(--transition), width var(--transition);
+            padding: 20px;
+            transition: margin-left var(--transition);
             min-height: 100vh;
             width: 100%;
             overflow-x: hidden;
         }
 
         @media (min-width: 992px) {
-            .sidebar { transform: translateX(0); }
+            .sidebar {
+                transform: translateX(0);
+            }
+
             .main-content {
                 margin-left: var(--sidebar-width);
                 width: calc(100% - var(--sidebar-width));
             }
+
             body.sidebar-collapsed .main-content {
                 margin-left: var(--sidebar-collapsed-width);
                 width: calc(100% - var(--sidebar-collapsed-width));
             }
         }
 
-        @media (max-width: 991px) {
-            .main-content { margin-left: 0; width: 100%; }
-        }
-
         /* ===== TOP NAVBAR ===== */
         .top-navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            padding: 15px 0;
-            margin-bottom: 30px;
+            padding: 10px 0 20px;
             flex-wrap: wrap;
             gap: 15px;
         }
-        .menu-toggle {
+
+        .menu-toggle, .menu-toggle-mobile {
             font-size: 24px;
             cursor: pointer;
-            display: inline-block;
         }
-        .search-bar {
-            position: relative;
-            width: 300px;
-            max-width: 100%;
+
+        @media (min-width: 992px) {
+            .menu-toggle-mobile {
+                display: none;
+            }
         }
-        .search-bar input {
-            width: 100%;
-            padding: 12px 40px 12px 20px;
-            border-radius: 40px;
-            border: 1px solid var(--border-light);
-            background: var(--light-card);
-            color: var(--light-text);
-            transition: var(--transition);
-        }
-        .dark-mode .search-bar input {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
-            color: var(--dark-text);
-        }
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(255,165,0,0.2);
-        }
-        .search-bar i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
+
         .nav-icons {
             display: flex;
             align-items: center;
             gap: 20px;
         }
+
         .nav-icons .icon {
             position: relative;
             font-size: 22px;
-            color: var(--light-text);
+            color: #212529;
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .dark-mode .nav-icons .icon { color: var(--dark-text); }
-        .nav-icons .icon:hover { color: var(--primary); }
+
+        body.dark-mode .nav-icons .icon {
+            color: #FFFFFF;
+        }
+
         .nav-icons .badge {
             position: absolute;
             top: -5px;
@@ -304,220 +382,522 @@ function statusBadge($status) {
             align-items: center;
             justify-content: center;
         }
+
         .avatar-icon {
             font-size: 2.2rem;
             color: var(--primary);
             cursor: pointer;
-            transition: color 0.2s;
         }
-        .avatar-icon:hover { color: var(--primary-dark); }
+
+        .avatar-icon:hover {
+            color: var(--primary-dark);
+        }
+
+        .theme-toggle {
+            cursor: pointer;
+            font-size: 22px;
+            color: #212529;
+        }
+
+        body.dark-mode .theme-toggle {
+            color: #FFFFFF;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border-radius: 40px;
+            border: 1px solid #E9ECEF;
+            background: #FFFFFF;
+            color: #212529;
+        }
+
+        body.dark-mode .search-box input {
+            background: #0F1C2B;
+            border-color: #3A414D;
+            color: #FFFFFF;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,165,0,0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        body.dark-mode .search-box i {
+            color: #adb5bd;
+        }
 
         /* ===== CARDS ===== */
         .card {
             border: none;
             border-radius: 20px;
-            padding: 14px;
-            background: var(--light-card);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            transition: var(--transition);
+            padding: 20px;
+            background: #FFFFFF;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             margin-bottom: 20px;
-        }
-        .dark-mode .card {
-            background: var(--dark-card);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            width: 100%;
+            overflow: hidden;
         }
 
-        .badge-success { background: rgba(40,167,69,0.15); color: #28a745; }
-        .badge-warning { background: rgba(255,193,7,0.15); color: #ffc107; }
-        .badge-danger { background: rgba(220,53,69,0.15); color: #dc3545; }
-        .badge-info { background: rgba(23,162,184,0.15); color: #17a2b8; }
-        .badge-primary { background: rgba(255,165,0,0.15); color: var(--primary); }
+        body.dark-mode .card {
+            background: #0F1C2B;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
 
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #b17f00;
+        }
+
+        .badge-danger {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .badge-info {
+            background: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+        }
+
+        body.dark-mode .badge-success {
+            background: rgba(40, 167, 69, 0.25);
+            color: #7acf7a;
+        }
+
+        body.dark-mode .badge-warning {
+            background: rgba(255, 193, 7, 0.25);
+            color: #ffdb7c;
+        }
+
+        body.dark-mode .badge-danger {
+            background: rgba(220, 53, 69, 0.25);
+            color: #ff8a92;
+        }
+
+        body.dark-mode .badge-info {
+            background: rgba(23, 162, 184, 0.25);
+            color: #6ed4ff;
+        }
+
+        /* ===== BUTTONS ===== */
         .btn-primary {
             background: linear-gradient(145deg, var(--primary), var(--primary-dark));
             color: #fff;
             border: none;
             border-radius: 40px;
             padding: 10px 24px;
-            box-shadow: 0 4px 14px rgba(255,165,0,0.3);
+            box-shadow: 0 4px 14px rgba(255, 165, 0, 0.3);
             transition: all 0.2s;
         }
+
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(255,165,0,0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 165, 0, 0.5);
         }
+
         .btn-outline-primary {
             border: 1px solid var(--primary);
             color: var(--primary);
             background: transparent;
+            border-radius: 40px;
+            padding: 8px 20px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
+
         .btn-outline-primary:hover {
             background: var(--primary);
             color: #fff;
         }
+
+        body.dark-mode .btn-outline-primary {
+            border-color: #FFD966;
+            color: #FFD966;
+        }
+
+        body.dark-mode .btn-outline-primary:hover {
+            background: #FFD966;
+            color: #0F1C2B;
+        }
+
         .btn-outline-danger {
             border: 1px solid #dc3545;
             color: #dc3545;
             background: transparent;
+            border-radius: 40px;
+            padding: 8px 20px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
+
         .btn-outline-danger:hover {
             background: #dc3545;
             color: #fff;
         }
-        .btn-sm {
-            padding: 6px 16px;
-            font-size: 13px;
+
+        body.dark-mode .btn-outline-danger {
+            border-color: #ff8a92;
+            color: #ff8a92;
         }
 
-        /* ===== TABLES ===== */
+        body.dark-mode .btn-outline-danger:hover {
+            background: #ff8a92;
+            color: #0F1C2B;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* ===== TABLES - FIXED VISIBILITY ===== */
         .table-responsive {
             overflow-x: auto;
-            min-width: 100%;
             border-radius: 20px;
-            background: var(--light-card);
-            padding: 0;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border: 1px solid var(--border-light);
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
+            margin-top: 10px;
         }
-        .dark-mode .table-responsive {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
+
+        body.dark-mode .table-responsive {
+            background: #0F1C2B;
+            border-color: #3A414D;
         }
+
         .table {
             width: 100%;
             margin-bottom: 0;
-            color: var(--light-text);
+            border-collapse: collapse;
+        }
+
+        /* LIGHT MODE TABLE */
+        .table {
+            color: #212529 !important;
             background: transparent;
         }
-        .dark-mode .table { color: var(--dark-text); }
+
         .table th {
-            background: rgba(0,0,0,0.02);
-            border-bottom: 2px solid var(--border-light);
+            background: #f8f9fa;
+            border-bottom: 2px solid #E9ECEF;
             font-weight: 600;
-            color: #6c757d;
+            color: #495057 !important;
             padding: 15px 12px;
             white-space: nowrap;
         }
-        .dark-mode .table th {
-            background: rgba(255,255,255,0.02);
-            border-bottom-color: var(--border-dark);
-            color: #adb5bd;
-        }
+
         .table td {
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid #E9ECEF;
             padding: 12px;
             vertical-align: middle;
+            color: #212529 !important;
+            background: transparent;
         }
-        .dark-mode .table td { border-bottom-color: var(--border-dark); }
-        .table tbody tr:last-child td { border-bottom: none; }
-        .table tbody tr:hover { background: rgba(0,0,0,0.02); }
-        .dark-mode .table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* DARK MODE TABLE */
+        body.dark-mode .table {
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .table th {
+            background: #1a2634;
+            border-bottom-color: #3A414D;
+            color: #FFFFFF !important;
+        }
+
+        body.dark-mode .table td {
+            border-bottom-color: #3A414D;
+            color: #FFFFFF !important;
+            background: transparent;
+        }
+
+        .table tbody tr:hover td {
+            background: rgba(0,0,0,0.02);
+        }
+
+        body.dark-mode .table tbody tr:hover td {
+            background: #1a2634;
+        }
+
+        /* Empty state */
+        .table td.text-center {
+            color: #6c757d !important;
+            padding: 30px !important;
+        }
+
+        body.dark-mode .table td.text-center {
+            color: #adb5bd !important;
+        }
 
         /* ===== FOOTER ===== */
         .footer {
-            background: var(--light-card);
-            border-top: 1px solid var(--border-light);
-            padding: 30px 0;
-            margin-top: 60px;
+            background: #FFFFFF;
+            border-top: 1px solid #E9ECEF;
+            padding: 20px 0;
+            margin-top: 40px;
             color: #6c757d;
         }
-        .dark-mode .footer {
-            background: var(--dark-card);
-            border-top-color: var(--border-dark);
+
+        body.dark-mode .footer {
+            background: #0F1C2B;
+            border-top-color: #3A414D;
             color: #adb5bd;
         }
 
         /* ===== DROPDOWNS ===== */
         .dropdown-menu {
-            background: var(--light-card);
-            border: 1px solid var(--border-light);
+            background: #FFFFFF;
+            border: 1px solid #E9ECEF;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             max-height: 400px;
             overflow-y: auto;
         }
-        .dark-mode .dropdown-menu {
-            background: var(--dark-card);
-            border-color: var(--border-dark);
+
+        body.dark-mode .dropdown-menu {
+            background: #0F1C2B;
+            border-color: #3A414D;
         }
+
         .dropdown-item {
-            color: var(--light-text);
-            white-space: normal;
-            word-wrap: break-word;
+            color: #212529;
+            padding: 10px 20px;
         }
-        .dark-mode .dropdown-item { color: var(--dark-text); }
-        .dropdown-item:hover { background: rgba(255,165,0,0.1); }
+
+        body.dark-mode .dropdown-item {
+            color: #FFFFFF;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 165, 0, 0.1);
+        }
+
+        .dropdown-header {
+            color: #6c757d;
+        }
+
+        body.dark-mode .dropdown-header {
+            color: #adb5bd;
+        }
+
+        /* ===== HEADER WITH TOGGLE ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .page-header h2 {
+            margin-bottom: 0;
+            font-size: 24px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .page-header h2 {
+            color: #FFFFFF;
+        }
+
+        .card-header-with-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 5px 0;
+            border-bottom: 1px solid transparent;
+        }
+
+        .card-header-with-toggle:hover {
+            border-bottom-color: var(--primary);
+        }
+
+        .card-header-with-toggle h5 {
+            margin-bottom: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        body.dark-mode .card-header-with-toggle h5 {
+            color: #FFFFFF;
+        }
+
+        .card-header-with-toggle i {
+            font-size: 20px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .card-header-with-toggle:hover i {
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .card-header-with-toggle.active i {
+            transform: rotate(90deg);
+            color: var(--primary);
+        }
+
+        body.dark-mode .card-header-with-toggle i {
+            color: #adb5bd;
+        }
+
+        body.dark-mode .card-header-with-toggle:hover i {
+            color: #FFD966;
+        }
+
+        .toggle-content {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.3s ease;
+        }
+
+        .toggle-content.show {
+            max-height: 2000px;
+            opacity: 1;
+            margin-top: 20px;
+        }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .sidebar { left: -100%; }
-            .sidebar.active { left: 0; }
-            .main-content { margin-left: 0 !important; width: 100% !important; }
-            .search-bar { width: 250px; }
-        }
-        @media (max-width: 768px) {
-            .top-navbar { flex-direction: column; align-items: stretch; }
-            .search-bar { width: 100%; }
-            .nav-icons { justify-content: flex-end; }
-            .table th, .table td { padding: 10px 8px; font-size: 14px; }
-        }
-    </style>
-    <style id="admin-sidebar-unify">
-        /* Unified admin sidebar animation + responsive behavior */
-        .sidebar {
-            transition: width 0.28s ease, transform 0.28s ease;
-            will-change: width, transform;
-        }
-        .main-content {
-            transition: margin-left 0.28s ease, width 0.28s ease;
-        }
-        .sidebar .logo span,
-        .sidebar .nav-link span {
-            transition: opacity 0.22s ease, max-width 0.22s ease, margin 0.22s ease;
-            max-width: 180px;
-            overflow: hidden;
-        }
-        .sidebar.collapsed {
-            width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            min-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-            max-width: var(--sidebar-collapsed, var(--sidebar-collapsed-width, 80px)) !important;
-        }
-        .sidebar.collapsed .logo span,
-        .sidebar.collapsed .nav-link span {
-            opacity: 0;
-            max-width: 0;
-            margin: 0;
-        }
-        #sidebarToggle i {
-            transition: transform 0.25s ease;
-        }
-        body.sidebar-collapsed #sidebarToggle i {
-            transform: rotate(180deg);
-        }
+            .sidebar {
+                left: -100%;
+            }
 
-        /* Remove admin search bars everywhere */
-        .search-bar {
-            display: none !important;
-        }
-        .top-navbar {
-            justify-content: flex-end;
-            gap: 12px;
-        }
+            .sidebar.active {
+                left: 0;
+            }
 
-        /* Extra safety for small screens */
-        @media (max-width: 991.98px) {
             .main-content {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-            .top-navbar {
-                flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
             }
+
+            
+            .top-navbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .nav-icons {
+                justify-content: flex-end;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            .nav-icons {
+                justify-content: flex-end;
+            }
+
+            .table th,
+            .table td {
+                padding: 10px 8px;
+                font-size: 14px;
+            }
+
+            .btn-sm {
+                padding: 4px 8px;
+                font-size: 11px;
+            }
+        }
+    </style>
+    <style id="admin-sidebar-unify">
+        .sidebar {
+            transition: width 0.28s ease, transform 0.28s ease;
+            will-change: width, transform;
+        }
+
+        .main-content {
+            transition: margin-left 0.28s ease, width 0.28s ease;
+        }
+
+        .sidebar .logo span,
+        .sidebar .nav-link span {
+            transition: opacity 0.22s ease, max-width 0.22s ease;
+            max-width: 180px;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width) !important;
+        }
+
+        .sidebar.collapsed .logo span,
+        .sidebar.collapsed .nav-link span {
+            opacity: 0;
+            max-width: 0;
+        }
+
+        #sidebarToggle i {
+            transition: transform 0.25s ease;
+        }
+
+        body.sidebar-collapsed #sidebarToggle i {
+            transform: rotate(180deg);
+        }
+
+        .search-bar {
+            display: none !important;
+        }
+
+        .top-navbar {
+            justify-content: flex-end;
+            gap: 12px;
         }
     </style>
 </head>
 <body>
- <!-- Sidebar Overlay (mobile) -->
+    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- Sidebar -->
@@ -527,7 +907,7 @@ function statusBadge($status) {
                 <i class="bi bi-camera-reels me-2"></i>
                 <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
             </div>
-            <button class="toggle-btn" id="sidebarToggle"><i class="bi bi-chevron-left"></i></button>
+            
         </div>
 
         <div class="nav">
@@ -560,15 +940,14 @@ function statusBadge($status) {
                         <i class="bi bi-plus-circle"></i>
                         <span>Add Theatre</span>
                     </a>
-                    
                 </div>
             </div>
 
-            <!-- Bookings (direct link) -->
-        <a href="bookings.php" class="nav-link" title="Bookings">
-            <i class="bi bi-ticket"></i>
-            <span>Bookings</span>
-        </a>
+            <!-- Bookings (direct link) - Active -->
+            <a href="bookings.php" class="nav-link active" title="Bookings">
+                <i class="bi bi-ticket"></i>
+                <span>Bookings</span>
+            </a>
 
             <!-- Users (with submenu) -->
             <div class="nav-item">
@@ -602,10 +981,10 @@ function statusBadge($status) {
                 <span>Messages</span>
             </a>
 
-        <a href="votes.php" class="nav-link" title="Voting">
-            <i class="bi bi-bar-chart"></i>
-            <span>Voting</span>
-        </a>
+            <a href="votes.php" class="nav-link" title="Voting">
+                <i class="bi bi-bar-chart"></i>
+                <span>Voting</span>
+            </a>
 
             <!-- Settings (with submenu) -->
             <div class="nav-item">
@@ -638,39 +1017,47 @@ function statusBadge($status) {
 
     <!-- Main Content -->
     <div class="main-content">
-        <div class="container-fluid">
-            <div class="top-navbar">
-                <div class="d-flex align-items-center flex-grow-1">
-                    <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                    
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
+                <div class="search-box">
+                    <input type="text" id="searchBookings" placeholder="Search bookings...">
+                    <i class="bi bi-search"></i>
                 </div>
-                <div class="nav-icons">
-                    <!-- Notification Bell Dropdown -->
-                    <div class="dropdown d-inline-block">
-                        <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
-                            <i class="bi bi-bell"></i>
-                            <span class="badge" id="notificationBadge" style="display: none;">0</span>
-                        </div>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
-                            <li><h6 class="dropdown-header">Notifications</h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li id="notificationList" style="max-height: 300px; overflow-y: auto;"></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
-                        </ul>
+            </div>
+            <div class="nav-icons">
+                <!-- Notification Bell Dropdown -->
+                <div class="dropdown d-inline-block">
+                    <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false" role="button">
+                        <i class="bi bi-bell"></i>
+                        <span class="badge" id="notificationBadge" style="display: none;">0</span>
                     </div>
-
-                    <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
-                    <i class="bi bi-person-circle avatar-icon"></i>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="width: 300px;">
+                        <li><h6 class="dropdown-header">Notifications</h6></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li id="notificationList"></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
+                    </ul>
                 </div>
-            </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2>Bookings Management</h2>
-                <a href="add_booking.php" class="btn btn-primary"><i class="bi bi-plus-circle"></i> New Booking</a>
+                <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
+                <i class="bi bi-person-circle avatar-icon"></i>
             </div>
+        </div>
 
-            <div class="card">
+        <!-- Page Header with Toggle -->
+        <div class="page-header">
+            <h2>Bookings Management</h2>
+        </div>
+
+        <!-- Bookings Table with Toggle -->
+        <div class="card">
+            <div class="card-header-with-toggle" data-target="bookingsSection" data-default-expanded="true">
+                <h5>All Bookings</h5>
+                <i class="bi bi-chevron-right"></i>
+            </div>
+            <div class="toggle-content show" id="bookingsSection">
                 <div class="table-responsive">
                     <table class="table" id="bookingsTable">
                         <thead>
@@ -700,9 +1087,15 @@ function statusBadge($status) {
                                     <td>$<?= number_format($booking['total_price'], 2) ?></td>
                                     <td><?= statusBadge($booking['status']) ?></td>
                                     <td>
-                                        <a href="view_booking.php?id=<?= $booking['booking_id'] ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
-                                        <a href="edit_booking.php?id=<?= $booking['booking_id'] ?>" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteBooking(<?= $booking['booking_id'] ?>)"><i class="bi bi-trash"></i></button>
+                                        <a href="booking_details.php?id=<?= $booking['booking_id'] ?>" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="edit_booking.php?id=<?= $booking['booking_id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteBooking(<?= $booking['booking_id'] ?>)" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -724,6 +1117,7 @@ function statusBadge($status) {
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="admin_toggle.js"></script>
     <script>
         // ========== NOTIFICATIONS ==========
         function updateNotifications() {
@@ -732,18 +1126,23 @@ function statusBadge($status) {
                 .then(data => {
                     const badge = document.getElementById('notificationBadge');
                     const list = document.getElementById('notificationList');
-                    if (data.notifications && data.notifications.length > 0) {
-                        badge.textContent = data.notifications.length;
-                        badge.style.display = 'flex';
-                        list.innerHTML = '';
-                        data.notifications.forEach(notif => {
-                            const item = document.createElement('li');
-                            item.innerHTML = `<a class="dropdown-item" href="${notif.link}">${notif.message}<br><small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small></a>`;
-                            list.appendChild(item);
-                        });
-                    } else {
-                        badge.style.display = 'none';
-                        list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                    if (badge && list) {
+                        if (data.notifications?.length) {
+                            badge.textContent = data.notifications.length;
+                            badge.style.display = 'flex';
+                            list.innerHTML = '';
+                            data.notifications.forEach(notif => {
+                                const item = document.createElement('li');
+                                item.innerHTML = `<a class="dropdown-item" href="${notif.link || '#'}">
+                                    ${notif.message}<br>
+                                    <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
+                                </a>`;
+                                list.appendChild(item);
+                            });
+                        } else {
+                            badge.style.display = 'none';
+                            list.innerHTML = '<li><span class="dropdown-item-text text-muted">No new notifications</span></li>';
+                        }
                     }
                 });
         }
@@ -752,113 +1151,11 @@ function statusBadge($status) {
             e.preventDefault();
             fetch('mark_notifications_read.php', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.success) updateNotifications();
-                });
+                .then(data => { if (data.success) updateNotifications(); });
         });
 
         updateNotifications();
         setInterval(updateNotifications, 30000);
-
-        // ========== SIDEBAR TOGGLE ==========
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebarToggleBtn = document.getElementById('sidebarToggle');
-
-        function toggleSidebar() {
-            if (window.innerWidth >= 992) {
-                sidebar.classList.toggle('collapsed');
-                document.body.classList.toggle('sidebar-collapsed');
-            } else {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-            }
-        }
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarToggleBtn) {
-            sidebarToggleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (window.innerWidth >= 992) {
-                    sidebar.classList.toggle('collapsed');
-                    document.body.classList.toggle('sidebar-collapsed');
-                }
-            });
-        }
-
-        if (overlay) {
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-        }
-
-        document.querySelectorAll('.sidebar .nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 992) {
-                    sidebar.classList.remove('active');
-                    overlay.classList.remove('active');
-                }
-            });
-        });
-        (function () {
-            const currentFile = window.location.pathname.split('/').pop();
-
-            if (['theatres.php', 'add_theatre.php'].includes(currentFile)) {
-                const submenu = document.getElementById('theatresSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['users.php', 'add_user.php', 'edit_user.php', 'update_user.php', 'user_dashboard.php'].includes(currentFile)) {
-                const submenu = document.getElementById('usersSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-            if (['settings.php', 'email_settings.php'].includes(currentFile)) {
-                const submenu = document.getElementById('settingsSubmenu');
-                if (submenu) submenu.classList.add('show');
-            }
-
-            function clearActiveStates() {
-                document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
-            }
-
-            function markActive(link) {
-                if (!link) return;
-                link.classList.add('active');
-                if (link.classList.contains('submenu-link')) {
-                    const collapseEl = link.closest('.collapse');
-                    if (collapseEl) {
-                        const parentToggle = document.querySelector('.sidebar .nav-link[data-bs-toggle="collapse"][href="#' + collapseEl.id + '"]');
-                        if (parentToggle) parentToggle.classList.add('active');
-                    }
-                }
-            }
-
-            function updateActiveStates() {
-                clearActiveStates();
-                const activeByHref = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-                if (activeByHref) markActive(activeByHref);
-            }
-
-            document.querySelectorAll('.sidebar .nav-link[data-bs-toggle="collapse"]').forEach(toggle => {
-                toggle.addEventListener('click', function () {
-                    clearActiveStates();
-                    this.classList.add('active');
-                });
-            });
-
-            document.querySelectorAll('.sidebar .submenu-link').forEach(link => {
-                link.addEventListener('click', function () {
-                    clearActiveStates();
-                    markActive(this);
-                });
-            });
-
-            updateActiveStates();
-        })();
 
         // ========== SEARCH FILTER ==========
         const searchBookingsInput = document.getElementById('searchBookings');
@@ -875,7 +1172,7 @@ function statusBadge($status) {
 
         // ========== DELETE BOOKING ==========
         function deleteBooking(id) {
-            if (confirm('Delete this booking?')) {
+            if (confirm('Delete this booking? This action cannot be undone.')) {
                 fetch('delete_booking.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -883,8 +1180,11 @@ function statusBadge($status) {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.success) location.reload();
-                    else alert('Delete failed: ' + data.error);
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Delete failed: ' + data.error);
+                    }
                 })
                 .catch(err => alert('Error: ' + err));
             }
@@ -892,11 +1192,3 @@ function statusBadge($status) {
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-

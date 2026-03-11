@@ -1,7 +1,19 @@
 ﻿<?php
 require_once 'db_connect.php';
 session_start();
+// DEBUG - Create a log file
+$log = __DIR__ . '/access_log.txt';
+$data = date('Y-m-d H:i:s') . " - Page: first_page.php\n";
+$data .= "User Role: " . ($_SESSION['user_role'] ?? 'NOT SET') . "\n";
+$data .= "User ID: " . ($_SESSION['user_id'] ?? 'NOT SET') . "\n";
+$data .= "Session: " . print_r($_SESSION, true) . "\n";
+$data .= "----------------------------\n\n";
+file_put_contents($log, $data, FILE_APPEND);
 
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+    header("Location: Admin_Dashboard/dashboard.php");
+    exit;
+}
 // Helper function to convert hex to rgba (for navbar transparency)
 function hex2rgba($hex, $alpha = 1)
 {
@@ -1606,28 +1618,44 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
         <div class="loader-vignette"></div>
     </div>
 
-    <!-- Floating Navbar with conditional class for logo -->
-    <header id="navbar" class="<?php echo !empty($settings['site_logo']) ? 'has-logo' : ''; ?>">
+    <!-- Floating Navbar with Burger Menu -->
+    <header id="navbar">
         <a href="first_page.php" class="logo">
             <?php if (!empty($settings['site_logo'])): ?>
-                <img src="<?php echo htmlspecialchars($settings['site_logo']) ?>"
-                    alt="<?php echo htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
+                <img src="<?= htmlspecialchars($settings['site_logo']) ?>"
+                    alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
             <?php else: ?>
-                <?php echo htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
+                <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
             <?php endif; ?>
         </a>
         <div class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></div>
         <nav class="nav-links" id="navLinks">
-            <a href="first_page.php" class="active">Home</a>
-            <a href="showtimes.php">Showtimes</a>
-            <a href="theatre.php">Theatres</a>
-            <a href="booking.php">Booking</a>
-            <a href="about.php">About</a>
-            <a href="user_dashboard.php">Dashboard</a>
-            <a href="logout.php">Logout</a>
+            <a href="first_page.php" <?= basename($_SERVER['PHP_SELF']) == 'first_page.php' ? 'class="active"' : '' ?>>Home</a>
+            <a href="showtimes.php" <?= basename($_SERVER['PHP_SELF']) == 'showtimes.php' ? 'class="active"' : '' ?>>Showtimes</a>
+            <a href="theatre.php" <?= basename($_SERVER['PHP_SELF']) == 'theatre.php' ? 'class="active"' : '' ?>>Theatres</a>
+            <a href="booking.php" <?= basename($_SERVER['PHP_SELF']) == 'booking.php' ? 'class="active"' : '' ?>>Booking</a>
+            <a href="about.php" <?= basename($_SERVER['PHP_SELF']) == 'about.php' ? 'class="active"' : '' ?>>About</a>
+
+            <?php if (isset($_SESSION['user_id'])):
+                $user_role = $_SESSION['user_role'] ?? 'user';
+                ?>
+                <?php if ($user_role === 'admin'): ?>
+                    <!-- Admin sees both Dashboard and Admin Panel -->
+                    <a href="user_dashboard.php" <?= basename($_SERVER['PHP_SELF']) == 'user_dashboard.php' ? 'class="active"' : '' ?>>My Dashboard</a>
+                    <a href="Admin_Dashboard/dashboard.php" class="admin-link">
+                        <i class="fas fa-crown"></i> Admin Panel
+                    </a>
+                <?php else: ?>
+                    <!-- Regular users only see their dashboard -->
+                    <a href="user_dashboard.php" <?= basename($_SERVER['PHP_SELF']) == 'user_dashboard.php' ? 'class="active"' : '' ?>>Dashboard</a>
+                <?php endif; ?>
+                <a href="logout.php">Logout</a>
+            <?php else: ?>
+                <a href="login.php">Login</a>
+                <a href="register.php">Register</a>
+            <?php endif; ?>
         </nav>
     </header>
-
     <!-- PREMIUM HERO SLIDER (dynamic from hero_slides table) -->
     <?php
     $slides = $conn->query("SELECT * FROM hero_slides WHERE active = 1 ORDER BY slide_order ASC");
@@ -1832,7 +1860,8 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             <!-- Left column: Dynamic Voting (moved here) -->
             <div class="main-column reveal">
                 <div class="section-header" style="margin-bottom: 25px;">
-                    <h2>Vote For Movie <span style="color: var(--popcorn-orange); font-size: 14px;"> Audience Choice</span></h2>
+                    <h2>Vote For Movie <span style="color: var(--popcorn-orange); font-size: 14px;"> Audience
+                            Choice</span></h2>
                 </div>
                 <div class="vote-card" id="voteCard">
                     <div class="vote-header">

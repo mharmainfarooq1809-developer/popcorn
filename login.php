@@ -13,39 +13,57 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
     }
 }
 
-// Handle registration
+// Initialize variables with strict null coalescing
+$errors = [];
+$reg_success = '';
+$login_error = '';
+
+// Handle registration with strict validation
 if (isset($_POST['register'])) {
-    $name = trim($_POST['reg_name']);
-    $email = trim($_POST['reg_email']);
-    $password = $_POST['reg_password'];
-    $confirm = $_POST['reg_confirm'];
+    $name = isset($_POST['reg_name']) ? trim($_POST['reg_name']) : '';
+    $email = isset($_POST['reg_email']) ? trim($_POST['reg_email']) : '';
+    $password = $_POST['reg_password'] ?? '';
+    $confirm = $_POST['reg_confirm'] ?? '';
 
     $errors = [];
 
-    // Validation
-    if (empty($name) || !preg_match("/^[a-zA-Z\s]{2,50}$/", $name)) {
+    // Strict validation
+    if (empty($name)) {
+        $errors[] = "Name is required.";
+    } elseif (!preg_match("/^[a-zA-Z\s]{2,50}$/", $name)) {
         $errors[] = "Name must be 2-50 letters and spaces only.";
     }
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+    if (empty($email)) {
+        $errors[] = "Email is required.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Invalid email format.";
     }
-    if (strlen($password) < 6) {
+
+    if (empty($password)) {
+        $errors[] = "Password is required.";
+    } elseif (strlen($password) < 6) {
         $errors[] = "Password must be at least 6 characters.";
     }
+
     if ($password !== $confirm) {
         $errors[] = "Passwords do not match.";
     }
 
-    // Check if email already exists
+    // Check if email already exists (only if no errors so far)
     if (empty($errors)) {
         $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $stmt->store_result();
-        if ($stmt->num_rows > 0) {
-            $errors[] = "Email already registered.";
+        if ($stmt) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $errors[] = "Email already registered.";
+            }
+            $stmt->close();
+        } else {
+            $errors[] = "Database error: unable to prepare statement.";
         }
-        $stmt->close();
     }
 
     // Insert if no errors
@@ -53,56 +71,86 @@ if (isset($_POST['register'])) {
         $hashed = password_hash($password, PASSWORD_DEFAULT);
         $role = 'user'; // default role
         $stmt = $conn->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $name, $email, $hashed, $role);
-        if ($stmt->execute()) {
-            $reg_success = "Registration successful! You can now log in.";
-            // Log registration notification
-            $conn->query("INSERT INTO notifications (type, message, link) VALUES ('user', 'New user registered: " . $conn->real_escape_string($name) . "', 'Admin_Dashboard/users.php')");
+        if ($stmt) {
+            $stmt->bind_param("ssss", $name, $email, $hashed, $role);
+            if ($stmt->execute()) {
+                $reg_success = "Registration successful! You can now log in.";
+                // Log registration notification with strict escaping
+                $safe_name = $conn->real_escape_string($name);
+                $conn->query("INSERT INTO notifications (type, message, link) VALUES ('user', 'New user registered: $safe_name', 'Admin_Dashboard/users.php')");
+            } else {
+                $errors[] = "Registration failed: " . $conn->error;
+            }
+            $stmt->close();
         } else {
-            $errors[] = "Registration failed: " . $conn->error;
+            $errors[] = "Database error: unable to prepare insert.";
         }
-        $stmt->close();
     }
 }
 
+// Handle login with strict validation
 if (isset($_POST['login'])) {
-    $email = trim($_POST['login_email']);
-    $password = $_POST['login_password'];
+    $email = isset($_POST['login_email']) ? trim($_POST['login_email']) : '';
+    $password = $_POST['login_password'] ?? '';
 
-    $stmt = $conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        // User found
-        if (password_verify($password, $row['password'])) {
-            $normalizedRole = strtolower(trim((string)$row['role']));
-            $_SESSION['user_id'] = $row['id'];
-            $_SESSION['user_name'] = $row['name'];
-            $_SESSION['user_role'] = $normalizedRole;
-
-            // Redirect based on role
-            if ($normalizedRole === 'admin') {
-                header("Location: Admin_Dashboard/dashboard.php");
-                exit;
-            } else {
-                header("Location: first_page.php");
-                exit;
-            }
-        } else {
-            $login_error = "Invalid email or password (password mismatch)";
-        }
+    if (empty($email) || empty($password)) {
+        $login_error = "Both email and password are required.";
     } else {
-        $login_error = "Invalid email or password (email not found)";
+        $stmt = $conn->prepare("SELECT id, name, password, role FROM users WHERE email = ?");
+        if ($stmt) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if ($row = $result->fetch_assoc()) {
+                // User found
+                if (password_verify($password, $row['password'])) {
+                    // Strict role normalization
+                    $normalizedRole = strtolower(trim((string)$row['role']));
+                    if (!in_array($normalizedRole, ['admin', 'user'], true)) {
+                        $normalizedRole = 'user'; // fallback to user if invalid role
+                    }
+                    
+                    $_SESSION['user_id'] = (int)$row['id'];
+                    $_SESSION['user_name'] = $row['name'];
+                    $_SESSION['user_role'] = $normalizedRole;
+                    $_SESSION['logged_in'] = true;
+                    $_SESSION['login_time'] = time();
+
+                    // Regenerate session ID for security
+                    session_regenerate_id(true);
+
+                    // Redirect based on role
+                    if ($normalizedRole === 'admin') {
+                        header("Location: Admin_Dashboard/dashboard.php");
+                        exit;
+                    } else {
+                        header("Location: first_page.php");
+                        exit;
+                    }
+                } else {
+                    $login_error = "Invalid email or password.";
+                }
+            } else {
+                $login_error = "Invalid email or password.";
+            }
+            $stmt->close();
+        } else {
+            $login_error = "Database error: unable to prepare statement.";
+        }
     }
-    $stmt->close();
 }
 
 // Determine initial active panel based on PHP state (for UI)
 $initialPanel = 'login'; // default
-if (!empty($errors) || isset($reg_success)) {
+if (!empty($errors) || !empty($reg_success)) {
     $initialPanel = 'register';
 }
+
+// Sanitize all output variables
+$site_name = htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub', ENT_QUOTES, 'UTF-8');
+$login_error_display = !empty($login_error) ? htmlspecialchars($login_error, ENT_QUOTES, 'UTF-8') : '';
+$reg_success_display = !empty($reg_success) ? htmlspecialchars($reg_success, ENT_QUOTES, 'UTF-8') : '';
+$errors_display = $errors;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -110,7 +158,7 @@ if (!empty($errors) || isset($reg_success)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?> · access</title>
+    <title><?php echo $site_name; ?> · access</title>
     <!-- Modern fonts: Inter + Clash Display for headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -443,6 +491,10 @@ if (!empty($errors) || isset($reg_success)) {
             left: 100%;
         }
 
+        .btn:active {
+            transform: translateY(-2px) scale(1.01);
+        }
+
         .error-msg,
         .success-msg {
             padding: 16px 22px;
@@ -554,6 +606,10 @@ if (!empty($errors) || isset($reg_success)) {
             transform: scale(1.05);
         }
 
+        .overlay-btn:active {
+            transform: scale(1.02);
+        }
+
         /* Overlay right state */
         .auth-card.overlay-right .overlay {
             left: 50%;
@@ -662,22 +718,22 @@ if (!empty($errors) || isset($reg_success)) {
                 <!-- LOGIN COLUMN (left) -->
                 <div class="form-col">
                     <h2 class="form-title">Sign In</h2>
-                    <?php if (isset($login_error)): ?>
-                        <div class="error-msg"><?= htmlspecialchars($login_error) ?></div>
+                    <?php if (!empty($login_error_display)): ?>
+                        <div class="error-msg"><?php echo $login_error_display; ?></div>
                     <?php endif; ?>
-                    <form method="post">
+                    <form method="post" autocomplete="off">
                         <div class="input-group">
-                            <label>Email address</label>
+                            <label for="login_email">Email address</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="login_email" placeholder="name@domain.com" required>
+                                <input type="email" id="login_email" name="login_email" placeholder="name@domain.com" required>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Password</label>
+                            <label for="login_password">Password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="login_password" placeholder="••••••••" required>
+                                <input type="password" id="login_password" name="login_password" placeholder="••••••••" required>
                             </div>
                         </div>
                         <button type="submit" name="login" class="btn">Log in</button>
@@ -687,44 +743,44 @@ if (!empty($errors) || isset($reg_success)) {
                 <!-- REGISTER COLUMN (right) -->
                 <div class="form-col">
                     <h2 class="form-title">Create account</h2>
-                    <?php if (!empty($errors)): ?>
+                    <?php if (!empty($errors_display)): ?>
                         <div class="error-msg">
-                            <?php foreach ($errors as $err): ?>
-                                <?= htmlspecialchars($err) ?><br>
+                            <?php foreach ($errors_display as $err): ?>
+                                <?php echo htmlspecialchars($err, ENT_QUOTES, 'UTF-8'); ?><br>
                             <?php endforeach; ?>
                         </div>
-                    <?php elseif (isset($reg_success)): ?>
-                        <div class="success-msg"><?= htmlspecialchars($reg_success) ?></div>
+                    <?php elseif (!empty($reg_success_display)): ?>
+                        <div class="success-msg"><?php echo $reg_success_display; ?></div>
                     <?php endif; ?>
-                    <form method="post">
+                    <form method="post" autocomplete="off">
                         <div class="input-group">
-                            <label>Full name</label>
+                            <label for="reg_name">Full name</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-user"></i>
-                                <input type="text" name="reg_name" placeholder="John Doe" required
+                                <input type="text" id="reg_name" name="reg_name" placeholder="John Doe" required
                                     pattern="[A-Za-z\s]{2,50}" title="2-50 letters and spaces only">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Email address</label>
+                            <label for="reg_email">Email address</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-envelope"></i>
-                                <input type="email" name="reg_email" placeholder="name@domain.com" required>
+                                <input type="email" id="reg_email" name="reg_email" placeholder="name@domain.com" required>
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Password</label>
+                            <label for="reg_password">Password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="reg_password" placeholder="••••••••" required
+                                <input type="password" id="reg_password" name="reg_password" placeholder="••••••••" required
                                     minlength="6">
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Confirm password</label>
+                            <label for="reg_confirm">Confirm password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" name="reg_confirm" placeholder="••••••••" required minlength="6">
+                                <input type="password" id="reg_confirm" name="reg_confirm" placeholder="••••••••" required minlength="6">
                             </div>
                         </div>
                         <button type="submit" name="register" class="btn">Register</button>
@@ -732,65 +788,90 @@ if (!empty($errors) || isset($reg_success)) {
                 </div>
             </div>
 
-            <!-- OVERLAY PANEL with dual content (buttons now correctly mapped) -->
+            <!-- OVERLAY PANEL with dual content -->
             <div class="overlay">
                 <!-- Left content: visible when overlay on left (register form visible) -->
                 <div class="overlay-content" data-state="left">
                     <h3 class="overlay-title">New here</h3>
                     <p class="overlay-desc">Create an account and unlock a universe of possibilities.</p>
-                    <button class="overlay-btn" id="switchToLogin">Sign in</button>
+                    <button class="overlay-btn" id="switchToLogin" type="button">Sign in</button>
                 </div>
                 <!-- Right content: visible when overlay on right (login form visible) -->
                 <div class="overlay-content" data-state="right">
                     <h3 class="overlay-title">Welcome back</h3>
                     <p class="overlay-desc">Enter your credentials to continue your journey among the stars.</p>
-                    <button class="overlay-btn" id="switchToRegister">Join now</button>
+                    <button class="overlay-btn" id="switchToRegister" type="button">Join now</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // ===== OVERLAY CONTROL =====
             const authCard = document.getElementById('authCard');
             const switchToRegister = document.getElementById('switchToRegister');
             const switchToLogin = document.getElementById('switchToLogin');
 
-            // Set initial state from PHP
+            // Set initial state from PHP with strict comparison
             const initialPanel = '<?php echo $initialPanel; ?>'; // 'login' or 'register'
+            
+            // Apply initial state
             if (initialPanel === 'register') {
                 authCard.classList.remove('overlay-right'); // overlay left → register visible
-                console.log('Initial state: register (overlay left)');
             } else {
                 authCard.classList.add('overlay-right'); // overlay right → login visible
-                console.log('Initial state: login (overlay right)');
             }
 
-            // Toggle functions
-            switchToRegister.addEventListener('click', function () {
-                authCard.classList.remove('overlay-right'); // moves overlay left, showing register
-                console.log('Switched to register (overlay left)');
-            });
+            // Toggle functions with strict event handling
+            if (switchToRegister) {
+                switchToRegister.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    authCard.classList.remove('overlay-right'); // moves overlay left, showing register
+                });
+            }
 
-            switchToLogin.addEventListener('click', function () {
-                authCard.classList.add('overlay-right'); // moves overlay right, showing login
-                console.log('Switched to login (overlay right)');
-            });
+            if (switchToLogin) {
+                switchToLogin.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    authCard.classList.add('overlay-right'); // moves overlay right, showing login
+                });
+            }
 
             // ===== PARTICLE FIELD GENERATION =====
             const particlesDiv = document.getElementById('particles');
-            for (let i = 0; i < 60; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                const size = Math.random() * 3 + 1;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.left = Math.random() * 100 + '%';
-                p.style.top = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 8 + 's';
-                p.style.animationDuration = (Math.random() * 15 + 15) + 's';
-                particlesDiv.appendChild(p);
+            if (particlesDiv) {
+                // Clear any existing particles
+                particlesDiv.innerHTML = '';
+                
+                for (let i = 0; i < 60; i++) {
+                    const p = document.createElement('div');
+                    p.className = 'particle';
+                    const size = Math.random() * 3 + 1;
+                    p.style.width = size + 'px';
+                    p.style.height = size + 'px';
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.top = Math.random() * 100 + '%';
+                    p.style.animationDelay = Math.random() * 8 + 's';
+                    p.style.animationDuration = (Math.random() * 15 + 15) + 's';
+                    particlesDiv.appendChild(p);
+                }
+            }
+
+            // ===== FORM VALIDATION ENHANCEMENT =====
+            const registerForm = document.querySelector('form[method="post"]:has([name="register"])');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    const password = document.getElementById('reg_password');
+                    const confirm = document.getElementById('reg_confirm');
+                    
+                    if (password && confirm) {
+                        if (password.value !== confirm.value) {
+                            e.preventDefault();
+                            alert('Passwords do not match!');
+                        }
+                    }
+                });
             }
         });
     </script>

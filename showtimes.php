@@ -1,4 +1,4 @@
-<?php
+ï»¿<?php
 require_once 'db_connect.php';
 session_start();
 // load global settings
@@ -22,10 +22,14 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Showtimes • <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Showtimes Â· <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
+            :root {
+                --primary:
+                    <?= htmlspecialchars($settings['theme_color']) ?>
+                ;
+            }
         </style>
     <?php endif; ?>
     <!-- Google Fonts: Heebo -->
@@ -138,10 +142,10 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             color: var(--popcorn-orange);
         }
 
-        .logo img { 
-            max-height: 60px; 
-            width: auto; 
-            display: block; 
+        .logo img {
+            max-height: 60px;
+            width: auto;
+            display: block;
         }
 
         .menu-toggle {
@@ -196,8 +200,8 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             width: 100%;
         }
 
-        /* ================= THEATRE SELECTOR ================= */
-        .theatre-section {
+        /* ================= SEARCH SECTION ================= */
+        .search-section {
             margin: 120px 0 30px;
             display: flex;
             align-items: center;
@@ -211,7 +215,7 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .theatre-section label {
+        .search-section label {
             font-weight: 700;
             color: var(--light-gray);
             font-size: 16px;
@@ -220,26 +224,69 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             gap: 8px;
         }
 
-        .theatre-section label i {
+        .search-section label i {
             color: var(--popcorn-orange);
         }
 
-        .theatre-section select {
+        .search-section .search-wrapper {
             flex: 1;
+            position: relative;
             min-width: 280px;
-            padding: 12px 20px;
+        }
+
+        .search-section input {
+            width: 100%;
+            padding: 12px 20px 12px 50px;
             border-radius: 40px;
             border: 1px solid var(--gray-1);
             background: var(--dark-gray);
             color: var(--white);
             font-family: 'Heebo', sans-serif;
             font-size: 16px;
-            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .theatre-section select:hover {
+        .search-section input:hover,
+        .search-section input:focus {
             border-color: var(--popcorn-orange);
             outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.2);
+        }
+
+        .search-section input::placeholder {
+            color: var(--gray-2);
+        }
+
+        .search-section .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-2);
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .search-section .clear-search {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-2);
+            cursor: pointer;
+            font-size: 18px;
+            display: none;
+            transition: color 0.3s;
+        }
+
+        .search-section .clear-search:hover {
+            color: var(--popcorn-orange);
+        }
+
+        .search-section .search-stats {
+            color: var(--light-gray);
+            font-size: 14px;
+            padding: 0 10px;
         }
 
         /* ================= CATEGORY FILTERS ================= */
@@ -276,6 +323,34 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             color: var(--dark-navy);
         }
 
+        /* ================= NO RESULTS MESSAGE ================= */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(15, 28, 43, 0.5);
+            border-radius: 30px;
+            border: 1px solid var(--gray-1);
+            backdrop-filter: blur(10px);
+        }
+
+        .no-results i {
+            font-size: 60px;
+            color: var(--gray-2);
+            margin-bottom: 20px;
+        }
+
+        .no-results h3 {
+            font-size: 24px;
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        .no-results p {
+            color: var(--light-gray);
+            font-size: 16px;
+        }
+
         /* ================= MODERN MOVIE GRID LAYOUT ================= */
         .movies-grid {
             display: grid;
@@ -303,16 +378,45 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             animation: fadeInUp 0.6s ease forwards;
         }
 
-        .movie-card:nth-child(1) { animation-delay: 0.1s; }
-        .movie-card:nth-child(2) { animation-delay: 0.15s; }
-        .movie-card:nth-child(3) { animation-delay: 0.2s; }
-        .movie-card:nth-child(4) { animation-delay: 0.25s; }
-        .movie-card:nth-child(5) { animation-delay: 0.3s; }
-        .movie-card:nth-child(6) { animation-delay: 0.35s; }
-        .movie-card:nth-child(7) { animation-delay: 0.4s; }
-        .movie-card:nth-child(8) { animation-delay: 0.45s; }
-        .movie-card:nth-child(9) { animation-delay: 0.5s; }
-        .movie-card:nth-child(10) { animation-delay: 0.55s; }
+        .movie-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .movie-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .movie-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .movie-card:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .movie-card:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .movie-card:nth-child(6) {
+            animation-delay: 0.35s;
+        }
+
+        .movie-card:nth-child(7) {
+            animation-delay: 0.4s;
+        }
+
+        .movie-card:nth-child(8) {
+            animation-delay: 0.45s;
+        }
+
+        .movie-card:nth-child(9) {
+            animation-delay: 0.5s;
+        }
+
+        .movie-card:nth-child(10) {
+            animation-delay: 0.55s;
+        }
 
         @keyframes fadeInUp {
             to {
@@ -348,10 +452,10 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to top, 
-                rgba(15, 28, 43, 0.98) 0%,
-                rgba(15, 28, 43, 0.6) 40%,
-                transparent 80%);
+            background: linear-gradient(to top,
+                    rgba(15, 28, 43, 0.98) 0%,
+                    rgba(15, 28, 43, 0.6) 40%,
+                    transparent 80%);
             opacity: 0;
             transition: opacity 0.4s ease;
             display: flex;
@@ -560,6 +664,10 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             height: 400px;
             border-radius: 16px;
             border: none;
+        }
+
+        .btn-close-white {
+            filter: invert(1) grayscale(100%) brightness(200%);
         }
 
         /* ================= FOOTER ================= */
@@ -784,16 +892,20 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                 gap: 15px;
             }
 
-            .theatre-section {
+            .search-section {
                 flex-direction: column;
                 align-items: stretch;
                 margin-top: 100px;
             }
 
+            .search-section .search-wrapper {
+                min-width: 100%;
+            }
+
             .movie-title {
                 font-size: 16px;
             }
-            
+
             .btn {
                 padding: 8px 12px;
                 font-size: 12px;
@@ -824,7 +936,8 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
     <header id="navbar">
         <a href="first_page.php" class="logo">
             <?php if (!empty($settings['site_logo'])): ?>
-                <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
+                <img src="<?= htmlspecialchars($settings['site_logo']) ?>"
+                    alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
             <?php else: ?>
                 <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
             <?php endif; ?>
@@ -842,15 +955,16 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
     </header>
 
     <main class="container">
-        <!-- Theatre selector -->
-        <div class="theatre-section">
-            <label><i class="fas fa-map-marker-alt"></i> Select Theatre</label>
-            <select id="theatreSelect">
-                <option>Bashundhara Shopping Mall, Panthapath</option>
-                <option>Bashundhara City, Panthapath</option>
-                <option>Shimanto Square, Dhanmondi</option>
-                <option>Jamuna Future Park</option>
-            </select>
+        <!-- Search Section  -->
+        <div class="search-section">
+            <label><i class="fas fa-search"></i> Search Movies</label>
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput"
+                    placeholder="Type to search by title, genre, category or language...">
+                <i class="fas fa-times-circle clear-search" id="clearSearch"></i>
+            </div>
+            <div class="search-stats" id="searchStats"></div>
         </div>
 
         <!-- Category filters -->
@@ -868,7 +982,7 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
         <!-- Movie grid container -->
         <div class="movies-grid" id="moviesContainer">
             <?php if ($movies->num_rows > 0): ?>
-                <?php while ($movie = $movies->fetch_assoc()): 
+                <?php while ($movie = $movies->fetch_assoc()):
                     $movie_id = $movie['id'];
                     $showtimes = [];
 
@@ -884,27 +998,88 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                             }
                         }
                     } catch (Exception $e) {
-                        // Table missing – ignore
+                        // Table missing â€“ ignore
                     }
 
-                    $currentHour = (int)date('H');
+                    $currentHour = (int) date('H');
                     $posterUrl = !empty($movie['image_url']) ? $movie['image_url'] : (!empty($movie['poster_url']) ? $movie['poster_url'] : 'https://via.placeholder.com/500x750?text=No+Poster');
-                ?>
-                <div class="movie-card" data-category="<?= htmlspecialchars($movie['category'] ?? '') ?>">
-                    <div class="movie-poster" style="background-image: url(<?= htmlspecialchars($posterUrl) ?>);">
-                        <div class="movie-poster-badges">
-                            <?php if (!empty($movie['is_premium'])): ?>
-                                <span class="premium-badge">Premium</span>
-                            <?php endif; ?>
-                            <?php if (!empty($movie['rating'])): ?>
-                                <span class="premium-badge" style="background: linear-gradient(145deg, #FFA500, #CC7F00);"><?= htmlspecialchars($movie['rating']) ?></span>
-                            <?php endif; ?>
+
+                    // Prepare searchable data for JavaScript filtering
+                    $searchableData = strtolower(
+                        ($movie['title'] ?? '') . ' ' .
+                        ($movie['genre'] ?? '') . ' ' .
+                        ($movie['category'] ?? '') . ' ' .
+                        ($movie['language'] ?? '')
+                    );
+                    ?>
+                    <div class="movie-card" data-category="<?= htmlspecialchars($movie['category'] ?? '') ?>"
+                        data-search="<?= htmlspecialchars($searchableData) ?>"
+                        data-title="<?= htmlspecialchars($movie['title'] ?? '') ?>">
+
+                        <div class="movie-poster" style="background-image: url(<?= htmlspecialchars($posterUrl) ?>);">
+                            <div class="movie-poster-badges">
+                                <?php if (!empty($movie['is_premium'])): ?>
+                                    <span class="premium-badge">Premium</span>
+                                <?php endif; ?>
+                                <?php if (!empty($movie['rating'])): ?>
+                                    <span class="premium-badge"
+                                        style="background: linear-gradient(145deg, #FFA500, #CC7F00);"><?= htmlspecialchars($movie['rating']) ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="movie-poster-overlay">
+                                <div class="movie-actions">
+                                    <button class="btn btn-outline"
+                                        onclick="openTrailer('<?= htmlspecialchars($movie['trailer_url'] ?? 'https://www.youtube.com/embed/dQw4w9WgXcQ') ?>')">
+                                        <i class="fas fa-play"></i> Trailer
+                                    </button>
+                                    <a href="booking.php?movie_id=<?= $movie['id'] ?>" class="btn btn-primary">
+                                        <i class="fas fa-ticket-alt"></i> Book
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                        
-                        <div class="movie-poster-overlay">
-                            <div class="movie-actions">
-                                <button class="btn btn-outline" onclick="openTrailer('<?= htmlspecialchars($movie['trailer_url'] ?? 'https://www.youtube.com/embed/dQw4w9WgXcQ') ?>')">
-                                    <i class="fas fa-play"></i> Trailer
+
+                        <div class="movie-card-content">
+                            <h3 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h3>
+
+                            <?php if (!empty($movie['genre'])): ?>
+                                <div class="movie-genre">
+                                    <i class="fas fa-film"></i> <?= htmlspecialchars($movie['genre']) ?>
+                                </div>
+                            <?php elseif (!empty($movie['category'])): ?>
+                                <div class="movie-genre">
+                                    <i class="fas fa-tag"></i> <?= htmlspecialchars($movie['category']) ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($movie['language'])): ?>
+                                <div class="movie-language">
+                                    <i class="fas fa-language"></i> <?= htmlspecialchars($movie['language']) ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Showtimes as rounded badges -->
+                            <?php if (count($showtimes) > 0): ?>
+                                <div class="showtimes-preview">
+                                    <?php foreach ($showtimes as $st):
+                                        $time = date('g:i A', strtotime($st['show_time']));
+                                        $isTonight = ($st['show_date'] == date('Y-m-d') && $currentHour >= 18 && $currentHour < 23);
+                                        ?>
+                                        <span class="showtime-pill <?= $isTonight ? 'tonight' : '' ?>"><?= $time ?></span>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="showtimes-preview">
+                                    <span class="showtime-pill" style="opacity: 0.5;">No shows</span>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Mobile/fallback buttons -->
+                            <div class="movie-actions d-md-none">
+                                <button class="btn btn-outline"
+                                    onclick="openTrailer('<?= htmlspecialchars($movie['trailer_url'] ?? 'https://www.youtube.com/embed/dQw4w9WgXcQ') ?>')">
+                                    <i class="fas fa-play"></i>
                                 </button>
                                 <a href="booking.php?movie_id=<?= $movie['id'] ?>" class="btn btn-primary">
                                     <i class="fas fa-ticket-alt"></i> Book
@@ -912,53 +1087,6 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="movie-card-content">
-                        <h3 class="movie-title"><?= htmlspecialchars($movie['title']) ?></h3>
-                        
-                        <?php if (!empty($movie['genre'])): ?>
-                            <div class="movie-genre">
-                                <i class="fas fa-film"></i> <?= htmlspecialchars($movie['genre']) ?>
-                            </div>
-                        <?php elseif (!empty($movie['category'])): ?>
-                            <div class="movie-genre">
-                                <i class="fas fa-tag"></i> <?= htmlspecialchars($movie['category']) ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <?php if (!empty($movie['language'])): ?>
-                            <div class="movie-language">
-                                <i class="fas fa-language"></i> <?= htmlspecialchars($movie['language']) ?>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <!-- Showtimes as rounded badges -->
-                        <?php if (count($showtimes) > 0): ?>
-                            <div class="showtimes-preview">
-                                <?php foreach ($showtimes as $st): 
-                                    $time = date('g:i A', strtotime($st['show_time']));
-                                    $isTonight = ($st['show_date'] == date('Y-m-d') && $currentHour >= 18 && $currentHour < 23);
-                                ?>
-                                    <span class="showtime-pill <?= $isTonight ? 'tonight' : '' ?>"><?= $time ?></span>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php else: ?>
-                            <div class="showtimes-preview">
-                                <span class="showtime-pill" style="opacity: 0.5;">No shows</span>
-                            </div>
-                        <?php endif; ?>
-                        
-                        <!-- Mobile/fallback buttons -->
-                        <div class="movie-actions d-md-none">
-                            <button class="btn btn-outline" onclick="openTrailer('<?= htmlspecialchars($movie['trailer_url'] ?? 'https://www.youtube.com/embed/dQw4w9WgXcQ') ?>')">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <a href="booking.php?movie_id=<?= $movie['id'] ?>" class="btn btn-primary">
-                                <i class="fas fa-ticket-alt"></i> Book
-                            </a>
-                        </div>
-                    </div>
-                </div>
                 <?php endwhile; ?>
             <?php else: ?>
                 <div class="col-12 text-center py-5">
@@ -973,7 +1101,8 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Movie Trailer</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <iframe id="trailerIframe" src="" allowfullscreen></iframe>
@@ -999,13 +1128,18 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                         <div class="contact-info">
                             <h5>Get in touch</h5>
                             <?php if (!empty($settings['contact_email'])): ?>
-                                <p><i class="fas fa-envelope"></i> <a href="mailto:<?= htmlspecialchars($settings['contact_email']) ?>"><?= htmlspecialchars($settings['contact_email']) ?></a></p>
+                                <p><i class="fas fa-envelope"></i> <a
+                                        href="mailto:<?= htmlspecialchars($settings['contact_email']) ?>"><?= htmlspecialchars($settings['contact_email']) ?></a>
+                                </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['contact_phone'])): ?>
-                                <p><i class="fas fa-phone-alt"></i> <a href="tel:<?= htmlspecialchars($settings['contact_phone']) ?>"><?= htmlspecialchars($settings['contact_phone']) ?></a></p>
+                                <p><i class="fas fa-phone-alt"></i> <a
+                                        href="tel:<?= htmlspecialchars($settings['contact_phone']) ?>"><?= htmlspecialchars($settings['contact_phone']) ?></a>
+                                </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['address'])): ?>
-                                <p><i class="fas fa-map-marker-alt"></i> <?= nl2br(htmlspecialchars($settings['address'])) ?></p>
+                                <p><i class="fas fa-map-marker-alt"></i> <?= nl2br(htmlspecialchars($settings['address'])) ?>
+                                </p>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
@@ -1039,19 +1173,22 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                     </div>
                     <div class="social-links">
                         <?php if (!empty($settings['facebook_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['facebook_url']) ?>" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="<?= htmlspecialchars($settings['facebook_url']) ?>" target="_blank" rel="noopener"
+                                aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['twitter_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['twitter_url']) ?>" target="_blank" rel="noopener" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="<?= htmlspecialchars($settings['twitter_url']) ?>" target="_blank" rel="noopener"
+                                aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['instagram_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['instagram_url']) ?>" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="<?= htmlspecialchars($settings['instagram_url']) ?>" target="_blank" rel="noopener"
+                                aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
             <div class="copyright">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' '.($settings['site_name'] ?? 'Popcorn Hub').' Cinemas. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? 'Â© ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
             </div>
         </div>
     </footer>
@@ -1081,34 +1218,109 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             });
         }
 
-        // Category filtering
-        const categoryBtns = document.querySelectorAll('.category-btn');
+        // ================= SEARCH FUNCTIONALITY =================
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const searchStats = document.getElementById('searchStats');
         const movieCards = document.querySelectorAll('.movie-card');
+        const categoryBtns = document.querySelectorAll('.category-btn');
 
+        let activeCategory = 'all';
+        let searchTerm = '';
+
+        // Search input handler
+        function filterMovies() {
+            searchTerm = searchInput.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            movieCards.forEach(card => {
+                const searchData = card.dataset.search || '';
+                const category = card.dataset.category || '';
+
+                // Check category match
+                const categoryMatch = activeCategory === 'all' || category === activeCategory;
+
+                // Check search term match
+                const searchMatch = searchTerm === '' || searchData.includes(searchTerm);
+
+                if (categoryMatch && searchMatch) {
+                    card.style.display = 'flex';
+                    card.style.animation = 'fadeInUp 0.6s ease forwards';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Update search stats
+            if (searchTerm || activeCategory !== 'all') {
+                const totalVisible = visibleCount;
+                const totalMovies = movieCards.length;
+                searchStats.innerHTML = `Found ${totalVisible} movie${totalVisible !== 1 ? 's' : ''}`;
+
+                if (totalVisible === 0) {
+                    showNoResults();
+                } else {
+                    hideNoResults();
+                }
+            } else {
+                searchStats.innerHTML = '';
+            }
+
+            // Show/hide clear button
+            clearSearch.style.display = searchTerm ? 'block' : 'none';
+        }
+
+        // No results message
+        function showNoResults() {
+            let noResultsDiv = document.querySelector('.no-results');
+            if (!noResultsDiv) {
+                noResultsDiv = document.createElement('div');
+                noResultsDiv.className = 'no-results';
+                noResultsDiv.innerHTML = `
+                    <i class="fas fa-film"></i>
+                    <h3>No Movies Found</h3>
+                    <p>Try adjusting your search or category filter</p>
+                `;
+                document.getElementById('moviesContainer').appendChild(noResultsDiv);
+            }
+        }
+
+        function hideNoResults() {
+            const noResultsDiv = document.querySelector('.no-results');
+            if (noResultsDiv) {
+                noResultsDiv.remove();
+            }
+        }
+
+        // Clear search
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            filterMovies();
+            searchInput.focus();
+        });
+
+        // Category filtering
         categoryBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 categoryBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
-                const selectedCategory = btn.dataset.category;
-
-                movieCards.forEach(card => {
-                    if (selectedCategory === 'all' || card.dataset.category === selectedCategory) {
-                        card.style.display = 'flex';
-                        card.style.animation = 'fadeInUp 0.6s ease forwards';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+                activeCategory = btn.dataset.category;
+                filterMovies();
             });
         });
 
-        // Detect image orientation
+        // Debounced search input
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(filterMovies, 300);
+        });
 
         // Trailer modal function
         function openTrailer(url) {
             const iframe = document.getElementById('trailerIframe');
-            
+
             // Convert YouTube URL to embed format if needed
             if (url.includes('youtube.com/watch?v=')) {
                 const videoId = new URL(url).searchParams.get('v');
@@ -1117,7 +1329,7 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                 const videoId = url.split('youtu.be/')[1].split('?')[0];
                 url = 'https://www.youtube.com/embed/' + videoId;
             }
-            
+
             iframe.src = url;
             const modal = new bootstrap.Modal(document.getElementById('trailerModal'));
             modal.show();
@@ -1142,6 +1354,10 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                 }
             });
         });
+
+        // Initialize
+        filterMovies();
     </script>
 </body>
+
 </html>
