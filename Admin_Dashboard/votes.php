@@ -851,6 +851,17 @@ while ($row = $movie_counts->fetch_assoc()) {
             justify-content: flex-end;
             gap: 12px;
         }
+
+        .avatar-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .avatar-icon:hover {
+            color: var(--primary-dark);
+        }
+
     </style>
 </head>
 <body>
@@ -936,7 +947,7 @@ while ($row = $movie_counts->fetch_assoc()) {
                     </ul>
                 </div>
                 <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
-                <img src="https://via.placeholder.com/40" class="avatar" alt="User">
+                <i class="bi bi-person-circle avatar-icon"></i>
             </div>
         </div>
 

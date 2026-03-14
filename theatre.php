@@ -12,7 +12,7 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
         exit;
     }
 }
-$theatres_result = $conn->query("SELECT * FROM theatres ORDER BY name");
+$theatres_result = $conn->query("SELECT * FROM theatres ORDER BY id ASC");
 $theatres = [];
 while ($row = $theatres_result->fetch_assoc()) {
     $row['id'] = (int)$row['id'];
@@ -608,6 +608,47 @@ while ($row = $theatres_result->fetch_assoc()) {
             font-size: 14px;
         }
 
+          .contact-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-info h5 {
+            color: var(--popcorn-gold);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--light-gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .contact-info p i {
+            color: var(--popcorn-orange);
+            font-size: 16px;
+            min-width: 20px;
+            margin-top: 3px;
+        }
+
+        .contact-info p a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-info p a:hover {
+            color: var(--popcorn-gold);
+        }
+
         /* ================= REVEAL ANIMATION ================= */
         .reveal {
             opacity: 0;
@@ -889,10 +930,11 @@ while ($row = $theatres_result->fetch_assoc()) {
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Footer (full width) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
+                <!-- Column 1: About & Contact -->
                 <div class="footer-col">
                     <h4>Popcorn Hub</h4>
                     <ul>
@@ -901,7 +943,29 @@ while ($row = $theatres_result->fetch_assoc()) {
                         <li><a href="footer_links/press.php">Press</a></li>
                         <li><a href="footer_links/contact.php">Contact</a></li>
                     </ul>
+                    <?php if (!empty($settings['contact_email']) || !empty($settings['contact_phone']) || !empty($settings['address'])): ?>
+                        <div class="contact-info">
+                            <h5>Get in touch</h5>
+                            <?php if (!empty($settings['contact_email'])): ?>
+                                <p><i class="fas fa-envelope"></i> <a
+                                        href="mailto:<?php echo htmlspecialchars($settings['contact_email']) ?>"><?php echo htmlspecialchars($settings['contact_email']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['contact_phone'])): ?>
+                                <p><i class="fas fa-phone-alt"></i> <a
+                                        href="tel:<?php echo htmlspecialchars($settings['contact_phone']) ?>"><?php echo htmlspecialchars($settings['contact_phone']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['address'])): ?>
+                                <p><i class="fas fa-map-marker-alt"></i>
+                                    <?php echo nl2br(htmlspecialchars($settings['address'])) ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
+
+                <!-- Column 2: Movies -->
                 <div class="footer-col">
                     <h4>Movies</h4>
                     <ul>
@@ -911,6 +975,8 @@ while ($row = $theatres_result->fetch_assoc()) {
                         <li><a href="footer_links/3d_imax.php">3D/IMAX</a></li>
                     </ul>
                 </div>
+
+                <!-- Column 3: Support -->
                 <div class="footer-col">
                     <h4>Support</h4>
                     <ul>
@@ -920,16 +986,29 @@ while ($row = $theatres_result->fetch_assoc()) {
                         <li><a href="footer_links/faq.php">FAQ</a></li>
                     </ul>
                 </div>
+
+                <!-- Column 4: Newsletter & Social -->
                 <div class="footer-col">
-                    <h4>Newsletter</h4>
-                    <div class="newsletter"><input type="email" placeholder="Your email"><button
-                            class="btn btn-primary btn-small">Subscribe</button></div>
-                    <div class="social-links"><a href="#"><i class="fab fa-facebook"></i></a><a href="#"><i
-                                class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-instagram"></i></a><a
-                            href="#"><i class="fab fa-youtube"></i></a></div>
+                    <h4>Stay Connected</h4>
+                    <div class="social-links">
+                        <?php if (!empty($settings['facebook_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-facebook-f"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['twitter_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['twitter_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-twitter"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['instagram_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['instagram_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-instagram"></i></a>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </div>
-            <div class="copyright"><?= htmlspecialchars($settings['footer_text'] ?? '&copy; '.date('Y').' '.($settings['site_name'] ?? 'Popcorn Hub').' Cinemas. All rights reserved.') ?></div>
+            <div class="copyright">
+                <?php echo htmlspecialchars($settings['footer_text'] ?? '&copy; ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
+            </div>
         </div>
     </footer>
 

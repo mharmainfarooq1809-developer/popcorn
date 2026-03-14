@@ -11,6 +11,11 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 $message = '';
 $error = '';
 
+// Check if added successfully from redirect
+if (isset($_GET['added']) && $_GET['added'] == 1) {
+    $message = "Theatre added successfully.";
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $city = trim($_POST['city'] ?? '');
@@ -28,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($stmt) {
             $stmt->bind_param('sssddss', $name, $city, $location, $rating, $price, $facilities_json, $image_url);
             if ($stmt->execute()) {
-                header('Location: theatres.php?added=1');
+                header('Location: add_theatre.php?added=1');
                 exit;
             }
             $error = 'Failed to add theatre.';
@@ -38,9 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+// Match facilities exactly from edit_theatre.php
+$facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
 ?>
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -93,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             --transition: all 0.3s ease;
         }
 
-        /* ===== HEADINGS - FIXED DARK MODE ===== */
+        /* ===== HEADINGS ===== */
         h1, h2, h3, h4, h5, h6 {
             color: #212529;
             transition: color 0.3s ease;
@@ -116,6 +125,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         body.dark-mode .page-title {
             color: #FFFFFF;
+        }
+
+        /* Form labels */
+        .form-label {
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .form-label {
+            color: #FFFFFF;
+        }
+
+        /* Text muted */
+        .text-muted {
+            color: #6c757d !important;
+        }
+
+        body.dark-mode .text-muted {
+            color: #AAAAAA !important;
         }
 
         /* ===== SIDEBAR OVERLAY ===== */
@@ -330,33 +359,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             gap: 15px;
         }
 
-        .menu-toggle {
+        .menu-toggle, .menu-toggle-mobile {
             font-size: 24px;
             cursor: pointer;
         }
 
-        .menu-toggle-mobile {
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        /* Desktop: show only menu-toggle, hide menu-toggle-mobile */
         @media (min-width: 992px) {
             .menu-toggle-mobile {
                 display: none;
-            }
-            .menu-toggle {
-                display: inline-block;
-            }
-        }
-
-        /* Mobile: show only menu-toggle-mobile, hide menu-toggle */
-        @media (max-width: 991.98px) {
-            .menu-toggle {
-                display: none;
-            }
-            .menu-toggle-mobile {
-                display: inline-block;
             }
         }
 
@@ -398,10 +408,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             cursor: pointer;
         }
 
-        .avatar-icon:hover {
-            color: var(--primary-dark);
-        }
-
         .theme-toggle {
             cursor: pointer;
             font-size: 22px;
@@ -416,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--primary);
         }
 
-        /* ===== CARDS ===== */
+        /* ===== CARDS & FORMS ===== */
         .card {
             border: none;
             border-radius: 20px;
@@ -431,17 +437,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         body.dark-mode .card {
             background: #0F1C2B;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Form elements */
-        .form-label {
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 5px;
-        }
-
-        body.dark-mode .form-label {
-            color: #FFFFFF;
         }
 
         .form-control,
@@ -468,6 +463,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             outline: none;
         }
 
+        textarea.form-control {
+            min-height: 60px;
+            resize: vertical;
+        }
+
         /* Checkbox styling */
         .form-check-input {
             background-color: #FFFFFF;
@@ -489,6 +489,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body.dark-mode .form-check-label {
+            color: #FFFFFF;
+        }
+
+        /* Image preview styles */
+        .image-preview-container {
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .image-preview-container.show {
+            display: block;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            border: 2px solid #E9ECEF;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            background: #f8f9fa;
+        }
+
+        body.dark-mode .image-preview {
+            border-color: #3A414D;
+            background: #2a3644;
+        }
+
+        .image-info {
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 5px 15px;
+            background: #E9ECEF;
+            border-radius: 20px;
+            display: inline-block;
+            color: #212529;
+        }
+
+        body.dark-mode .image-info {
+            background: #2a3644;
             color: #FFFFFF;
         }
 
@@ -617,9 +658,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             align-items: center;
             margin-bottom: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
             padding: 5px 0;
             border-bottom: 1px solid transparent;
+            transition: all 0.3s ease;
         }
 
         .card-header-with-toggle:hover {
@@ -631,11 +672,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 24px;
             font-weight: 600;
             color: #212529;
-            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .card-header-with-toggle h2 {
+            color: #FFFFFF;
         }
 
         .card-header-with-toggle:hover h2 {
-            color: #FFA500;
+            color: var(--primary);
+        }
+
+        body.dark-mode .card-header-with-toggle:hover h2 {
+            color: #FFD966;
         }
 
         .card-header-with-toggle i {
@@ -645,22 +693,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .card-header-with-toggle:hover i {
-            color: #FFA500;
+            color: var(--primary);
             transform: translateX(5px);
         }
 
         .card-header-with-toggle.active i {
             transform: rotate(90deg);
-            color: #FFA500;
-        }
-
-        /* Dark mode styles */
-        body.dark-mode .card-header-with-toggle h2 {
-            color: #FFFFFF;
-        }
-
-        body.dark-mode .card-header-with-toggle:hover h2 {
-            color: #FFD966;
+            color: var(--primary);
         }
 
         body.dark-mode .card-header-with-toggle i {
@@ -703,12 +742,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 margin-left: 0 !important;
                 width: 100% !important;
             }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                padding: 15px;
-            }
 
             .top-navbar {
                 flex-direction: column;
@@ -717,6 +750,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             .nav-icons {
                 justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 15px;
             }
 
             .card {
@@ -727,17 +766,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 font-size: 20px;
             }
 
-            .row.g-3 {
-                flex-direction: column;
-            }
-
-            .col-md-4, .col-md-3, .col-md-6 {
-                width: 100%;
-            }
-
             .btn-outline-secondary {
                 margin-left: 0;
                 margin-top: 10px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn-primary {
                 width: 100%;
                 justify-content: center;
             }
@@ -746,15 +782,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 flex-direction: column;
             }
 
-            .btn-primary {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .form-check-inline {
-                display: block;
-                margin-right: 0;
-                margin-bottom: 8px;
+            .col-auto {
+                width: 50%;
             }
         }
     </style>
@@ -763,38 +792,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             transition: width 0.28s ease, transform 0.28s ease;
             will-change: width, transform;
         }
+
         .main-content {
             transition: margin-left 0.28s ease, width 0.28s ease;
         }
+
         .sidebar .logo span,
         .sidebar .nav-link span {
             transition: opacity 0.22s ease, max-width 0.22s ease;
             max-width: 180px;
             overflow: hidden;
         }
+
         .sidebar.collapsed {
             width: var(--sidebar-collapsed-width) !important;
         }
+
         .sidebar.collapsed .logo span,
         .sidebar.collapsed .nav-link span {
             opacity: 0;
             max-width: 0;
         }
+
         #sidebarToggle i {
             transition: transform 0.25s ease;
         }
+
         body.sidebar-collapsed #sidebarToggle i {
             transform: rotate(180deg);
         }
+
         .search-bar {
             display: none !important;
         }
+
         .top-navbar {
             justify-content: flex-end;
             gap: 12px;
         }
     </style>
 </head>
+
 <body>
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -858,13 +896,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                <i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i>
             </div>
             <div class="nav-icons">
+                <!-- Notification Bell Dropdown -->
                 <div class="dropdown d-inline-block">
                     <div class="icon position-relative" id="notificationDropdown" data-bs-toggle="dropdown">
                         <i class="bi bi-bell"></i>
@@ -878,12 +917,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <li><a class="dropdown-item text-center small" href="#" id="markAllRead">Mark all as read</a></li>
                     </ul>
                 </div>
+
                 <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
                 <i class="bi bi-person-circle avatar-icon"></i>
             </div>
         </div>
 
-        <!-- Page Header with Toggle Effect -->
+        <!-- Page Header with Toggle -->
         <div class="card-header-with-toggle" data-target="addTheatreSection" data-default-expanded="true">
             <h2>Add Theatre</h2>
             <i class="bi bi-chevron-right"></i>
@@ -893,12 +933,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="toggle-content show" id="addTheatreSection">
             <?php if ($message): ?>
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
                     <?= htmlspecialchars($message) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>
             <?php if ($error): ?>
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <?= htmlspecialchars($error) ?>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -907,63 +949,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card">
                 <form method="post">
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Name</label>
-                            <input class="form-control" name="name" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">City</label>
-                            <input class="form-control" name="city" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Location</label>
-                            <input class="form-control" name="location" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Rating</label>
-                            <input type="number" step="0.1" min="0" max="5" class="form-control" name="rating" value="4.0">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" step="0.01" min="0" class="form-control" name="price" value="500">
+                        <div class="col-md-6">
+                            <label class="form-label">Theatre Name *</label>
+                            <input type="text" name="name" class="form-control" required value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Image URL</label>
-                            <input class="form-control" name="image_url" placeholder="https://example.com/image.jpg">
+                            <label class="form-label">City *</label>
+                            <input type="text" name="city" class="form-control" required value="<?= htmlspecialchars($_POST['city'] ?? '') ?>">
                         </div>
                         <div class="col-12">
-                            <label class="form-label d-block">Facilities</label>
-                            <div class="row">
-                                <?php foreach (['3D','IMAX','Dolby Atmos','VIP Seats','Food Court','Parking'] as $fac): ?>
-                                    <div class="col-md-4 col-6 mb-2">
+                            <label class="form-label">Address / Location *</label>
+                            <input type="text" name="location" class="form-control" required value="<?= htmlspecialchars($_POST['location'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Rating (0-5)</label>
+                            <input type="number" step="0.1" min="0" max="5" name="rating" class="form-control" value="<?= htmlspecialchars($_POST['rating'] ?? '4.0') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ticket Price ($)</label>
+                            <input type="number" step="0.01" min="0" name="price" class="form-control" value="<?= htmlspecialchars($_POST['price'] ?? '500') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Image URL</label>
+                            <textarea name="image_url" id="image_url" class="form-control" rows="2"
+                                placeholder="Enter image URL"><?= htmlspecialchars($_POST['image_url'] ?? '') ?></textarea>
+                            <small class="text-muted">Supports: http://, https://, data:image</small>
+                        </div>
+
+                        <!-- Image Preview -->
+                        <div class="col-12">
+                            <div class="image-preview-container" id="imagePreviewContainer">
+                                <img id="imagePreview" class="image-preview" src="" alt="Preview">
+                                <div class="image-info" id="imageInfo"></div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Facilities</label>
+                            <div class="row g-2">
+                                <?php foreach ($facility_options as $fac): ?>
+                                    <div class="col-auto">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="facilities[]" value="<?= $fac ?>" id="fac_<?= md5($fac) ?>">
-                                            <label class="form-check-label" for="fac_<?= md5($fac) ?>"><?= $fac ?></label>
+                                            <input class="form-check-input" type="checkbox" name="facilities[]"
+                                                value="<?= $fac ?>" id="fac_<?= $fac ?>"
+                                                <?= (isset($_POST['facilities']) && in_array($fac, $_POST['facilities'])) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="fac_<?= $fac ?>"><?= $fac ?></label>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-4 d-flex gap-2">
-                        <button class="btn btn-primary" type="submit">Save Theatre</button>
-                        <a class="btn btn-outline-secondary" href="theatres.php">Back</a>
+                        
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary">Save Theatre</button>
+                            <a href="theatres.php" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
-
-        <footer class="footer text-center">
-            <div class="container">
-                <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
-            </div>
-        </footer>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center">
+        <div class="container">
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="admin_toggle.js"></script>
     <script>
-        // ========== NOTIFICATIONS ==========
+        // ================= NOTIFICATIONS =================
         function updateNotifications() {
             fetch('get_notifications.php')
                 .then(res => res.json())
@@ -977,8 +1034,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             list.innerHTML = '';
                             data.notifications.forEach(notif => {
                                 const item = document.createElement('li');
-                                const link = notif.link ? notif.link : '#';
-                                item.innerHTML = `<a class="dropdown-item" href="${link}">
+                                item.innerHTML = `<a class="dropdown-item" href="${notif.link || '#'}">
                                     ${notif.message}<br>
                                     <small class="text-muted">${new Date(notif.created_at).toLocaleString()}</small>
                                 </a>`;
@@ -1003,6 +1059,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         updateNotifications();
         setInterval(updateNotifications, 30000);
+
+        // ================= IMAGE PREVIEW =================
+        function isDataUrl(url) {
+            return url && url.startsWith('data:');
+        }
+
+        function previewImage() {
+            const urlInput = document.getElementById('image_url');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImg = document.getElementById('imagePreview');
+            const imageInfo = document.getElementById('imageInfo');
+
+            const url = urlInput.value.trim();
+
+            if (url) {
+                previewContainer.classList.add('show');
+                previewImg.src = url;
+
+                if (isDataUrl(url)) {
+                    const length = url.length;
+                    imageInfo.innerHTML = `📸 Data URL · Length: ${length} characters · Type: ${url.split(';')[0] || 'Unknown'}`;
+                } else if (url.startsWith('http')) {
+                    imageInfo.innerHTML = `🌐 External URL · ${url.substring(0, 50)}${url.length > 50 ? '...' : ''}`;
+                } else {
+                    imageInfo.innerHTML = `📁 Local path · ${url}`;
+                }
+
+                previewImg.onerror = function() {
+                    imageInfo.innerHTML = '⚠️ Image failed to load. Please check the URL.';
+                    imageInfo.style.color = '#dc3545';
+                };
+
+                previewImg.onload = function() {
+                    imageInfo.style.color = '';
+                    if (!imageInfo.innerHTML.includes('⚠️')) {
+                        imageInfo.innerHTML += ` · ${this.naturalWidth} x ${this.naturalHeight}px`;
+                    }
+                };
+            } else {
+                previewContainer.classList.remove('show');
+                previewImg.src = '';
+                imageInfo.innerHTML = '';
+            }
+        }
+
+        // Debounced preview on input
+        let previewTimeout;
+        const imageUrlInput = document.getElementById('image_url');
+        if (imageUrlInput) {
+            imageUrlInput.addEventListener('input', function() {
+                clearTimeout(previewTimeout);
+                previewTimeout = setTimeout(previewImage, 500);
+            });
+        }
+
+        // Initial preview if there's a value (e.g., after form submission error)
+        window.addEventListener('load', previewImage);
     </script>
 </body>
 </html>

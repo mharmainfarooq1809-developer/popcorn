@@ -22,49 +22,53 @@ $user_id = $_SESSION['user_id'];
 // Handle ticket cancellation
 if (isset($_POST['cancel_booking'])) {
     $booking_id = intval($_POST['booking_id']);
-    
+
     // Start transaction
     $conn->begin_transaction();
-    
+
     try {
         // Check if booking belongs to user and is not already cancelled
         $check = $conn->prepare("SELECT id, status, points_earned FROM bookings WHERE id = ? AND user_id = ?");
         $check->bind_param("ii", $booking_id, $user_id);
         $check->execute();
         $booking = $check->get_result()->fetch_assoc();
-        
+
         if (!$booking) {
             throw new Exception("Booking not found or doesn't belong to you.");
         }
-        
+
         if ($booking['status'] === 'cancelled') {
             throw new Exception("This booking is already cancelled.");
         }
-        
+
         if ($booking['status'] !== 'confirmed') {
             throw new Exception("Only confirmed bookings can be cancelled.");
         }
-        
+
         // Update booking status to cancelled
         $update = $conn->prepare("UPDATE bookings SET status = 'cancelled' WHERE id = ?");
         $update->bind_param("i", $booking_id);
         $update->execute();
-        
+
         // Refund points (remove points earned from this booking)
         if ($booking['points_earned'] > 0) {
             $points_refund = -$booking['points_earned'];
-            $conn->prepare("UPDATE users SET points = points - ? WHERE id = ?")
-                ->execute([$booking['points_earned'], $user_id]);
             
+            // Update user points
+            $update_points = $conn->prepare("UPDATE users SET points = points - ? WHERE id = ?");
+            $update_points->bind_param("ii", $booking['points_earned'], $user_id);
+            $update_points->execute();
+
             // Add to points history
-            $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, 'Booking cancelled')");
-            $history->bind_param("ii", $user_id, $points_refund);
+            $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
+            $reason = "Booking #" . $booking_id . " cancelled - Refund";
+            $history->bind_param("iis", $user_id, $points_refund, $reason);
             $history->execute();
         }
-        
+
         $conn->commit();
         $cancel_success = "Booking cancelled successfully. Points have been refunded.";
-        
+
     } catch (Exception $e) {
         $conn->rollback();
         $cancel_error = $e->getMessage();
@@ -125,6 +129,20 @@ try {
 } catch (mysqli_sql_exception $e) {
     $votedMovies = $conn->query("SELECT 1 WHERE 1=0");
 }
+
+// If user has points but no history, create initial history entry
+if ($user['points'] > 0 && $history->num_rows == 0) {
+    $initial_reason = "Welcome points / Account registration";
+    $insert_initial = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
+    $insert_initial->bind_param("iis", $user_id, $user['points'], $initial_reason);
+    $insert_initial->execute();
+    
+    // Refresh history
+    $stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $history = $stmt->get_result();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -135,9 +153,20 @@ try {
     <title>Dashboard · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            a, .btn-primary { color: var(--primary); }
-            .btn-sm { background: var(--primary); }
+            :root {
+                --primary:
+                    <?= htmlspecialchars($settings['theme_color']) ?>
+                ;
+            }
+
+            a,
+            .btn-primary {
+                color: var(--primary);
+            }
+
+            .btn-sm {
+                background: var(--primary);
+            }
         </style>
     <?php endif; ?>
     <!-- Google Fonts: Heebo -->
@@ -253,7 +282,11 @@ try {
             color: var(--popcorn-orange);
         }
 
-        .logo img { max-height: 60px; width: auto; display: block; }
+        .logo img {
+            max-height: 60px;
+            width: auto;
+            display: block;
+        }
 
         /* Mobile menu toggle */
         .menu-toggle {
@@ -449,14 +482,17 @@ try {
             font-size: 12px;
             font-weight: 600;
         }
+
         .status-confirmed {
             background: rgba(40, 167, 69, 0.2);
             color: #4CAF50;
         }
+
         .status-pending {
             background: rgba(255, 193, 7, 0.2);
             color: #ffc107;
         }
+
         .status-cancelled {
             background: rgba(220, 53, 69, 0.2);
             color: #ff6b6b;
@@ -477,6 +513,7 @@ try {
             border: none;
             cursor: pointer;
         }
+
         .btn-sm:hover {
             background: var(--popcorn-gold);
             transform: translateY(-2px);
@@ -487,6 +524,7 @@ try {
             color: #ff6b6b;
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
+
         .btn-sm.btn-danger:hover {
             background: rgba(220, 53, 69, 0.3);
             color: #ff8a92;
@@ -525,7 +563,7 @@ try {
             font-size: 14px;
         }
 
-        /* ================= FOOTER ================= */
+        /* ================= FOOTER (FULL WIDTH) ================= */
         footer {
             background: var(--deep-navy);
             border-top: 1px solid var(--gray-1);
@@ -534,15 +572,133 @@ try {
             width: 100%;
         }
 
-        .footer-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 30px;
-            text-align: center;
-            color: var(--gray-2);
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
-        .footer-content p {
+        .footer-col h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--popcorn-orange);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s, padding-left 0.2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--popcorn-gold);
+            padding-left: 6px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-info h5 {
+            color: var(--popcorn-gold);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--light-gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .contact-info p i {
+            color: var(--popcorn-orange);
+            font-size: 16px;
+            min-width: 20px;
+            margin-top: 3px;
+        }
+
+        .contact-info p a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-info p a:hover {
+            color: var(--popcorn-gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: var(--light-gray);
+            font-size: 22px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--popcorn-orange);
+            transform: translateY(-3px);
+        }
+
+        .newsletter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .newsletter input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--gray-1);
+            background: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .newsletter button {
+            width: 100%;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--gray-1);
+            color: var(--gray-2);
             font-size: 14px;
         }
 
@@ -607,7 +763,8 @@ try {
     <header id="navbar">
         <a href="first_page.php" class="logo">
             <?php if (!empty($settings['site_logo'])): ?>
-                <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
+                <img src="<?= htmlspecialchars($settings['site_logo']) ?>"
+                    alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
             <?php else: ?>
                 <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
             <?php endif; ?>
@@ -639,7 +796,7 @@ try {
                 <span class="close-btn" onclick="this.parentElement.style.display='none'"><i class="bi bi-x"></i></span>
             </div>
         <?php endif; ?>
-        
+
         <?php if (isset($cancel_error)): ?>
             <div class="alert alert-danger" id="errorAlert">
                 <i class="bi bi-exclamation-triangle-fill"></i>
@@ -670,25 +827,6 @@ try {
                 points = 10% discount.</p>
         </div>
 
-        <!-- Your Votes Section -->
-        <div class="dashboard-card">
-            <h2 class="card-title">Your Votes</h2>
-            <?php if ($votedMovies->num_rows > 0): ?>
-                <div class="vote-list">
-                    <?php while ($vote = $votedMovies->fetch_assoc()): ?>
-                        <div class="vote-item">
-                            <span class="movie-title"><?= htmlspecialchars($vote['title']) ?></span>
-                            <span class="movie-meta"><?= $vote['genre'] ?> · <?= $vote['year'] ?></span>
-                            <span class="vote-date"><?= date('M j, Y', strtotime($vote['voted_at'])) ?></span>
-                        </div>
-                    <?php endwhile; ?>
-                </div>
-            <?php else: ?>
-                <p style="color: var(--light-gray);">You haven't voted for any movies yet. <a href="first_page.php#voteCard"
-                        style="color: var(--popcorn-gold);">Cast your vote now!</a></p>
-            <?php endif; ?>
-        </div>
-
         <!-- Points History -->
         <div class="dashboard-card">
             <h2 class="card-title">Points History</h2>
@@ -702,7 +840,10 @@ try {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php while ($row = $history->fetch_assoc()): ?>
+                        <?php 
+                        if ($history && $history->num_rows > 0):
+                            while ($row = $history->fetch_assoc()): 
+                        ?>
                             <tr>
                                 <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
                                 <td class="<?= $row['points_change'] > 0 ? 'text-success' : 'text-danger' ?>">
@@ -710,10 +851,13 @@ try {
                                 </td>
                                 <td><?= htmlspecialchars($row['reason']) ?></td>
                             </tr>
-                        <?php endwhile; ?>
-                        <?php if ($history->num_rows == 0): ?>
+                        <?php 
+                            endwhile;
+                        else: 
+                        ?>
                             <tr>
-                                <td colspan="3" style="text-align:center; color: var(--light-gray);">No points history yet.
+                                <td colspan="3" style="text-align:center; color: var(--light-gray);">
+                                    No points history yet. Start booking movies to earn points!
                                 </td>
                             </tr>
                         <?php endif; ?>
@@ -742,45 +886,60 @@ try {
                     </thead>
                     <tbody>
                         <?php if ($bookings->num_rows > 0): ?>
-                            <?php while ($row = $bookings->fetch_assoc()): 
+                            <?php while ($row = $bookings->fetch_assoc()):
                                 $statusClass = '';
-                                if ($row['status'] == 'confirmed') $statusClass = 'status-confirmed';
-                                elseif ($row['status'] == 'pending') $statusClass = 'status-pending';
-                                elseif ($row['status'] == 'cancelled') $statusClass = 'status-cancelled';
-                                
+                                if ($row['status'] == 'confirmed')
+                                    $statusClass = 'status-confirmed';
+                                elseif ($row['status'] == 'pending')
+                                    $statusClass = 'status-pending';
+                                elseif ($row['status'] == 'cancelled')
+                                    $statusClass = 'status-cancelled';
+
                                 $canCancel = ($row['status'] === 'confirmed');
                                 $showtimeDate = $row['show_date'] != 'N/A' ? strtotime($row['show_date']) : 0;
                                 $isPastShow = $showtimeDate && $showtimeDate < strtotime('today');
-                                if ($isPastShow) $canCancel = false;
-                            ?>
+                                if ($isPastShow)
+                                    $canCancel = false;
+                                ?>
                                 <tr>
                                     <td><?= date('Y-m-d', strtotime($row['booking_date'])) ?></td>
                                     <td><?= htmlspecialchars($row['movie_title']) ?></td>
                                     <td><?= htmlspecialchars($row['theatre']) ?></td>
-                                    <td><?= $row['show_time'] != 'N/A' ? date('g:i A', strtotime($row['show_time'])) : 'N/A' ?></td>
+                                    <td><?= $row['show_time'] != 'N/A' ? date('g:i A', strtotime($row['show_time'])) : 'N/A' ?>
+                                    </td>
                                     <td><?= htmlspecialchars($row['seats']) ?></td>
                                     <td>$<?= number_format($row['total_price'], 2) ?></td>
                                     <td><?= $row['points_earned'] ?></td>
-                                    <td><span class="status-badge <?= $statusClass ?>"><?= ucfirst($row['status']) ?></span></td>
+                                    <td><span class="status-badge <?= $statusClass ?>"><?= ucfirst($row['status']) ?></span>
+                                    </td>
                                     <td>
                                         <div class="action-buttons">
-                                            <a href="ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm" title="View Ticket">
+                                            <a href="ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm"
+                                                title="View Ticket">
                                                 <i class="bi bi-ticket-perforated"></i> View
                                             </a>
                                             <?php if ($canCancel): ?>
-                                                <button class="btn-sm btn-danger" onclick="confirmCancel(<?= $row['booking_id'] ?>, '<?= htmlspecialchars($row['movie_title']) ?>')" title="Cancel Booking">
+                                                <button class="btn-sm btn-danger"
+                                                    onclick="confirmCancel(<?= $row['booking_id'] ?>, '<?= htmlspecialchars($row['movie_title']) ?>')"
+                                                    title="Cancel Booking">
                                                     <i class="bi bi-x-circle"></i> Cancel
                                                 </button>
                                             <?php elseif ($row['status'] === 'cancelled'): ?>
-                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled>
+                                                <span class="btn-sm"
+                                                    style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;"
+                                                    disabled>
                                                     <i class="bi bi-check-circle"></i> Cancelled
                                                 </span>
                                             <?php elseif ($isPastShow): ?>
-                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled title="Past shows cannot be cancelled">
+                                                <span class="btn-sm"
+                                                    style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;"
+                                                    disabled title="Past shows cannot be cancelled">
                                                     <i class="bi bi-clock-history"></i> Expired
                                                 </span>
                                             <?php else: ?>
-                                                <span class="btn-sm" style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;" disabled>
+                                                <span class="btn-sm"
+                                                    style="background: var(--gray-1); color: var(--light-gray); cursor: not-allowed;"
+                                                    disabled>
                                                     <i class="bi bi-hourglass-split"></i> Pending
                                                 </span>
                                             <?php endif; ?>
@@ -798,11 +957,85 @@ try {
             </div>
         </div>
     </main>
-
-    <!-- Full-width Footer -->
+    <!-- Footer (full width) -->
     <footer>
-        <div class="footer-content">
-            <p><?= htmlspecialchars($settings['footer_text'] ?? '&copy; '.date('Y').' '.($settings['site_name'] ?? 'Popcorn Hub').'. Your loyalty dashboard.') ?></p>
+        <div class="container">
+            <div class="footer-grid">
+                <!-- Column 1: About & Contact -->
+                <div class="footer-col">
+                    <h4>Popcorn Hub</h4>
+                    <ul>
+                        <li><a href="footer_links/abouts.php">About Us</a></li>
+                        <li><a href="footer_links/careers.php">Careers</a></li>
+                        <li><a href="footer_links/press.php">Press</a></li>
+                        <li><a href="footer_links/contact.php">Contact</a></li>
+                    </ul>
+                    <?php if (!empty($settings['contact_email']) || !empty($settings['contact_phone']) || !empty($settings['address'])): ?>
+                        <div class="contact-info">
+                            <h5>Get in touch</h5>
+                            <?php if (!empty($settings['contact_email'])): ?>
+                                <p><i class="fas fa-envelope"></i> <a
+                                        href="mailto:<?php echo htmlspecialchars($settings['contact_email']) ?>"><?php echo htmlspecialchars($settings['contact_email']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['contact_phone'])): ?>
+                                <p><i class="fas fa-phone-alt"></i> <a
+                                        href="tel:<?php echo htmlspecialchars($settings['contact_phone']) ?>"><?php echo htmlspecialchars($settings['contact_phone']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['address'])): ?>
+                                <p><i class="fas fa-map-marker-alt"></i>
+                                    <?php echo nl2br(htmlspecialchars($settings['address'])) ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Column 2: Movies -->
+                <div class="footer-col">
+                    <h4>Movies</h4>
+                    <ul>
+                        <li><a href="footer_links/now%20showing.php">Now Showing</a></li>
+                        <li><a href="footer_links/coming_soon.php">Coming Soon</a></li>
+                        <li><a href="footer_links/exclusive.php">Exclusive</a></li>
+                        <li><a href="footer_links/3d_imax.php">3D/IMAX</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="footer_links/help_center.php">Help Center</a></li>
+                        <li><a href="footer_links/terms.php">Terms of Use</a></li>
+                        <li><a href="footer_links/privacy.php">Privacy Policy</a></li>
+                        <li><a href="footer_links/faq.php">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter & Social -->
+                <div class="footer-col">
+                    <h4>Stay Connected</h4>
+                    <div class="social-links">
+                        <?php if (!empty($settings['facebook_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-facebook-f"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['twitter_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['twitter_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-twitter"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['instagram_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['instagram_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-instagram"></i></a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <?php echo htmlspecialchars($settings['footer_text'] ?? '&copy; ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
+            </div>
         </div>
     </footer>
 
@@ -885,10 +1118,23 @@ try {
         }, 5000);
     </script>
     <style>
-        body.fade-out { opacity: 0; transition: opacity 0.6s ease; }
-        .alert { transition: opacity 0.5s; }
-        .btn-sm { cursor: pointer; }
-        .btn-sm:disabled { cursor: not-allowed; }
+        body.fade-out {
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .alert {
+            transition: opacity 0.5s;
+        }
+
+        .btn-sm {
+            cursor: pointer;
+        }
+
+        .btn-sm:disabled {
+            cursor: not-allowed;
+        }
     </style>
 </body>
+
 </html>

@@ -749,24 +749,37 @@ while ($row = $theatres_result->fetch_assoc()) {
         .showtime-table {
             width: 100%;
             border-collapse: collapse;
+            background: transparent;
         }
 
-        /* LIGHT MODE */
+        /* Table headers - LIGHT MODE */
+        .showtime-table thead {
+            background: #f8f9fa;
+        }
+
         .showtime-table th {
             background: #f8f9fa;
-            border-bottom: 2px solid #E9ECEF;
+            border-bottom: 2px solid #dee2e6;
             font-weight: 600;
-            color: #495057 !important;
+            color: #212529 !important;
             padding: 12px;
+            font-size: 14px;
         }
 
+        /* Table cells - LIGHT MODE */
         .showtime-table td {
-            border-bottom: 1px solid #E9ECEF;
+            border-bottom: 1px solid #dee2e6;
             padding: 12px;
             color: #212529 !important;
+            background: #ffffff;
+            font-size: 14px;
         }
 
-        /* DARK MODE */
+        /* DARK MODE OVERRIDES */
+        body.dark-mode .showtime-table thead {
+            background: #1a2634;
+        }
+
         body.dark-mode .showtime-table th {
             background: #1a2634;
             border-bottom-color: #3A414D;
@@ -776,6 +789,16 @@ while ($row = $theatres_result->fetch_assoc()) {
         body.dark-mode .showtime-table td {
             border-bottom-color: #3A414D;
             color: #FFFFFF !important;
+            background: #0F1C2B;
+        }
+
+        /* Hover effect */
+        .showtime-table tbody tr:hover td {
+            background: rgba(255, 165, 0, 0.05);
+        }
+
+        body.dark-mode .showtime-table tbody tr:hover td {
+            background: rgba(255, 165, 0, 0.1);
         }
 
         /* Status badges - fix visibility */
@@ -785,38 +808,61 @@ while ($row = $theatres_result->fetch_assoc()) {
             border-radius: 30px;
             font-size: 11px;
             font-weight: 600;
+            text-align: center;
         }
 
         /* Light mode status badges */
         .status-active {
             background: rgba(40, 167, 69, 0.15);
             color: #28a745 !important;
+            border: 1px solid rgba(40, 167, 69, 0.3);
         }
 
         .status-ended {
             background: rgba(108, 117, 125, 0.15);
-            color: #6c757d !important;
+            color: #495057 !important;
+            border: 1px solid rgba(108, 117, 125, 0.3);
         }
 
         .status-cancelled {
             background: rgba(220, 53, 69, 0.15);
             color: #dc3545 !important;
+            border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
         /* Dark mode status badges - brighter colors */
         body.dark-mode .status-active {
             background: rgba(40, 167, 69, 0.25);
             color: #7acf7a !important;
+            border-color: rgba(40, 167, 69, 0.4);
         }
 
         body.dark-mode .status-ended {
             background: rgba(108, 117, 125, 0.25);
-            color: #AAAAAA !important;
+            color: #c0c0c0 !important;
+            border-color: rgba(108, 117, 125, 0.4);
         }
 
         body.dark-mode .status-cancelled {
             background: rgba(220, 53, 69, 0.25);
             color: #ff8a92 !important;
+            border-color: rgba(220, 53, 69, 0.4);
+        }
+
+        /* Buttons in table */
+        .showtime-table .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* Loading state */
+        .showtime-table .text-center {
+            color: #6c757d !important;
+            background: transparent;
+        }
+
+        body.dark-mode .showtime-table .text-center {
+            color: #AAAAAA !important;
         }
 
         /* ===== DATA URL PREVIEW ===== */
@@ -1076,6 +1122,17 @@ while ($row = $theatres_result->fetch_assoc()) {
             justify-content: flex-end;
             gap: 12px;
         }
+
+         .avatar-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .avatar-icon:hover {
+            color: var(--primary-dark);
+        }
+
     </style>
 </head>
 <body>
@@ -1146,7 +1203,6 @@ while ($row = $theatres_result->fetch_assoc()) {
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                <i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i>
             </div>
             <div class="nav-icons">
                 <!-- Notification Bell Dropdown -->
@@ -1165,7 +1221,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                 </div>
 
                 <div class="theme-toggle" id="themeToggle"><i class="bi bi-moon"></i></div>
-                <i class="fas fa-user avatar"></i>
+                <i class="bi bi-person-circle avatar-icon"></i>
             </div>
         </div>
 
@@ -1497,12 +1553,30 @@ while ($row = $theatres_result->fetch_assoc()) {
             console.log('manageShowtimes called with movieId:', movieId);
             currentShowtimeMovieId = movieId;
             document.getElementById('currentMovieId').value = movieId;
+            
+            // Reset the modal content
+            document.getElementById('showtimesBody').innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading showtimes...</td></tr>';
+            
+            // Clear form fields
+            document.getElementById('newTheatre').value = '';
+            document.getElementById('newDate').value = '';
+            document.getElementById('newTime').value = '';
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('newDate').value = today;
+            
+            // Load showtimes
             loadShowtimes(movieId);
-            new bootstrap.Modal(document.getElementById('showtimeModal')).show();
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('showtimeModal'));
+            modal.show();
         }
 
         function loadShowtimes(movieId) {
             console.log('Loading showtimes for movie ID:', movieId);
+            
             fetch('get_showtimes.php?movie_id=' + movieId)
                 .then(response => {
                     if (!response.ok) {
@@ -1517,7 +1591,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                 })
                 .catch(error => {
                     console.error('Error loading showtimes:', error);
-                    document.getElementById('showtimesBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load showtimes.</td></tr>';
+                    document.getElementById('showtimesBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Failed to load showtimes. Please try again.</td></tr>';
                 });
         }
 

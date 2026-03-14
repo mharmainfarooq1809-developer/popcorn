@@ -1259,10 +1259,6 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
                 <!-- Column 4: Newsletter & Social -->
                 <div class="footer-col">
                     <h4>Stay Connected</h4>
-                    <div class="newsletter">
-                        <input type="email" placeholder="Your email address">
-                        <button class="btn btn-primary btn-small">Subscribe</button>
-                    </div>
                     <div class="social-links">
                         <?php if (!empty($settings['facebook_url'])): ?>
                             <a href="<?= htmlspecialchars($settings['facebook_url']) ?>" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i></a>

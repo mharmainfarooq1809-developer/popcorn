@@ -70,7 +70,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Ticket · <?= $site_name ?></title>
+    <title>Your Ticket ï¿½ <?= $site_name ?></title>
     <?php if ($theme_color): ?>
         <style>
             :root { --primary: <?= $theme_color ?>; }
@@ -399,13 +399,143 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
             gap: 20px;
             margin-top: 30px;
         }
-
+/* ================= FOOTER (FULL WIDTH) ================= */
         footer {
-            background: linear-gradient(180deg, var(--deep-navy) 0%, #0a121f 100%);
+            background: var(--deep-navy);
             border-top: 1px solid var(--gray-1);
-            padding: 30px 0;
+            padding: 60px 0 30px;
+            margin-top: 80px;
+            width: 100%;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-col h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--popcorn-orange);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s, padding-left 0.2s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--popcorn-gold);
+            padding-left: 6px;
+        }
+
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-info h5 {
+            color: var(--popcorn-gold);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--light-gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .contact-info p i {
+            color: var(--popcorn-orange);
+            font-size: 16px;
+            min-width: 20px;
+            margin-top: 3px;
+        }
+
+        .contact-info p a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-info p a:hover {
+            color: var(--popcorn-gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: var(--light-gray);
+            font-size: 22px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--popcorn-orange);
+            transform: translateY(-3px);
+        }
+
+        .newsletter {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .newsletter input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--gray-1);
+            background: var(--dark-gray);
+            color: var(--white);
+        }
+
+        .newsletter button {
+            width: 100%;
+        }
+
+        .copyright {
             text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid var(--gray-1);
             color: var(--gray-2);
+            font-size: 14px;
         }
 
         .reveal {
@@ -423,6 +553,25 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
             opacity: 0;
             transition: opacity 0.6s ease;
         }
+
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s, transform 0.8s;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        body.fade-out {
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        
 
         /* ================= PRINT STYLES ================= */
         @media print {
@@ -566,7 +715,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
                     <div class="ticket-left">
                         <div class="ticket-header">
                             <h1><?= $site_name ?></h1>
-                            <p>Digital Ticket · E-Ticket · Scan for verification</p>
+                            <p>Digital Ticket ï¿½ E-Ticket ï¿½ Scan for verification</p>
                         </div>
                         <div class="info-grid" id="ticketInfo">
                             <!-- Filled by JavaScript -->
@@ -587,9 +736,85 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
         <?php endif; ?>
     </main>
 
+     <!-- Footer (full width) -->
     <footer>
         <div class="container">
-            <p><?= $footer_text ?></p>
+            <div class="footer-grid">
+                <!-- Column 1: About & Contact -->
+                <div class="footer-col">
+                    <h4>Popcorn Hub</h4>
+                    <ul>
+                        <li><a href="footer_links/abouts.php">About Us</a></li>
+                        <li><a href="footer_links/careers.php">Careers</a></li>
+                        <li><a href="footer_links/press.php">Press</a></li>
+                        <li><a href="footer_links/contact.php">Contact</a></li>
+                    </ul>
+                    <?php if (!empty($settings['contact_email']) || !empty($settings['contact_phone']) || !empty($settings['address'])): ?>
+                        <div class="contact-info">
+                            <h5>Get in touch</h5>
+                            <?php if (!empty($settings['contact_email'])): ?>
+                                <p><i class="fas fa-envelope"></i> <a
+                                        href="mailto:<?php echo htmlspecialchars($settings['contact_email']) ?>"><?php echo htmlspecialchars($settings['contact_email']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['contact_phone'])): ?>
+                                <p><i class="fas fa-phone-alt"></i> <a
+                                        href="tel:<?php echo htmlspecialchars($settings['contact_phone']) ?>"><?php echo htmlspecialchars($settings['contact_phone']) ?></a>
+                                </p>
+                            <?php endif; ?>
+                            <?php if (!empty($settings['address'])): ?>
+                                <p><i class="fas fa-map-marker-alt"></i>
+                                    <?php echo nl2br(htmlspecialchars($settings['address'])) ?>
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Column 2: Movies -->
+                <div class="footer-col">
+                    <h4>Movies</h4>
+                    <ul>
+                        <li><a href="footer_links/now%20showing.php">Now Showing</a></li>
+                        <li><a href="footer_links/coming_soon.php">Coming Soon</a></li>
+                        <li><a href="footer_links/exclusive.php">Exclusive</a></li>
+                        <li><a href="footer_links/3d_imax.php">3D/IMAX</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Support -->
+                <div class="footer-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="footer_links/help_center.php">Help Center</a></li>
+                        <li><a href="footer_links/terms.php">Terms of Use</a></li>
+                        <li><a href="footer_links/privacy.php">Privacy Policy</a></li>
+                        <li><a href="footer_links/faq.php">FAQ</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Newsletter & Social -->
+                <div class="footer-col">
+                    <h4>Stay Connected</h4>
+                    <div class="social-links">
+                        <?php if (!empty($settings['facebook_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-facebook-f"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['twitter_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['twitter_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-twitter"></i></a>
+                        <?php endif; ?>
+                        <?php if (!empty($settings['instagram_url'])): ?>
+                            <a href="<?php echo htmlspecialchars($settings['instagram_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-instagram"></i></a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                <?php echo htmlspecialchars($settings['footer_text'] ?? '&copy; ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
+            </div>
         </div>
     </footer>
 
@@ -629,7 +854,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
         if (reveal) setTimeout(() => reveal.classList.add('active'), 200);
 
         <?php if ($isConfirmed): ?>
-            // Booking data from PHP – safely encoded with json_encode
+            // Booking data from PHP ï¿½ safely encoded with json_encode
             const movie    = <?= json_encode($movie, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             const name     = <?= json_encode($holderName, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
             const seats    = <?= json_encode($seats, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
@@ -666,7 +891,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
                 }
 
                 try {
-                    // Build QR data – use a simple string without backticks to avoid issues
+                    // Build QR data ï¿½ use a simple string without backticks to avoid issues
                     const qrData = 
                         'Booking Confirmation\n' +
                         'Movie: ' + movie + '\n' +

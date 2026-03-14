@@ -966,7 +966,6 @@ $admin_id = $_SESSION['user_id']; // for storing replies
         <div class="top-navbar">
             <div class="d-flex align-items-center">
                 <i class="bi bi-list menu-toggle me-3" id="menuToggle"></i>
-                <i class="bi bi-list menu-toggle-mobile me-3" id="mobileMenuToggle"></i>
             </div>
             <div class="nav-icons">
                 <!-- Notification Bell Dropdown -->

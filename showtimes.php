@@ -670,36 +670,20 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             filter: invert(1) grayscale(100%) brightness(200%);
         }
 
-        /* ================= FOOTER ================= */
+        /* ================= FOOTER (FULL WIDTH) ================= */
         footer {
-            background: linear-gradient(180deg, var(--deep-navy) 0%, #0a121f 100%);
+            background: var(--deep-navy);
             border-top: 1px solid var(--gray-1);
             padding: 60px 0 30px;
             margin-top: 80px;
-            position: relative;
-            overflow: hidden;
             width: 100%;
-        }
-
-        footer::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIj48cGF0aCBkPSJNMjAgMjBhMTAgMTAgMCAwIDEgMjAgMCAxMCAxMCAwIDAgMS0yMCAweiIgZmlsbD0iI0ZGQTUwMCIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==') repeat;
-            opacity: 0.2;
-            z-index: 0;
         }
 
         .footer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 40px;
             margin-bottom: 40px;
-            position: relative;
-            z-index: 2;
         }
 
         .footer-col h4 {
@@ -719,7 +703,6 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             width: 40px;
             height: 3px;
             background: var(--popcorn-orange);
-            border-radius: 2px;
         }
 
         .footer-col ul {
@@ -733,40 +716,12 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
         .footer-col ul li a {
             color: var(--light-gray);
             text-decoration: none;
-            transition: all 0.2s;
-            display: inline-block;
+            transition: color 0.2s, padding-left 0.2s;
         }
 
         .footer-col ul li a:hover {
             color: var(--popcorn-gold);
-            transform: translateX(5px);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .social-links a {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--light-gray);
-            font-size: 20px;
-            transition: all 0.3s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .social-links a:hover {
-            background: var(--popcorn-orange);
-            color: white;
-            transform: translateY(-3px);
-            border-color: transparent;
+            padding-left: 6px;
         }
 
         .contact-info {
@@ -800,11 +755,37 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             margin-top: 3px;
         }
 
+        .contact-info p a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-info p a:hover {
+            color: var(--popcorn-gold);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            color: var(--light-gray);
+            font-size: 22px;
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            color: var(--popcorn-orange);
+            transform: translateY(-3px);
+        }
+
         .newsletter {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin-bottom: 20px;
         }
 
         .newsletter input {
@@ -812,26 +793,22 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             padding: 12px 16px;
             border-radius: 40px;
             border: 1px solid var(--gray-1);
-            background: rgba(31, 39, 50, 0.6);
+            background: var(--dark-gray);
             color: var(--white);
-            font-family: 'Heebo', sans-serif;
-            font-size: 15px;
         }
 
-        .newsletter input:focus {
-            outline: none;
-            border-color: var(--popcorn-orange);
+        .newsletter button {
+            width: 100%;
         }
 
         .copyright {
             text-align: center;
             padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--gray-1);
             color: var(--gray-2);
             font-size: 14px;
-            position: relative;
-            z-index: 2;
         }
+
 
         /* ================= RESPONSIVE DESIGN ================= */
         @media (max-width: 1200px) {
@@ -1112,10 +1089,11 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
         </div>
     </main>
 
-    <!-- Footer -->
+     <!-- Footer (full width) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
+                <!-- Column 1: About & Contact -->
                 <div class="footer-col">
                     <h4>Popcorn Hub</h4>
                     <ul>
@@ -1129,32 +1107,35 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                             <h5>Get in touch</h5>
                             <?php if (!empty($settings['contact_email'])): ?>
                                 <p><i class="fas fa-envelope"></i> <a
-                                        href="mailto:<?= htmlspecialchars($settings['contact_email']) ?>"><?= htmlspecialchars($settings['contact_email']) ?></a>
+                                        href="mailto:<?php echo htmlspecialchars($settings['contact_email']) ?>"><?php echo htmlspecialchars($settings['contact_email']) ?></a>
                                 </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['contact_phone'])): ?>
                                 <p><i class="fas fa-phone-alt"></i> <a
-                                        href="tel:<?= htmlspecialchars($settings['contact_phone']) ?>"><?= htmlspecialchars($settings['contact_phone']) ?></a>
+                                        href="tel:<?php echo htmlspecialchars($settings['contact_phone']) ?>"><?php echo htmlspecialchars($settings['contact_phone']) ?></a>
                                 </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['address'])): ?>
-                                <p><i class="fas fa-map-marker-alt"></i> <?= nl2br(htmlspecialchars($settings['address'])) ?>
+                                <p><i class="fas fa-map-marker-alt"></i>
+                                    <?php echo nl2br(htmlspecialchars($settings['address'])) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>
 
+                <!-- Column 2: Movies -->
                 <div class="footer-col">
                     <h4>Movies</h4>
                     <ul>
-                        <li><a href="footer_links/now_showing.php">Now Showing</a></li>
+                        <li><a href="footer_links/now%20showing.php">Now Showing</a></li>
                         <li><a href="footer_links/coming_soon.php">Coming Soon</a></li>
                         <li><a href="footer_links/exclusive.php">Exclusive</a></li>
                         <li><a href="footer_links/3d_imax.php">3D/IMAX</a></li>
                     </ul>
                 </div>
 
+                <!-- Column 3: Support -->
                 <div class="footer-col">
                     <h4>Support</h4>
                     <ul>
@@ -1165,30 +1146,27 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                     </ul>
                 </div>
 
+                <!-- Column 4: Newsletter & Social -->
                 <div class="footer-col">
                     <h4>Stay Connected</h4>
-                    <div class="newsletter">
-                        <input type="email" placeholder="Your email address">
-                        <button class="btn btn-primary">Subscribe</button>
-                    </div>
                     <div class="social-links">
                         <?php if (!empty($settings['facebook_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['facebook_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-facebook-f"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['twitter_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['twitter_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['twitter_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-twitter"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['instagram_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['instagram_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['instagram_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-instagram"></i></a>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
             <div class="copyright">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
+                <?php echo htmlspecialchars($settings['footer_text'] ?? '&copy; ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
             </div>
         </div>
     </footer>

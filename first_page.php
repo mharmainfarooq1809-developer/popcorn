@@ -444,7 +444,7 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
         .hero-exclusive {
             background: radial-gradient(circle at 30% 50%, var(--deep-navy), var(--dark-navy));
             border-radius: 24px;
-            padding: 50px;
+            padding: 40px 50px;
             margin: 60px 0;
             display: flex;
             flex-wrap: wrap;
@@ -484,26 +484,140 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             flex: 1 1 350px;
         }
 
+        .hero-label {
+            display: inline-block;
+            background: var(--popcorn-orange);
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 16px;
+            border-radius: 30px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: var(--light-gray);
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hero-meta i {
+            color: var(--popcorn-orange);
+        }
+
+        .hero-description {
+            font-size: 16px;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .hero-director {
+            color: var(--gray-2);
+            font-size: 14px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-1);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
         .hero-exclusive .hero-poster {
             flex: 0 0 260px;
             height: 340px;
-            background: linear-gradient(145deg, var(--gray-1), var(--dark-gray));
             border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray-2);
+            background-size: cover !important;
+            background-position: center !important;
             border: 2px solid var(--popcorn-orange);
             box-shadow: 0 20px 30px -10px black;
-            transition: transform 0.4s;
-            font-size: 20px;
-            font-weight: 700;
-            text-transform: uppercase;
+            transition: transform 0.4s, border-color 0.3s;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
         }
 
         .hero-exclusive .hero-poster:hover {
             transform: scale(1.02) rotate(1deg);
             border-color: var(--popcorn-gold);
+            box-shadow: 0 25px 40px rgba(255, 165, 0, 0.4);
+        }
+
+        /* Carousel specific styles */
+        #featuredCarousel.carousel {
+            padding-bottom: 40px;
+        }
+
+        #featuredCarousel .carousel-indicators {
+            bottom: -20px;
+        }
+
+        #featuredCarousel .carousel-indicators button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--gray-1);
+            opacity: 1;
+            margin: 0 6px;
+        }
+
+        #featuredCarousel .carousel-indicators button.active {
+            background-color: var(--popcorn-orange);
+        }
+
+        #featuredCarousel .carousel-control-prev,
+        #featuredCarousel .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 165, 0, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, background 0.3s;
+        }
+
+        #featuredCarousel:hover .carousel-control-prev,
+        #featuredCarousel:hover .carousel-control-next {
+            opacity: 1;
+        }
+
+        #featuredCarousel .carousel-control-prev {
+            left: 20px;
+        }
+
+        #featuredCarousel .carousel-control-next {
+            right: 20px;
+        }
+
+        #featuredCarousel .carousel-control-prev:hover,
+        #featuredCarousel .carousel-control-next:hover {
+            background: var(--popcorn-orange);
+        }
+
+        #featuredCarousel .carousel-control-prev-icon,
+        #featuredCarousel .carousel-control-next-icon {
+            filter: brightness(0) invert(1);
         }
 
         /* ================= CATEGORY FILTERS ================= */
@@ -1570,6 +1684,25 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             .nav-links a {
                 font-size: 18px;
             }
+
+            .hero-exclusive {
+                padding: 30px 20px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-exclusive .hero-poster {
+                flex: 0 0 200px;
+                height: 260px;
+                margin: 0 auto;
+            }
+
+            #featuredCarousel .carousel-control-prev,
+            #featuredCarousel .carousel-control-next {
+                display: none;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1586,6 +1719,10 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
         @media (max-width: 480px) {
             .loader-logo {
                 font-size: 2.2rem;
+            }
+
+            .hero-title {
+                font-size: 28px;
             }
         }
 
@@ -1618,42 +1755,24 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
         <div class="loader-vignette"></div>
     </div>
 
-    <!-- Floating Navbar with Burger Menu -->
+       <!-- Floating Navbar with Burger Menu -->
     <header id="navbar">
         <a href="first_page.php" class="logo">
             <?php if (!empty($settings['site_logo'])): ?>
-                <img src="<?= htmlspecialchars($settings['site_logo']) ?>"
-                    alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
+                <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
             <?php else: ?>
                 <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
             <?php endif; ?>
         </a>
         <div class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></div>
         <nav class="nav-links" id="navLinks">
-            <a href="first_page.php" <?= basename($_SERVER['PHP_SELF']) == 'first_page.php' ? 'class="active"' : '' ?>>Home</a>
-            <a href="showtimes.php" <?= basename($_SERVER['PHP_SELF']) == 'showtimes.php' ? 'class="active"' : '' ?>>Showtimes</a>
-            <a href="theatre.php" <?= basename($_SERVER['PHP_SELF']) == 'theatre.php' ? 'class="active"' : '' ?>>Theatres</a>
-            <a href="booking.php" <?= basename($_SERVER['PHP_SELF']) == 'booking.php' ? 'class="active"' : '' ?>>Booking</a>
-            <a href="about.php" <?= basename($_SERVER['PHP_SELF']) == 'about.php' ? 'class="active"' : '' ?>>About</a>
-
-            <?php if (isset($_SESSION['user_id'])):
-                $user_role = $_SESSION['user_role'] ?? 'user';
-                ?>
-                <?php if ($user_role === 'admin'): ?>
-                    <!-- Admin sees both Dashboard and Admin Panel -->
-                    <a href="user_dashboard.php" <?= basename($_SERVER['PHP_SELF']) == 'user_dashboard.php' ? 'class="active"' : '' ?>>My Dashboard</a>
-                    <a href="Admin_Dashboard/dashboard.php" class="admin-link">
-                        <i class="fas fa-crown"></i> Admin Panel
-                    </a>
-                <?php else: ?>
-                    <!-- Regular users only see their dashboard -->
-                    <a href="user_dashboard.php" <?= basename($_SERVER['PHP_SELF']) == 'user_dashboard.php' ? 'class="active"' : '' ?>>Dashboard</a>
-                <?php endif; ?>
-                <a href="logout.php">Logout</a>
-            <?php else: ?>
-                <a href="login.php">Login</a>
-                <a href="register.php">Register</a>
-            <?php endif; ?>
+            <a href="first_page.php" class="active">Home</a>
+            <a href="showtimes.php">Showtimes</a>
+            <a href="theatre.php">Theatres</a>
+            <a href="booking.php">Booking</a>
+            <a href="about.php">About</a>
+            <a href="user_dashboard.php">Dashboard</a>
+            <a href="logout.php">Logout</a>
         </nav>
     </header>
     <!-- PREMIUM HERO SLIDER (dynamic from hero_slides table) -->
@@ -1728,25 +1847,27 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
                     while ($featured = $featured_result->fetch_assoc()): ?>
                         <div class="carousel-item <?php echo $first ? 'active' : '' ?>">
                             <div class="hero-content">
-                                <span class="hero-label">? Exclusive Featured</span>
+                                <span class="hero-label"><i class="fas fa-star me-2"></i>Exclusive Featured</span>
                                 <h1 class="hero-title"><?php echo htmlspecialchars($featured['title']) ?></h1>
                                 <div class="hero-meta">
-                                    <span><?php echo htmlspecialchars($featured['category']) ?></span>
-                                    <span><?php echo htmlspecialchars($featured['language']) ?></span>
+                                    <span><i class="fas fa-tag"></i> <?php echo htmlspecialchars($featured['category']) ?></span>
+                                    <span><i class="fas fa-language"></i> <?php echo htmlspecialchars($featured['language']) ?></span>
                                 </div>
                                 <p class="hero-description"><?php echo htmlspecialchars($featured['genre']) ?></p>
-                                <p class="hero-director"><strong>Director:</strong> TBD | <strong>Cast:</strong> TBD</p>
+                                <p class="hero-director"><i class="fas fa-video me-2"></i><strong>Director:</strong> TBD | <i class="fas fa-users ms-2 me-2"></i><strong>Cast:</strong> TBD</p>
                                 <div class="hero-buttons">
-                                    <a href="booking.php?movie_id=<?php echo $featured['id'] ?>" class="btn btn-primary">Get
-                                        Ticket</a>
+                                    <a href="booking.php?movie_id=<?php echo $featured['id'] ?>" class="btn btn-primary">
+                                        <i class="fas fa-ticket-alt me-2"></i>Get Ticket
+                                    </a>
                                     <a href="#" class="btn btn-outline"
-                                        onclick="playTrailer('<?php echo htmlspecialchars(addslashes($featured['title'])) ?>', '<?php echo htmlspecialchars(addslashes($featured['trailer_url'])) ?>')"><i
-                                            class="fas fa-play"></i> Watch Trailer</a>
+                                        onclick="playTrailer('<?php echo htmlspecialchars(addslashes($featured['title'])) ?>', '<?php echo htmlspecialchars(addslashes($featured['trailer_url'])) ?>')">
+                                        <i class="fas fa-play me-2"></i> Watch Trailer
+                                    </a>
                                 </div>
                             </div>
                             <div class="hero-poster"
-                                style="background-image: url('<?php echo htmlspecialchars($featured['image_url']) ?>'); background-size: cover; background-position: center;">
-                                <!-- Poster image as background instead of text -->
+                                style="background-image: url('<?php echo htmlspecialchars($featured['image_url']) ?>');">
+                                <!-- Poster image as background -->
                             </div>
                         </div>
                         <?php $first = false; endwhile; ?>
@@ -1764,11 +1885,14 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             <!-- Fallback if no featured movies -->
             <section class="hero-exclusive reveal">
                 <div class="hero-content">
-                    <span class="hero-label">? Exclusive Featured</span>
+                    <span class="hero-label"><i class="fas fa-star me-2"></i>Exclusive Featured</span>
                     <h1 class="hero-title">No featured movies</h1>
                     <p class="hero-description">Admin hasn't selected any featured movies yet.</p>
+                    <div class="hero-buttons">
+                        <a href="showtimes.php" class="btn btn-primary">Browse All Movies</a>
+                    </div>
                 </div>
-                <div class="hero-poster">FEATURED</div>
+                <div class="hero-poster" style="background-image: url('default-poster.jpg');">FEATURED</div>
             </section>
         <?php endif; ?>
 
@@ -1899,8 +2023,8 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
                     <div class="benefit-item"><i class="fas fa-gift"></i><span>Exclusive Offers</span></div>
                     <div class="benefit-item"><i class="fas fa-child"></i><span>50% Off for Kids</span></div>
                 </div>
-                <div class="join-buttons"><a href="register.html" class="btn btn-primary">Create Account</a><a
-                        href="login.html" class="btn btn-outline">Sign In</a></div>
+                <div class="join-buttons"><a href="register.php" class="btn btn-primary">Create Account</a><a
+                        href="login.php" class="btn btn-outline">Sign In</a></div>
             </div>
         </div>
     </main>
@@ -1981,10 +2105,6 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
                 <!-- Column 4: Newsletter & Social -->
                 <div class="footer-col">
                     <h4>Stay Connected</h4>
-                    <div class="newsletter">
-                        <input type="email" placeholder="Your email address">
-                        <button class="btn btn-primary btn-small">Subscribe</button>
-                    </div>
                     <div class="social-links">
                         <?php if (!empty($settings['facebook_url'])): ?>
                             <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"

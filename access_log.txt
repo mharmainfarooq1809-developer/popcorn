@@ -90,3 +90,708 @@ Session: Array
 
 ----------------------------
 
+2026-03-13 04:17:27 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:25:28 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:25:34 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:27:30 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:30:45 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:32:22 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-13 04:35:34 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773372934
+)
+
+----------------------------
+
+2026-03-13 04:40:03 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373203
+)
+
+----------------------------
+
+2026-03-13 04:41:33 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373203
+)
+
+----------------------------
+
+2026-03-13 04:42:15 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373335
+)
+
+----------------------------
+
+2026-03-13 04:43:06 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373335
+)
+
+----------------------------
+
+2026-03-13 04:51:06 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373335
+)
+
+----------------------------
+
+2026-03-13 04:57:17 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773373335
+)
+
+----------------------------
+
+2026-03-13 05:36:29 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773376589
+)
+
+----------------------------
+
+2026-03-13 05:36:51 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773376589
+)
+
+----------------------------
+
+2026-03-13 05:46:38 - Page: first_page.php
+User Role: admin
+User ID: 2
+Session: Array
+(
+    [user_id] => 2
+    [user_name] => Admin
+    [user_role] => admin
+    [logged_in] => 1
+    [login_time] => 1773377149
+)
+
+----------------------------
+
+2026-03-13 05:47:12 - Page: first_page.php
+User Role: user
+User ID: 6
+Session: Array
+(
+    [user_id] => 6
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773377232
+)
+
+----------------------------
+
+2026-03-13 06:11:00 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773378657
+)
+
+----------------------------
+
+2026-03-13 06:12:03 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773378657
+)
+
+----------------------------
+
+2026-03-13 06:12:14 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773378657
+)
+
+----------------------------
+
+2026-03-13 06:22:20 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773379340
+)
+
+----------------------------
+
+2026-03-13 06:26:53 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773379613
+)
+
+----------------------------
+
+2026-03-13 06:28:56 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773379736
+)
+
+----------------------------
+
+2026-03-13 06:30:51 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773379851
+)
+
+----------------------------
+
+2026-03-13 06:33:04 - Page: first_page.php
+User Role: user
+User ID: 7
+Session: Array
+(
+    [user_id] => 7
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773379984
+)
+
+----------------------------
+
+2026-03-13 06:41:39 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773380499
+)
+
+----------------------------
+
+2026-03-13 06:52:00 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381120
+)
+
+----------------------------
+
+2026-03-13 06:56:59 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381419
+)
+
+----------------------------
+
+2026-03-13 06:58:11 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 06:58:53 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 06:59:04 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 06:59:11 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 07:00:07 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 07:01:28 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381491
+)
+
+----------------------------
+
+2026-03-13 07:03:19 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381799
+)
+
+----------------------------
+
+2026-03-13 07:04:05 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773381799
+)
+
+----------------------------
+
+2026-03-13 07:11:45 - Page: first_page.php
+User Role: user
+User ID: 8
+Session: Array
+(
+    [user_id] => 8
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773382305
+)
+
+----------------------------
+
+2026-03-14 02:26:42 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:27:32 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:27:40 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:27:56 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:30:56 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:31:04 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:31:22 - Page: first_page.php
+User Role: NOT SET
+User ID: NOT SET
+Session: Array
+(
+)
+
+----------------------------
+
+2026-03-14 02:36:40 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773452200
+)
+
+----------------------------
+
+2026-03-14 02:46:32 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773452792
+)
+
+----------------------------
+
+2026-03-14 02:48:42 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773452792
+)
+
+----------------------------
+
+2026-03-14 02:51:58 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773453118
+)
+
+----------------------------
+
+2026-03-14 02:53:41 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773453221
+)
+
+----------------------------
+
+2026-03-14 02:54:54 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773453294
+)
+
+----------------------------
+
+2026-03-14 02:55:12 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773453294
+)
+
+----------------------------
+
+2026-03-14 02:59:06 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773453546
+)
+
+----------------------------
+
+2026-03-14 03:09:06 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773454146
+)
+
+----------------------------
+
+2026-03-14 03:09:26 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773454146
+)
+
+----------------------------
+
+2026-03-14 03:19:26 - Page: first_page.php
+User Role: user
+User ID: 9
+Session: Array
+(
+    [user_id] => 9
+    [user_name] => Harmain
+    [user_role] => user
+    [logged_in] => 1
+    [login_time] => 1773454146
+)
+
+----------------------------
+

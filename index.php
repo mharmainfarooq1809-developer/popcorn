@@ -24,6 +24,24 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --dark-navy: #0B1623;
+            --deep-navy: #0F1C2B;
+            --white: #F2F2F2;
+            --dark-purple: #5B1E8C;
+            --primary-purple: #6F2DA8;
+            --medium-purple: #8E63B3;
+            --light-lavender: #B9A3CC;
+            --dark-gray: #1F2732;
+            --gray-1: #3A414D;
+            --gray-2: #555C68;
+            --gray-3: #7A808A;
+            --light-gray: #A7ADB6;
+            --very-light-gray: #C9CED6;
+            --popcorn-gold: #FFD966;
+            --popcorn-orange: #FFA500;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -429,6 +447,48 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
             font-size: 14px;
         }
 
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .contact-info h5 {
+            color: var(--popcorn-gold);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .contact-info p {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            color: var(--light-gray);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .contact-info p i {
+            color: var(--popcorn-orange);
+            font-size: 16px;
+            min-width: 20px;
+            margin-top: 3px;
+        }
+
+        .contact-info p a {
+            color: var(--light-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-info p a:hover {
+            color: var(--popcorn-gold);
+        }
+
+
         /* ========== ANIMATIONS ========== */
         .fade-up {
             opacity: 0;
@@ -535,10 +595,6 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
             <h1><span>Unlimited</span> Movies, TV<br>Shows & More</h1>
             <p>Watch anywhere. Cancel anytime. Ready to watch? Enter your email to create or restart your membership.
             </p>
-            <div class="email-form">
-                <input type="email" placeholder="Email address">
-                <button>Get Started <i class="fas fa-chevron-right" style="margin-left: 8px;"></i></button>
-            </div>
         </div>
     </section>
 
@@ -554,12 +610,13 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
         <div class="movie-row fade-up" id="newReleasesRow"></div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer (full width) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
+                <!-- Column 1: About & Contact -->
                 <div class="footer-col">
-                    <h4><?= htmlspecialchars($site_name) ?></h4>
+                    <h4>Popcorn Hub</h4>
                     <ul>
                         <li><a href="footer_links/abouts.php">About Us</a></li>
                         <li><a href="footer_links/careers.php">Careers</a></li>
@@ -567,24 +624,28 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
                         <li><a href="footer_links/contact.php">Contact</a></li>
                     </ul>
                     <?php if (!empty($settings['contact_email']) || !empty($settings['contact_phone']) || !empty($settings['address'])): ?>
-                        <div class="contact-info" style="margin-top:14px;color:#A7ADB6;font-size:14px;line-height:1.7;">
+                        <div class="contact-info">
+                            <h5>Get in touch</h5>
                             <?php if (!empty($settings['contact_email'])): ?>
                                 <p><i class="fas fa-envelope"></i> <a
-                                        href="mailto:<?= htmlspecialchars($settings['contact_email']) ?>"><?= htmlspecialchars($settings['contact_email']) ?></a>
+                                        href="mailto:<?php echo htmlspecialchars($settings['contact_email']) ?>"><?php echo htmlspecialchars($settings['contact_email']) ?></a>
                                 </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['contact_phone'])): ?>
                                 <p><i class="fas fa-phone-alt"></i> <a
-                                        href="tel:<?= htmlspecialchars($settings['contact_phone']) ?>"><?= htmlspecialchars($settings['contact_phone']) ?></a>
+                                        href="tel:<?php echo htmlspecialchars($settings['contact_phone']) ?>"><?php echo htmlspecialchars($settings['contact_phone']) ?></a>
                                 </p>
                             <?php endif; ?>
                             <?php if (!empty($settings['address'])): ?>
-                                <p><i class="fas fa-map-marker-alt"></i> <?= nl2br(htmlspecialchars($settings['address'])) ?>
+                                <p><i class="fas fa-map-marker-alt"></i>
+                                    <?php echo nl2br(htmlspecialchars($settings['address'])) ?>
                                 </p>
                             <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 </div>
+
+                <!-- Column 2: Movies -->
                 <div class="footer-col">
                     <h4>Movies</h4>
                     <ul>
@@ -594,6 +655,8 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
                         <li><a href="footer_links/3d_imax.php">3D/IMAX</a></li>
                     </ul>
                 </div>
+
+                <!-- Column 3: Support -->
                 <div class="footer-col">
                     <h4>Support</h4>
                     <ul>
@@ -603,30 +666,28 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
                         <li><a href="footer_links/faq.php">FAQ</a></li>
                     </ul>
                 </div>
+
+                <!-- Column 4: Newsletter & Social -->
                 <div class="footer-col">
-                    <h4>Newsletter</h4>
-                    <div class="newsletter">
-                        <input type="email" placeholder="Your email">
-                        <button class="btn-primary btn-small">Subscribe</button>
-                    </div>
+                    <h4>Stay Connected</h4>
                     <div class="social-links">
                         <?php if (!empty($settings['facebook_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['facebook_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['facebook_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-facebook-f"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['twitter_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['twitter_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['twitter_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-twitter"></i></a>
                         <?php endif; ?>
                         <?php if (!empty($settings['instagram_url'])): ?>
-                            <a href="<?= htmlspecialchars($settings['instagram_url']) ?>" target="_blank" rel="noopener"
-                                aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="<?php echo htmlspecialchars($settings['instagram_url']) ?>" target="_blank"
+                                rel="noopener"><i class="fab fa-instagram"></i></a>
                         <?php endif; ?>
                     </div>
                 </div>
             </div>
             <div class="copyright">
-                <?= htmlspecialchars($footer_text) ?>
+                <?php echo htmlspecialchars($settings['footer_text'] ?? '&copy; ' . date('Y') . ' ' . ($settings['site_name'] ?? 'Popcorn Hub') . ' Cinemas. All rights reserved.') ?>
             </div>
         </div>
     </footer>
