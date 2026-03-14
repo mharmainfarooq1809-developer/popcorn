@@ -1551,7 +1551,7 @@ if (!$no_movies) {
                 <!-- Terms and conditions -->
                 <div class="terms">
                     <input type="checkbox" id="terms">
-                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Cancellation
+                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a> and <a href="cancelation_policy.html">Cancellation
                             Policy</a></label>
                 </div>
 
