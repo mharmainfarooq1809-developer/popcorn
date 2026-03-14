@@ -916,37 +916,6 @@ body.dark-mode .footer {
             </div>
         </div>
 
-        <!-- Movies Voted For -->
-        <div class="card">
-            <h4>Movies Voted For</h4>
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Movie</th>
-                            <th>Genre</th>
-                            <th>Year</th>
-                            <th>Voted On</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($votedMovies->num_rows > 0): ?>
-                            <?php while ($vote = $votedMovies->fetch_assoc()): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($vote['title']) ?></td>
-                                    <td><?= htmlspecialchars($vote['genre'] ?? 'N/A') ?></td>
-                                    <td><?= $vote['year'] ?? 'N/A' ?></td>
-                                    <td><?= date('Y-m-d', strtotime($vote['voted_at'])) ?></td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
-                            <tr><td colspan="4" class="text-center py-4">No votes yet</td></tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
 
     <footer class="footer text-center">
         <div class="container">
