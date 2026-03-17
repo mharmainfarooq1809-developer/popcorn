@@ -14,3 +14,4 @@ if ($dup && $dup->num_rows > 0) {
 $mm = $conn->query("SELECT setting_value FROM settings WHERE setting_key='maintenance_mode'");
 if ($mm && $mm->num_rows) { while($r=$mm->fetch_assoc()){ echo "maintenance_mode=",$r['setting_value'],"\n"; } } else { echo "maintenance_mode=MISSING\n"; }
 ?>
+

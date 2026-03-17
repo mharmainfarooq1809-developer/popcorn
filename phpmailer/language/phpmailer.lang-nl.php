@@ -24,7 +24,7 @@ $PHPMAILER_LANG['invalid_header']       = 'Ongeldige headernaam of -waarde';
 $PHPMAILER_LANG['invalid_hostentry']    = 'Ongeldige hostentry: ';
 $PHPMAILER_LANG['invalid_host']         = 'Ongeldige host: ';
 $PHPMAILER_LANG['mailer_not_supported'] = ' mailer wordt niet ondersteund.';
-$PHPMAILER_LANG['provide_address']      = 'Er moet minstens één ontvanger worden opgegeven.';
+$PHPMAILER_LANG['provide_address']      = 'Er moet minstens Ã©Ã©n ontvanger worden opgegeven.';
 $PHPMAILER_LANG['recipients_failed']    = 'SMTP-fout: de volgende ontvangers zijn mislukt: ';
 $PHPMAILER_LANG['signing']              = 'Signeerfout: ';
 $PHPMAILER_LANG['smtp_code']            = 'SMTP-code: ';
@@ -36,3 +36,4 @@ $PHPMAILER_LANG['variable_set']         = 'Kan de volgende variabele niet instel
 $PHPMAILER_LANG['no_smtputf8']          = 'De server ondersteunt geen SMTPUTF8 dat nodig is om naar Unicode-adressen te sturen.';
 $PHPMAILER_LANG['imap_recommended']     = 'Het gebruik van de vereenvoudigde adresparser is niet aanbevolen. Installeer de IMAP-extensie voor PHP voor volledige RFC822-ondersteuning.';
 $PHPMAILER_LANG['deprecated_argument']  = 'Verouderd argument: ';
+

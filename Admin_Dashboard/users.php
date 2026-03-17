@@ -20,12 +20,10 @@ $users = $conn->query("SELECT id, name, email, role, profile_image, points, crea
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Users - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
                 ;
             }
         </style>
@@ -1445,7 +1443,7 @@ $users = $conn->query("SELECT id, name, email, role, profile_image, points, crea
     <footer class="footer text-center">
         <div class="container">
             <p class="small">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
             </p>
         </div>
     </footer>

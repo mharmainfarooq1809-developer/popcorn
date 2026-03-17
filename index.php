@@ -1,11 +1,11 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db_connect.php';
 require_once 'settings_init.php';
 
 $site_name = $settings['site_name'] ?? 'Popcorn Hub';
 $site_logo = $settings['site_logo'] ?? '';
-$footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name . '. All rights reserved.');
+$footer_text = $settings['footer_text'] ?? (' ' . date('Y') . ' ' . $site_name . '. All rights reserved.');
 
 ?><!DOCTYPE html>
 <html lang="en">
@@ -774,7 +774,7 @@ $footer_text = $settings['footer_text'] ?? ('© ' . date('Y') . ' ' . $site_name
                         <div class="card-title">${movie.title}</div>
                         <div class="card-meta">
                             <span>${movie.year}</span>
-                            <span>�</span>
+                            <span></span>
                             <span>${movie.genre}</span>
                         </div>
                     </div>

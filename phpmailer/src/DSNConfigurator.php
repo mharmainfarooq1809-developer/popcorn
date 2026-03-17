@@ -243,3 +243,4 @@ class DSNConfigurator
         return false;
     }
 }
+

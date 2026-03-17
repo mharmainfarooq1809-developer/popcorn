@@ -33,12 +33,10 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Settings · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Email Settings - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
                 ;
             }
         </style>
@@ -932,7 +930,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                     <div class="col-md-6">
                         <label class="form-label">SMTP Password</label>
                         <input type="password" class="form-control" name="smtp_password"
-                            value="<?= htmlspecialchars($settings['smtp_password'] ?? '') ?>" placeholder="••••••••">
+                            value="<?= htmlspecialchars($settings['smtp_password'] ?? '') ?>" placeholder="********">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Admin Email (From)</label>
@@ -962,7 +960,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
     <footer class="footer text-center">
         <div class="container">
             <p class="small">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
             </p>
         </div>
     </footer>
@@ -1032,13 +1030,13 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                 })
                 .then(data => {
                     if (data.success) {
-                        resultDiv.innerHTML = '<span class="text-success">✓ Test email sent successfully!</span>';
+                        resultDiv.innerHTML = '<span class="text-success">OK Test email sent successfully!</span>';
                     } else {
-                        resultDiv.innerHTML = '<span class="text-danger">✗ ' + (data.error || 'Failed to send test email.') + '</span>';
+                        resultDiv.innerHTML = '<span class="text-danger">Error ' + (data.error || 'Failed to send test email.') + '</span>';
                     }
                 })
                 .catch(error => {
-                    resultDiv.innerHTML = '<span class="text-danger">✗ Network error: ' + error.message + '</span>';
+                    resultDiv.innerHTML = '<span class="text-danger">Error Network error: ' + error.message + '</span>';
                 })
                 .finally(() => {
                     btn.disabled = false;

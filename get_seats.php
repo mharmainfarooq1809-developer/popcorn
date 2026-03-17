@@ -22,7 +22,7 @@ $booked = [];
 $pending = [];
 
 try {
-    // Query confirmed bookings (extract seats from the comma‑separated string)
+    // Query confirmed bookings (extract seats from the comma-separated string)
     $stmt = $conn->prepare("SELECT seats FROM bookings WHERE showtime_id = ? AND status = 'confirmed'");
     $stmt->bind_param("i", $showtime_id);
     $stmt->execute();
@@ -54,4 +54,3 @@ try {
     error_log("get_seats.php exception: " . $e->getMessage());
     sendError('Server error');
 }
-?>

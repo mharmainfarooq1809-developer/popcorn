@@ -23,8 +23,8 @@ $types = str_repeat('s', count($seatArray));
 $params = $seatArray;
 
 $checkStmt = $conn->prepare("
-    SELECT seats FROM bookings 
-    WHERE showtime_id = ? AND status IN ('pending', 'confirmed') 
+    SELECT seats FROM bookings
+    WHERE showtime_id = ? AND status IN ('pending', 'confirmed')
     AND FIND_IN_SET(?, seats)
 ");
 // Note: FIND_IN_SET works with comma-separated values. Alternative: use JSON or separate table.

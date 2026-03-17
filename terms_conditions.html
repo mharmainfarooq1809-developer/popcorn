@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cancellation Policy - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Terms and Conditions - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     
     <!-- Google Fonts: Heebo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,7 +75,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 100px auto 60px;
             padding: 0 20px;
             width: 100%;
@@ -154,6 +154,13 @@
             font-size: 28px;
         }
 
+        .policy-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--white);
+            margin: 20px 0 10px;
+        }
+
         .policy-section p {
             color: var(--very-light-gray);
             font-size: 16px;
@@ -161,14 +168,15 @@
             margin-bottom: 15px;
         }
 
-        .policy-section ul {
+        .policy-section ul, .policy-section ol {
             margin-left: 35px;
             margin-top: 10px;
+            margin-bottom: 15px;
         }
 
         .policy-section li {
             color: var(--light-gray);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 16px;
         }
 
@@ -176,6 +184,18 @@
             color: var(--popcorn-orange);
             margin-right: 10px;
             font-size: 14px;
+        }
+
+        .highlight-box {
+            background: rgba(255, 165, 0, 0.05);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            border-radius: 24px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .highlight-box p {
+            margin-bottom: 0;
         }
 
         .contact-details {
@@ -221,6 +241,14 @@
         }
 
         /* Back to Booking Button */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
         .back-button {
             display: inline-flex;
             align-items: center;
@@ -234,7 +262,6 @@
             font-size: 16px;
             transition: all 0.3s;
             border: 1px solid rgba(255,255,255,0.1);
-            margin-top: 30px;
         }
 
         .back-button:hover {
@@ -247,9 +274,13 @@
             font-size: 20px;
         }
 
-        .button-container {
-            text-align: center;
-            margin-top: 30px;
+        .back-button.secondary {
+            background: var(--gray-1);
+        }
+
+        .back-button.secondary:hover {
+            background: var(--gray-2);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
         }
 
         /* Floating Navbar */
@@ -343,6 +374,38 @@
             font-size: 14px;
         }
 
+        /* Table of Contents */
+        .toc {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .toc h3 {
+            color: var(--popcorn-gold);
+            margin-bottom: 15px;
+        }
+
+        .toc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .toc-item {
+            color: var(--light-gray);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .toc-item:hover {
+            background: rgba(255, 165, 0, 0.1);
+            color: var(--popcorn-orange);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .container {
@@ -370,9 +433,13 @@
                 display: none;
             }
             
+            .button-container {
+                flex-direction: column;
+            }
+            
             .back-button {
-                padding: 12px 24px;
-                font-size: 14px;
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -396,58 +463,131 @@
     <main class="container">
         <div class="policy-card">
             <div class="policy-header">
-                <h1>Cancellation <span>Policy</span></h1>
+                <h1>Terms and <span>Conditions</span></h1>
                 <div class="last-updated">
                     <i class="bi bi-calendar3 me-2"></i>Last updated: March 14, 2026
                 </div>
             </div>
 
-            <div class="policy-section">
-                <h2><i class="bi bi-clock-history"></i> 1. Order Cancellation</h2>
-                <p>You can cancel your booking within <strong class="text-warning">24 hours</strong> of placing it. After this time, the tickets may already be processed and cannot be cancelled. Cancellations are only accepted for confirmed bookings.</p>
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3><i class="bi bi-list-ul me-2"></i>Table of Contents</h3>
+                <div class="toc-grid">
+                    <a href="#section1" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>1. Acceptance of Terms</a>
+                    <a href="#section2" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>2. Booking and Payment</a>
+                    <a href="#section3" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>3. Cancellation Policy</a>
+                    <a href="#section4" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>4. Loyalty Points</a>
+                    <a href="#section5" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>5. User Conduct</a>
+                    <a href="#section6" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>6. Privacy</a>
+                    <a href="#section7" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>7. Limitation of Liability</a>
+                    <a href="#section8" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>8. Modifications</a>
+                    <a href="#section9" class="toc-item"><i class="bi bi-arrow-right-circle me-2"></i>9. Contact Information</a>
+                </div>
             </div>
 
-            <div class="policy-section">
-                <h2><i class="bi bi-cash-stack"></i> 2. Refund Policy</h2>
-                <p>If your booking is cancelled within the allowed time, a full refund will be issued to your original payment method. Refunds are typically processed within 5-7 business days and will be credited as:</p>
+            <div id="section1" class="policy-section">
+                <h2><i class="bi bi-check-circle"></i> 1. Acceptance of Terms</h2>
+                <p>By accessing and using Popcorn Hub's services, you agree to be bound by these Terms and Conditions. If you do not agree with any part of these terms, please do not use our services.</p>
+                <div class="highlight-box">
+                    <p><i class="bi bi-info-circle-fill text-warning me-2"></i> These terms constitute a legally binding agreement between you and Popcorn Hub Cinemas.</p>
+                </div>
+            </div>
+
+            <div id="section2" class="policy-section">
+                <h2><i class="bi bi-credit-card"></i> 2. Booking and Payment</h2>
+                <p>When making a booking through our platform:</p>
                 <ul>
-                    <li><i class="bi bi-check-circle-fill"></i> Cash refunds for payments made in cash</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Card refunds for credit/debit card payments</li>
-                    <li><i class="bi bi-check-circle-fill"></i> Points will be refunded to your loyalty account</li>
+                    <li><i class="bi bi-check-circle-fill"></i> All prices are in USD and include applicable taxes</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Payment must be completed at the time of booking</li>
+                    <li><i class="bi bi-check-circle-fill"></i> We accept major credit cards, debit cards, and loyalty points</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Booking confirmations will be sent to your registered email</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Seats are allocated on a first-come, first-served basis</li>
                 </ul>
             </div>
 
-            <div class="policy-section">
-                <h2><i class="bi bi-exclamation-triangle"></i> 3. Late Cancellation</h2>
-                <p>Bookings cancelled after the 24-hour window or for shows that have already started are not eligible for a refund. However, you can still cancel to release the seats for other customers.</p>
+            <div id="section3" class="policy-section">
+                <h2><i class="bi bi-calendar-x"></i> 3. Cancellation Policy</h2>
+                <p>Our cancellation policy is designed to be fair to both customers and cinemas:</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Cancellations made up to 24 hours before showtime: Full refund</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Cancellations within 24 hours of showtime: No refund</li>
+                    <li><i class="bi bi-check-circle-fill"></i> No-shows: No refund</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Points used for bookings will be refunded upon cancellation</li>
+                </ul>
+                <p>For more details, please refer to our <a href="cancelation_policy.html" style="color: var(--popcorn-orange);">Cancellation Policy</a> page.</p>
             </div>
 
-            <div class="policy-section">
-                <h2><i class="bi bi-star"></i> 4. Points & Loyalty</h2>
-                <p>When you cancel a booking:</p>
+            <div id="section4" class="policy-section">
+                <h2><i class="bi bi-star-fill"></i> 4. Loyalty Points Program</h2>
+                <h3>Earning Points:</h3>
                 <ul>
-                    <li><i class="bi bi-check-circle-fill"></i> Points earned from that booking will be deducted from your account</li>
-                    <li><i class="bi bi-check-circle-fill"></i> The transaction will be recorded in your points history</li>
-                    <li><i class="bi bi-check-circle-fill"></i> No penalty points are applied</li>
+                    <li><i class="bi bi-check-circle-fill"></i> 1 point earned for every ticket purchased</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Points are credited within 24 hours of the show</li>
+                    <li><i class="bi bi-check-circle-fill"></i> 10 points = 10% discount on your next booking</li>
+                </ul>
+                <h3>Points Expiration:</h3>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Points expire 12 months after they are earned</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Inactive accounts for 6 months may have points forfeited</li>
                 </ul>
             </div>
 
-            <div class="policy-section">
-                <h2><i class="bi bi-envelope"></i> 5. Contact Us</h2>
-                <p>If you have any questions regarding cancellations or need assistance, please contact our support team:</p>
+            <div id="section5" class="policy-section">
+                <h2><i class="bi bi-people"></i> 5. User Conduct</h2>
+                <p>When using our platform, you agree to:</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Provide accurate and complete information</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Maintain the security of your account</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Not engage in fraudulent activities</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Not attempt to bypass our booking system</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Not resell tickets at inflated prices</li>
+                </ul>
+            </div>
+
+            <div id="section6" class="policy-section">
+                <h2><i class="bi bi-shield-lock"></i> 6. Privacy Policy</h2>
+                <p>Your privacy is important to us. We collect and use personal information in accordance with our Privacy Policy. By using our services, you consent to:</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Collection of necessary personal data for booking purposes</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Use of cookies to improve your experience</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Sharing information with cinemas for ticket validation</li>
+                </ul>
+                <p>For complete details, please review our full <a href="footer_links/privacy.php" style="color: var(--popcorn-orange);">Privacy Policy</a>.</p>
+            </div>
+
+            <div id="section7" class="policy-section">
+                <h2><i class="bi bi-exclamation-triangle"></i> 7. Limitation of Liability</h2>
+                <p>Popcorn Hub shall not be liable for:</p>
+                <ul>
+                    <li><i class="bi bi-check-circle-fill"></i> Cancellations or changes by cinemas</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Technical issues beyond our control</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Indirect or consequential damages</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Loss of data or profits</li>
+                </ul>
+                <p>Our maximum liability shall not exceed the amount paid for the specific booking in question.</p>
+            </div>
+
+            <div id="section8" class="policy-section">
+                <h2><i class="bi bi-arrow-repeat"></i> 8. Modifications to Terms</h2>
+                <p>We reserve the right to modify these terms at any time. Changes will be effective immediately upon posting. Your continued use of our services constitutes acceptance of modified terms.</p>
+            </div>
+
+            <div id="section9" class="policy-section">
+                <h2><i class="bi bi-envelope"></i> 9. Contact Information</h2>
+                <p>If you have any questions about these Terms and Conditions, please contact us:</p>
                 
                 <div class="contact-details">
                     <div class="contact-item">
                         <i class="bi bi-envelope-fill"></i>
-                        <a href="mailto:support@popcornhub.com">support@popcornhub.com</a>
+                        <a href="mailto:legal@popcornhub.com">legal@popcornhub.com</a>
                     </div>
                     <div class="contact-item">
                         <i class="bi bi-telephone-fill"></i>
                         <a href="tel:+1234567890">+1 (234) 567-890</a>
                     </div>
                     <div class="contact-item">
-                        <i class="bi bi-chat-dots-fill"></i>
-                        <a href="#">Live Chat (24/7)</a>
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span style="color: var(--light-gray);">123 Cinema Street, Hollywood, CA 90210</span>
                     </div>
                 </div>
             </div>
@@ -456,8 +596,8 @@
                 <a href="booking.php" class="back-button">
                     <i class="bi bi-arrow-left"></i> Back to Booking
                 </a>
-                <a href="user_dashboard.php" class="back-button" style="background: var(--gray-1); margin-left: 15px;">
-                    <i class="bi bi-person"></i> Go to Dashboard
+                <a href="user_dashboard.php" class="back-button secondary">
+                    <i class="bi bi-person"></i> Dashboard
                 </a>
             </div>
         </div>
@@ -474,6 +614,18 @@
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Smooth scroll for table of contents
+        document.querySelectorAll('.toc-item').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         });
     </script>
 </body>

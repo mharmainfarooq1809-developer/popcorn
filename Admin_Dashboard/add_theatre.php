@@ -53,11 +53,10 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Add Theatre · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Add Theatre - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
@@ -999,7 +998,7 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-12 mt-4">
                             <button type="submit" class="btn btn-primary">Save Theatre</button>
                             <a href="theatres.php" class="btn btn-outline-secondary">Cancel</a>
@@ -1013,7 +1012,7 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
@@ -1079,22 +1078,22 @@ $facility_options = ['IMAX', '3D', 'Dolby Atmos', 'VIP Lounge'];
 
                 if (isDataUrl(url)) {
                     const length = url.length;
-                    imageInfo.innerHTML = `📸 Data URL · Length: ${length} characters · Type: ${url.split(';')[0] || 'Unknown'}`;
+                    imageInfo.innerHTML = "Data URL - Length: " + length + " characters - Type: " + (url.split(';')[0] || 'Unknown');
                 } else if (url.startsWith('http')) {
-                    imageInfo.innerHTML = `🌐 External URL · ${url.substring(0, 50)}${url.length > 50 ? '...' : ''}`;
+                    imageInfo.innerHTML = "External URL - " + url.substring(0, 50) + (url.length > 50 ? '...' : '');
                 } else {
-                    imageInfo.innerHTML = `📁 Local path · ${url}`;
+                    imageInfo.innerHTML = "Local path - " + url;
                 }
 
                 previewImg.onerror = function() {
-                    imageInfo.innerHTML = '⚠️ Image failed to load. Please check the URL.';
+                    imageInfo.innerHTML = 'Warning: Image failed to load. Please check the URL.';
                     imageInfo.style.color = '#dc3545';
                 };
 
                 previewImg.onload = function() {
                     imageInfo.style.color = '';
-                    if (!imageInfo.innerHTML.includes('⚠️')) {
-                        imageInfo.innerHTML += ` · ${this.naturalWidth} x ${this.naturalHeight}px`;
+                    if (!imageInfo.innerHTML.includes('Warning:')) {
+                        imageInfo.innerHTML += ' - ' + this.naturalWidth + ' x ' + this.naturalHeight + 'px';
                     }
                 };
             } else {

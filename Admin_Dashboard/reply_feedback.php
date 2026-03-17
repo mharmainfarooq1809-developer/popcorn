@@ -150,3 +150,4 @@ try {
     echo json_encode(['success' => false, 'error' => 'Failed to send email. Please check server logs.']);
 }
 ?>
+

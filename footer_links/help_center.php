@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> | Popcorn Hub</title>
   <style>
-        /* Copy the full CSS block from page_template.php – exactly the same */
+        /* Copy the full CSS block from page_template.php " exactly the same */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -113,7 +113,7 @@
             font-size: 16px;
         }
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -127,7 +127,21 @@
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
@@ -135,7 +149,21 @@
             h1 { font-size: 32px; }
             .section h2 { font-size: 24px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
             .content-card { padding: 25px 15px; }
         }
@@ -148,25 +176,29 @@
     </div>
     <div class="page-container">
         <div class="content-card">
-            <h1>Help Center</h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1>Help Center</h1>
             <p>Find answers to common questions and get the support you need.</p>
-            
+
             <div class="section">
                 <h2>Frequently Asked Questions</h2>
                 <ul>
-                    <li><strong>How do I book a ticket?</strong> – Visit our showtimes page, select a movie, and follow the checkout process.</li>
-                    <li><strong>Can I cancel or change my booking?</strong> – Yes, up to 2 hours before the showtime via your account dashboard.</li>
-                    <li><strong>Do you offer group discounts?</strong> – Absolutely! Contact us for groups of 10 or more.</li>
-                    <li><strong>What safety measures are in place?</strong> – Enhanced cleaning, contactless payment, and optional mask areas.</li>
+                    <li><strong>How do I book a ticket?</strong> " Visit our showtimes page, select a movie, and follow the checkout process.</li>
+                    <li><strong>Can I cancel or change my booking?</strong> " Yes, up to 2 hours before the showtime via your account dashboard.</li>
+                    <li><strong>Do you offer group discounts?</strong> " Absolutely! Contact us for groups of 10 or more.</li>
+                    <li><strong>What safety measures are in place?</strong> " Enhanced cleaning, contactless payment, and optional mask areas.</li>
                 </ul>
             </div>
 
             <div class="section">
                 <h2>Still Need Help</h2>
-                <p>Email our support team at <strong>help@popcornhub.com</strong> or call (555) 123‑4567.</p>
+                <p>Email our support team at <strong>help@popcornhub.com</strong> or call (555) 123'4567.</p>
             </div>
         </div>
     </div>
     <div class="footer">...</div>
 </body>
 </html>
+

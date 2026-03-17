@@ -2,6 +2,12 @@
 session_start();
 require_once 'db_connect.php';
 
+function points_history_has_column($conn, $column) {
+    $column = $conn->real_escape_string($column);
+    $res = $conn->query("SHOW COLUMNS FROM points_history LIKE '$column'");
+    return $res && $res->num_rows > 0;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
@@ -73,8 +79,8 @@ $seatArray = explode(',', $seats);
 foreach ($seatArray as $seat) {
     $seat = trim($seat);
     $check = $conn->prepare(
-        "SELECT id FROM bookings WHERE showtime_id = ? 
-         AND status IN ('pending', 'confirmed') 
+        "SELECT id FROM bookings WHERE showtime_id = ?
+         AND status IN ('pending', 'confirmed')
          AND FIND_IN_SET(?, seats)"
     );
     $check->bind_param("is", $showtimeId, $seat);
@@ -93,18 +99,18 @@ $conn->begin_transaction();
 try {
     // Insert booking without holder_name
     $stmt = $conn->prepare(
-        "INSERT INTO bookings 
-            (showtime_id, user_id, seats, adults, children, total_price, points_earned, discount_applied, status, booking_date) 
+        "INSERT INTO bookings
+            (showtime_id, user_id, seats, adults, children, total_price, points_earned, discount_applied, status, booking_date)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'confirmed', NOW())"
     );
-    $stmt->bind_param("iisiiidi", 
-        $showtimeId, 
-        $user_id, 
-        $seats, 
-        $adults, 
-        $children, 
-        $total, 
-        $pointsEarned, 
+    $stmt->bind_param("iisiiidi",
+        $showtimeId,
+        $user_id,
+        $seats,
+        $adults,
+        $children,
+        $total,
+        $pointsEarned,
         $discountEligible
     );
     $stmt->execute();
@@ -117,11 +123,23 @@ try {
     $updatePoints->execute();
     $updatePoints->close();
 
+    // Add to points history
+    $reason = "Booking #" . $bookingId . " confirmed";
+    if (points_history_has_column($conn, 'created_at')) {
+        $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason, created_at) VALUES (?, ?, ?, NOW())");
+        $history->bind_param("iis", $user_id, $pointsEarned, $reason);
+    } else {
+        $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
+        $history->bind_param("iis", $user_id, $pointsEarned, $reason);
+    }
+    $history->execute();
+    $history->close();
+
     // Create admin notification
     $notifMsg = "New booking for " . $conn->real_escape_string($movieTitle) . " (Booking #$bookingId)";
     $notifLink = "Admin_Dashboard/view_booking.php?id=" . $bookingId; // adjust
     $conn->query(
-        "INSERT INTO notifications (user_id, type, message, link, is_read, created_at) 
+        "INSERT INTO notifications (user_id, type, message, link, is_read, created_at)
          VALUES (1, 'booking', '$notifMsg', '$notifLink', 0, NOW())"
     );
 

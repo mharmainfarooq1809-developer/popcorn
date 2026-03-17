@@ -1,6 +1,6 @@
 <?php
 
-// settings_init.php – load all settings into $settings array
+// settings_init.php " load all settings into $settings array
 if (!isset($conn)) {
     // If db_connect hasn't been included yet, include it
     require_once 'db_connect.php';
@@ -46,3 +46,4 @@ if (!empty($settings['site_logo'])) {
 }
 
 ?>
+

@@ -1,4 +1,4 @@
-// admin_toggle.js - Unified toggle system for all admin pages
+﻿// admin_toggle.js - Unified toggle system for all admin pages
 
 document.addEventListener('DOMContentLoaded', function() {
     initSidebarToggle();
@@ -18,12 +18,12 @@ function initSidebarToggle() {
 
     function toggleSidebar() {
         if (!sidebar) return;
-        
+
         if (window.innerWidth >= 992) {
             // Desktop: toggle collapsed class (mini sidebar)
             sidebar.classList.toggle('collapsed');
             document.body.classList.toggle('sidebar-collapsed');
-            
+
             // Store preference in localStorage
             localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
         } else {
@@ -104,7 +104,7 @@ function initSidebarToggle() {
 function initThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     if (!themeToggle) return;
-    
+
     const themeIcon = themeToggle.querySelector('i');
 
     function setTheme(isDark) {
@@ -117,7 +117,7 @@ function initThemeToggle() {
             if (themeIcon) themeIcon.className = 'bi bi-moon';
             localStorage.setItem('admin-theme', 'light');
         }
-        
+
         // Dispatch event for other components to listen
         document.dispatchEvent(new CustomEvent('themeChanged', { detail: { isDark: isDark } }));
     }
@@ -145,17 +145,17 @@ function initThemeToggle() {
 function initCollapsibleSections() {
     // Find all toggle headers
     const headers = document.querySelectorAll('.card-header-with-toggle');
-    
+
     headers.forEach(function(header) {
         // Add click event to each header
         header.addEventListener('click', function() {
             toggleSection(this);
         });
-        
+
         // Check if section should be expanded by default
         const contentId = header.getAttribute('data-target');
         const defaultExpanded = header.getAttribute('data-default-expanded') === 'true';
-        
+
         if (defaultExpanded) {
             header.classList.add('active');
             let content = null;
@@ -174,27 +174,27 @@ function initCollapsibleSections() {
 // Global toggle function that can be called from any page
 function toggleSection(header) {
     if (!header) return;
-    
+
     header.classList.toggle('active');
-    
+
     // Try to find content by data-target attribute first
     const contentId = header.getAttribute('data-target');
     let content = null;
     if (contentId) {
         content = document.getElementById(contentId);
     }
-    
+
     // If not found, try next sibling
     if (!content) {
         content = header.nextElementSibling;
     }
-    
+
     if (content && content.classList.contains('toggle-content')) {
         content.classList.toggle('show');
-        
+
         // Dispatch event for tracking
-        document.dispatchEvent(new CustomEvent('sectionToggled', { 
-            detail: { 
+        document.dispatchEvent(new CustomEvent('sectionToggled', {
+            detail: {
                 header: header,
                 isOpen: content.classList.contains('show')
             }
@@ -206,7 +206,7 @@ function toggleSection(header) {
 function initNotificationSystem() {
     updateNotifications();
     setInterval(updateNotifications, 30000);
-    
+
     const markAllReadBtn = document.getElementById('markAllRead');
     if (markAllReadBtn) {
         markAllReadBtn.addEventListener('click', function(e) {
@@ -222,14 +222,14 @@ function updateNotifications() {
         .then(data => {
             const badge = document.getElementById('notificationBadge');
             const list = document.getElementById('notificationList');
-            
+
             if (!badge || !list) return;
-            
+
             if (data.notifications && data.notifications.length > 0) {
                 badge.textContent = data.notifications.length;
                 badge.style.display = 'flex';
                 list.innerHTML = '';
-                
+
                 data.notifications.forEach(notif => {
                     const item = document.createElement('li');
                     const link = notif.link ? notif.link : '#';
@@ -280,12 +280,12 @@ function initMobileMenu() {
 // ========== ACTIVE MENU HIGHLIGHTING ==========
 (function initActiveMenu() {
     const currentFile = window.location.pathname.split('/').pop();
-    
+
     // Files that should trigger submenu expansion
     const theatrePages = ['theatres.php', 'add_theatre.php', 'edit_theatre.php'];
     const userPages = ['users.php', 'add_user.php', 'edit_user.php', 'user_dashboard.php'];
     const settingsPages = ['settings.php', 'email_settings.php'];
-    
+
     // Expand submenus based on current page
     if (theatrePages.includes(currentFile)) {
         const submenu = document.getElementById('theatresSubmenu');
@@ -299,16 +299,16 @@ function initMobileMenu() {
         const submenu = document.getElementById('settingsSubmenu');
         if (submenu) submenu.classList.add('show');
     }
-    
+
     // Mark active links
     function clearActiveStates() {
         document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
     }
-    
+
     function markActive(link) {
         if (!link) return;
         link.classList.add('active');
-        
+
         // If it's a submenu link, also highlight parent
         if (link.classList.contains('submenu-link')) {
             const collapseEl = link.closest('.collapse');
@@ -318,37 +318,37 @@ function initMobileMenu() {
             }
         }
     }
-    
+
     // Find and mark active link
     clearActiveStates();
-    
+
     // First try exact match
     let activeLink = document.querySelector('.sidebar .nav-link[href="' + currentFile + '"]');
-    
+
     // If not found, try with leading ./
     if (!activeLink && currentFile) {
         activeLink = document.querySelector('.sidebar .nav-link[href="./' + currentFile + '"]');
     }
-    
+
     // If still not found, try with parent path
     if (!activeLink && currentFile) {
         activeLink = document.querySelector('.sidebar .nav-link[href*="' + currentFile + '"]');
     }
-    
+
     if (activeLink) markActive(activeLink);
-    
+
     // Special case for add_theatre.php - also highlight Theatres parent
     if (currentFile === 'add_theatre.php' || currentFile === 'edit_theatre.php') {
         const theatresParent = document.querySelector('.sidebar .nav-link[href="#theatresSubmenu"]');
         if (theatresParent) theatresParent.classList.add('active');
     }
-    
+
     // Special case for add_user.php and user_dashboard.php - also highlight Users parent
     if (currentFile === 'add_user.php' || currentFile === 'edit_user.php' || currentFile === 'user_dashboard.php') {
         const usersParent = document.querySelector('.sidebar .nav-link[href="#usersSubmenu"]');
         if (usersParent) usersParent.classList.add('active');
     }
-    
+
     // Special case for email_settings.php - also highlight Settings parent
     if (currentFile === 'email_settings.php') {
         const settingsParent = document.querySelector('.sidebar .nav-link[href="#settingsSubmenu"]');

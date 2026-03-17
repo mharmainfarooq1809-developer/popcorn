@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> | Popcorn Hub</title>
   <style>
-        /* Copy the full CSS block from page_template.php – exactly the same */
+        /* Copy the full CSS block from page_template.php " exactly the same */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -113,7 +113,7 @@
             font-size: 16px;
         }
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -127,7 +127,21 @@
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
@@ -135,7 +149,21 @@
             h1 { font-size: 32px; }
             .section h2 { font-size: 24px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
             .content-card { padding: 25px 15px; }
         }
@@ -148,20 +176,23 @@
     </div>
     <div class="page-container">
         <div class="content-card">
-            <h1>Press</h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1>Press</h1>
             <p>For media inquiries, interview requests, or press materials, please contact our press office.</p>
-            
+
             <div class="section">
                 <h2>Press Contact</h2>
                 <p><strong>Email:</strong> press@popcornhub.com<br>
-                <strong>Phone:</strong> (555) 123‑4568</p>
+                <strong>Phone:</strong> (555) 123'4568</p>
             </div>
 
             <div class="section">
                 <h2>Latest News</h2>
                 <ul>
                     <li><strong>March 2026:</strong> Popcorn Hub announces expansion to three new locations.</li>
-                    <li><strong>January 2026:</strong> We launch our loyalty program – earn points for every ticket!</li>
+                    <li><strong>January 2026:</strong> We launch our loyalty program " earn points for every ticket!</li>
                     <li><strong>October 2025:</strong> Popcorn Hub wins "Best Cinema Experience" award.</li>
                 </ul>
             </div>
@@ -175,3 +206,4 @@
     <div class="footer">...</div>
 </body>
 </html>
+

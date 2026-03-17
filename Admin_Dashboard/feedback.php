@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once '../db_connect.php';
 require_once '../settings_init.php';
@@ -14,9 +14,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Feedback · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+  <title>Feedback - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     * {
       margin: 0;
@@ -456,7 +456,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     <footer class="footer text-center">
       <div class="container">
         <p class="small">
-          <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+          <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
       </div>
     </footer>
   </div>

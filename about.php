@@ -19,10 +19,10 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>About Us - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
+            :root { --theme-primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
             .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
         </style>
     <?php endif; ?>
@@ -889,6 +889,7 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -917,7 +918,7 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
         <!-- Page Header -->
         <div class="page-header reveal">
             <h1>About Popcorn Hub</h1>
-            <p>Redefining the movie experience since 2010 – premium comfort, cutting-edge technology, and unforgettable
+            <p>Redefining the movie experience since 2010 " premium comfort, cutting-edge technology, and unforgettable
                 memories.</p>
         </div>
 
@@ -1084,28 +1085,28 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
                             class="testimonial-avatar">
                         <div class="testimonial-content">
                             <h4>Amelia Clarke</h4>
-                            <p>“The IMAX experience was out of this world!”</p>
+                            <p>The IMAX experience was out of this world!</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>James Wilson</h4>
-                            <p>“Best sound system I've ever heard.”</p>
+                            <p>Best sound system I've ever heard.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Sophia Martinez</h4>
-                            <p>“Luxury seating and amazing service.”</p>
+                            <p>Luxury seating and amazing service.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Oliver Brown</h4>
-                            <p>“Perfect for family movie nights.”</p>
+                            <p>Perfect for family movie nights.</p>
                         </div>
                     </div>
                     <!-- Duplicates for loop -->
@@ -1113,28 +1114,28 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
                         <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Amelia Clarke</h4>
-                            <p>“The IMAX experience was out of this world!”</p>
+                            <p>The IMAX experience was out of this world!</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>James Wilson</h4>
-                            <p>“Best sound system I've ever heard.”</p>
+                            <p>Best sound system I've ever heard.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Sophia Martinez</h4>
-                            <p>“Luxury seating and amazing service.”</p>
+                            <p>Luxury seating and amazing service.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Oliver Brown</h4>
-                            <p>“Perfect for family movie nights.”</p>
+                            <p>Perfect for family movie nights.</p>
                         </div>
                     </div>
                 </div>
@@ -1147,28 +1148,28 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
                         <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Ethan Harris</h4>
-                            <p>“Crystal clear 3D – felt like I was in the movie.”</p>
+                            <p>Crystal clear 3D " felt like I was in the movie.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/53.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Charlotte King</h4>
-                            <p>“The staff was incredibly friendly and helpful.”</p>
+                            <p>The staff was incredibly friendly and helpful.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/47.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Liam Scott</h4>
-                            <p>“Great value for money, especially the VIP lounge.”</p>
+                            <p>Great value for money, especially the VIP lounge.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/62.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Isabella Lee</h4>
-                            <p>“I'll definitely come back for more.”</p>
+                            <p>I'll definitely come back for more.</p>
                         </div>
                     </div>
                     <!-- Duplicates -->
@@ -1176,28 +1177,28 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
                         <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Ethan Harris</h4>
-                            <p>“Crystal clear 3D – felt like I was in the movie.”</p>
+                            <p>Crystal clear 3D " felt like I was in the movie.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/53.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Charlotte King</h4>
-                            <p>“The staff was incredibly friendly and helpful.”</p>
+                            <p>The staff was incredibly friendly and helpful.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/men/47.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Liam Scott</h4>
-                            <p>“Great value for money, especially the VIP lounge.”</p>
+                            <p>Great value for money, especially the VIP lounge.</p>
                         </div>
                     </div>
                     <div class="testimonial-card">
                         <img src="https://randomuser.me/api/portraits/women/62.jpg" alt="User">
                         <div class="testimonial-content">
                             <h4>Isabella Lee</h4>
-                            <p>“I'll definitely come back for more.”</p>
+                            <p>I'll definitely come back for more.</p>
                         </div>
                     </div>
                 </div>
@@ -1401,3 +1402,4 @@ if (($settings['maintenance_mode'] ?? '0') === '1' && !in_array($current_page, $
     </script>
 </body>
 </html>
+

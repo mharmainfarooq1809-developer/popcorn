@@ -12,7 +12,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
 
 // Get all votes with user and movie details
 $votes = $conn->query("
-    SELECT 
+    SELECT
         v.id AS vote_id,
         v.voted_at,
         u.id AS user_id,
@@ -30,7 +30,7 @@ $votes = $conn->query("
 
 // Get vote counts per movie (for chart)
 $movie_counts = $conn->query("
-    SELECT 
+    SELECT
         m.title,
         COUNT(v.id) AS vote_count
     FROM user_votes v
@@ -52,10 +52,9 @@ while ($row = $movie_counts->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Votes · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Votes - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1045,7 +1044,7 @@ while ($row = $movie_counts->fetch_assoc()) {
 
         <footer class="footer text-center">
             <div class="container">
-                <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+                <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
             </div>
         </footer>
     </div>
@@ -1109,7 +1108,7 @@ while ($row = $movie_counts->fetch_assoc()) {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { 
+                    plugins: {
                         legend: { display: false }
                     },
                     scales: {

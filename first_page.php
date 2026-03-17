@@ -49,10 +49,10 @@ while ($row = $categories_result->fetch_assoc()) {
     $categories[] = $row['category'];
 }
 // Fetch upcoming movies (release_date in the future)
-$upcoming_query = "SELECT id, title, genre, release_date, image_url AS poster 
-                   FROM movies 
-                   WHERE release_date > CURDATE() 
-                   ORDER BY release_date ASC 
+$upcoming_query = "SELECT id, title, genre, release_date, image_url AS poster
+                   FROM movies
+                   WHERE release_date > CURDATE()
+                   ORDER BY release_date ASC
                    LIMIT 4";
 $upcoming_result = $conn->query($upcoming_query);
 $upcoming_movies = $upcoming_result->fetch_all(MYSQLI_ASSOC);
@@ -1739,6 +1739,7 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -1783,9 +1784,18 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
     <div class="hero-slider">
         <?php if ($slide_count > 0):
             $first = true;
-            while ($slide = $slides->fetch_assoc()): ?>
+            while ($slide = $slides->fetch_assoc()):
+                $images = json_decode($slide['image_url'], true);
+                if (!is_array($images)) {
+                    $images = [$slide['image_url']];
+                }
+                $images = array_values(array_filter($images, function ($img) {
+                    return is_string($img) && trim($img) !== '';
+                }));
+                $bgImage = !empty($images) ? $images[array_rand($images)] : 'default.jpg';
+                ?>
                 <div class="slide <?php echo $first ? 'active' : '' ?>"
-                    style="background-image: url('<?php echo htmlspecialchars($slide['image_url']) ?>');">
+                    style="background-image: url('<?php echo htmlspecialchars($bgImage) ?>');">
                     <div class="slide-content">
                         <h2><?php echo htmlspecialchars($slide['title']) ?></h2>
                         <?php if (!empty($slide['description'])): ?>
@@ -2023,7 +2033,7 @@ $premium_count = $conn->query("SELECT COUNT(*) as cnt FROM movies WHERE is_premi
                     <div class="benefit-item"><i class="fas fa-gift"></i><span>Exclusive Offers</span></div>
                     <div class="benefit-item"><i class="fas fa-child"></i><span>50% Off for Kids</span></div>
                 </div>
-                <div class="join-buttons"><a href="register.php" class="btn btn-primary">Create Account</a><a
+                <div class="join-buttons"><a href="login.php" class="btn btn-primary">Create Account</a><a
                         href="login.php" class="btn btn-outline">Sign In</a></div>
             </div>
         </div>

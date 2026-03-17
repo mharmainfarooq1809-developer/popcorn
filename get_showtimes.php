@@ -10,17 +10,17 @@ if (!$movie_id) {
 // Determine whether showtimes.theatre stores name or ID
 // We'll assume it stores the theatre name (as in your sample). If it's an ID, change to t.id = s.theatre
 $stmt = $conn->prepare("
-    SELECT 
-        s.id, 
-        s.show_date, 
-        s.show_time, 
-        s.theatre, 
-        s.status, 
+    SELECT
+        s.id,
+        s.show_date,
+        s.show_time,
+        s.theatre,
+        s.status,
         t.price
     FROM showtimes s
     LEFT JOIN theatres t ON s.theatre = t.name   -- change to t.id if s.theatre is ID
-    WHERE s.movie_id = ? 
-      AND s.status = 'active' 
+    WHERE s.movie_id = ?
+      AND s.status = 'active'
       AND (s.show_date > CURDATE() OR (s.show_date = CURDATE() AND s.show_time >= CURTIME()))
     ORDER BY s.show_date, s.show_time
 ");

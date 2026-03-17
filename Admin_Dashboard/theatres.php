@@ -17,10 +17,9 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theatres · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Theatres - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -851,7 +850,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
                 padding: 15px;
             }
 
-            
+
             .top-navbar {
                 flex-direction: column;
                 align-items: stretch;
@@ -1108,7 +1107,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 

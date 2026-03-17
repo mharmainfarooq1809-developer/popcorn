@@ -12,7 +12,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
 
 // Fetch all bookings with related data
 $query = "
-    SELECT 
+    SELECT
         b.id AS booking_id,
         u.name AS customer_name,
         m.title AS movie_title,
@@ -48,10 +48,9 @@ function statusBadge($status) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookings · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Bookings - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -821,7 +820,7 @@ function statusBadge($status) {
                 padding: 15px;
             }
 
-            
+
             .top-navbar {
                 flex-direction: column;
                 align-items: stretch;
@@ -907,7 +906,7 @@ function statusBadge($status) {
                 <i class="bi bi-camera-reels me-2"></i>
                 <span><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></span>
             </div>
-            
+
         </div>
 
         <div class="nav">
@@ -1112,7 +1111,7 @@ function statusBadge($status) {
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 

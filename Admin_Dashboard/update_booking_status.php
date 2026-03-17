@@ -32,3 +32,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['status'
 
 http_response_code(400);
 echo json_encode(['success' => false, 'error' => 'Invalid request']);
+

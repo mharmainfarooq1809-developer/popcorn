@@ -11,6 +11,18 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
 
 $admin_name = $_SESSION['user_name'] ?? 'Admin';
 
+function points_history_has_column($conn, $column) {
+    $column = $conn->real_escape_string($column);
+    $res = $conn->query("SHOW COLUMNS FROM points_history LIKE '$column'");
+    return $res && $res->num_rows > 0;
+}
+
+function points_history_order_by($conn) {
+    if (points_history_has_column($conn, 'created_at')) return 'created_at';
+    if (points_history_has_column($conn, 'id')) return 'id';
+    return 'user_id';
+}
+
 // Get user ID from URL
 $user_id = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
 if (!$user_id) {
@@ -30,14 +42,15 @@ if (!$user) {
 }
 
 // Get points history
-$stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY created_at DESC");
+$orderBy = points_history_order_by($conn);
+$stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY $orderBy DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $history = $stmt->get_result();
 
 // Get recent bookings
 $stmt = $conn->prepare("
-    SELECT 
+    SELECT
         b.id AS booking_id,
         b.seats,
         b.adults,
@@ -78,9 +91,8 @@ $votedMovies = $votes->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>User Dashboard - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
-        <style>:root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }</style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -342,12 +354,12 @@ body.dark-mode .sidebar .bottom-section {
     .sidebar {
         transform: translateX(0);
     }
-    
+
     .main-content {
         margin-left: var(--sidebar-width);
         width: calc(100% - var(--sidebar-width));
     }
-    
+
     body.sidebar-collapsed .main-content {
         margin-left: var(--sidebar-collapsed-width);
         width: calc(100% - var(--sidebar-collapsed-width));
@@ -748,15 +760,15 @@ body.dark-mode .footer {
     .main-content {
         padding: 15px;
     }
-    
+
     .card {
         padding: 15px;
     }
-    
+
     .points-value {
         font-size: 2rem;
     }
-    
+
     .table th,
     .table td {
         padding: 8px;
@@ -886,7 +898,7 @@ body.dark-mode .footer {
                     </thead>
                     <tbody>
                         <?php if ($bookings->num_rows > 0): ?>
-                            <?php while ($row = $bookings->fetch_assoc()): 
+                            <?php while ($row = $bookings->fetch_assoc()):
                                 $statusClass = '';
                                 if ($row['status'] == 'confirmed') $statusClass = 'status-confirmed';
                                 elseif ($row['status'] == 'pending') $statusClass = 'status-pending';
@@ -902,7 +914,7 @@ body.dark-mode .footer {
                                     <td><?= $row['points_earned'] ?></td>
                                     <td><span class="status-badge <?= $statusClass ?>"><?= ucfirst($row['status']) ?></span></td>
                                     <td>
-                                        <a href="../ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm btn-outline-primary" target="_blank">
+                                        <a href="ticket.php?booking_id=<?= $row['booking_id'] ?>" class="btn-sm btn-outline-primary" target="_blank">
                                             <i class="bi bi-ticket"></i> View
                                         </a>
                                     </td>
@@ -919,7 +931,7 @@ body.dark-mode .footer {
 
     <footer class="footer text-center">
         <div class="container">
-            <p class="small mb-0"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small mb-0"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 

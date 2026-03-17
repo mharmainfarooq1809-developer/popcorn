@@ -6,13 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> | Popcorn Hub</title>
-    <!-- (same head links and CSS as abouts.php – omitted here for brevity, but in a real answer include the full CSS block) -->
+    <!-- (same head links and CSS as abouts.php " omitted here for brevity, but in a real answer include the full CSS block) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Copy the full CSS block from page_template.php – exactly the same */
+        /* Copy the full CSS block from page_template.php " exactly the same */
         * {
             margin: 0;
             padding: 0;
@@ -160,7 +160,7 @@
         }
 
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -175,8 +175,21 @@
             font-size: 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header {
                 padding: 15px 25px;
             }
@@ -202,8 +215,21 @@
                 font-size: 24px;
             }
         }
-
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header {
                 flex-direction: column;
                 gap: 12px;
@@ -225,17 +251,20 @@
 
     <div class="page-container">
         <div class="content-card">
-            <h1>Careers</h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1>Careers</h1>
             <p>Join the Popcorn Hub family! We're always looking for passionate individuals to help us create the best
                 movie experience.</p>
 
             <div class="section">
                 <h2>Current Openings</h2>
                 <ul>
-                    <li><strong>Cinema Manager</strong> – Lead our team and ensure smooth operations.</li>
-                    <li><strong>Customer Service Representative</strong> – Be the face of Popcorn Hub.</li>
-                    <li><strong>Projectionist</strong> – Maintain our cutting‑edge projection equipment.</li>
-                    <li><strong>Concession Staff</strong> – Serve our famous popcorn with a smile.</li>
+                    <li><strong>Cinema Manager</strong> " Lead our team and ensure smooth operations.</li>
+                    <li><strong>Customer Service Representative</strong> " Be the face of Popcorn Hub.</li>
+                    <li><strong>Projectionist</strong> " Maintain our cutting'edge projection equipment.</li>
+                    <li><strong>Concession Staff</strong> " Serve our famous popcorn with a smile.</li>
                 </ul>
             </div>
 
@@ -260,3 +289,4 @@
 </body>
 
 </html>
+

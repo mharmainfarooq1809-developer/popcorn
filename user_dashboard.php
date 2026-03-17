@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db_connect.php';
 require_once 'settings_init.php';
@@ -18,6 +18,18 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
+
+function points_history_has_column($conn, $column) {
+    $column = $conn->real_escape_string($column);
+    $res = $conn->query("SHOW COLUMNS FROM points_history LIKE '$column'");
+    return $res && $res->num_rows > 0;
+}
+
+function points_history_order_by($conn) {
+    if (points_history_has_column($conn, 'created_at')) return 'created_at';
+    if (points_history_has_column($conn, 'id')) return 'id';
+    return 'user_id';
+}
 
 // Handle ticket cancellation
 if (isset($_POST['cancel_booking'])) {
@@ -53,16 +65,21 @@ if (isset($_POST['cancel_booking'])) {
         // Refund points (remove points earned from this booking)
         if ($booking['points_earned'] > 0) {
             $points_refund = -$booking['points_earned'];
-            
+
             // Update user points
             $update_points = $conn->prepare("UPDATE users SET points = points - ? WHERE id = ?");
             $update_points->bind_param("ii", $booking['points_earned'], $user_id);
             $update_points->execute();
 
             // Add to points history
-            $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
             $reason = "Booking #" . $booking_id . " cancelled - Refund";
-            $history->bind_param("iis", $user_id, $points_refund, $reason);
+            if (points_history_has_column($conn, 'created_at')) {
+                $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason, created_at) VALUES (?, ?, ?, NOW())");
+                $history->bind_param("iis", $user_id, $points_refund, $reason);
+            } else {
+                $history = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
+                $history->bind_param("iis", $user_id, $points_refund, $reason);
+            }
             $history->execute();
         }
 
@@ -82,14 +99,15 @@ $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 
 // Get points history
-$stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY created_at DESC");
+$orderBy = points_history_order_by($conn);
+$stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY $orderBy DESC");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $history = $stmt->get_result();
 
 // Get recent bookings with full details
 $stmt = $conn->prepare("
-    SELECT 
+    SELECT
         b.id AS booking_id,
         b.seats,
         b.adults,
@@ -133,12 +151,18 @@ try {
 // If user has points but no history, create initial history entry
 if ($user['points'] > 0 && $history->num_rows == 0) {
     $initial_reason = "Welcome points / Account registration";
-    $insert_initial = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
-    $insert_initial->bind_param("iis", $user_id, $user['points'], $initial_reason);
+    if (points_history_has_column($conn, 'created_at')) {
+        $insert_initial = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason, created_at) VALUES (?, ?, ?, NOW())");
+        $insert_initial->bind_param("iis", $user_id, $user['points'], $initial_reason);
+    } else {
+        $insert_initial = $conn->prepare("INSERT INTO points_history (user_id, points_change, reason) VALUES (?, ?, ?)");
+        $insert_initial->bind_param("iis", $user_id, $user['points'], $initial_reason);
+    }
     $insert_initial->execute();
-    
+
     // Refresh history
-    $stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY created_at DESC");
+    $orderBy = points_history_order_by($conn);
+    $stmt = $conn->prepare("SELECT * FROM points_history WHERE user_id = ? ORDER BY $orderBy DESC");
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $history = $stmt->get_result();
@@ -150,12 +174,11 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Dashboard - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
+                --theme-primary: <?= htmlspecialchars($settings['theme_color']) ?>
                 ;
             }
 
@@ -185,6 +208,10 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -756,6 +783,7 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -785,7 +813,7 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
         <!-- Welcome Header -->
         <div style="margin-bottom: 30px;">
             <h1 style="font-size: 42px; font-weight: 800;">Welcome back, <?= htmlspecialchars($user['name']) ?>!</h1>
-            <p style="color: var(--light-gray);"><?= htmlspecialchars($user['email']) ?> · Your loyalty dashboard</p>
+            <p style="color: var(--light-gray);"><?= htmlspecialchars($user['email']) ?> - Your loyalty dashboard</p>
         </div>
 
         <!-- Alert Messages -->
@@ -840,9 +868,9 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
                         </tr>
                     </thead>
                     <tbody>
-                        <?php 
+                        <?php
                         if ($history && $history->num_rows > 0):
-                            while ($row = $history->fetch_assoc()): 
+                            while ($row = $history->fetch_assoc()):
                         ?>
                             <tr>
                                 <td><?= date('Y-m-d H:i', strtotime($row['created_at'])) ?></td>
@@ -851,9 +879,9 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
                                 </td>
                                 <td><?= htmlspecialchars($row['reason']) ?></td>
                             </tr>
-                        <?php 
+                        <?php
                             endwhile;
-                        else: 
+                        else:
                         ?>
                             <tr>
                                 <td colspan="3" style="text-align:center; color: var(--light-gray);">
@@ -1046,13 +1074,7 @@ if ($user['points'] > 0 && $history->num_rows == 0) {
     </form>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
     <script>
-        // Smooth scroll and navbar effect
-        const lenis = new Lenis({ duration: 1.6, smooth: true, smoothTouch: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
-
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', () => {
             navbar.classList.toggle('scrolled', window.scrollY > 50);

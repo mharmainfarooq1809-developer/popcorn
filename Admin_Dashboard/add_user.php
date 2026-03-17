@@ -15,7 +15,7 @@ $error = '';
 // Handle form submission (if you want to process without AJAX fallback)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // You can process here, but we'll use AJAX as the primary method.
-    // This block can be left empty or used for non‑JS fallback.
+    // This block can be left empty or used for non'JS fallback.
 }
 ?>
 <!DOCTYPE html>
@@ -24,12 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add User · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Add User - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
                 ;
             }
         </style>
@@ -970,7 +968,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <footer class="footer text-center">
         <div class="container">
             <p class="small">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
             </p>
         </div>
     </footer>

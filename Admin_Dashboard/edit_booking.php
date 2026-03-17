@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once '../db_connect.php';
 require_once '../settings_init.php'; // load global settings
@@ -19,7 +19,7 @@ if (!$booking_id) {
 
 // Fetch booking details with related info
 $stmt = $conn->prepare("
-    SELECT 
+    SELECT
         b.*,
         u.name AS user_name,
         u.email AS user_email,
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = "Holder name, at least one ticket, and seats are required.";
     } else {
         $update = $conn->prepare("
-            UPDATE bookings 
+            UPDATE bookings
             SET holder_name = ?, adults = ?, children = ?, total_price = ?, discount_applied = ?, status = ?, seats = ?
             WHERE id = ?
         ");
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $message = "Booking updated successfully.";
             // Refresh booking data
             $stmt = $conn->prepare("
-                SELECT 
+                SELECT
                     b.*,
                     u.name AS user_name,
                     u.email AS user_email,
@@ -103,11 +103,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Booking · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Edit Booking - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
@@ -1206,7 +1205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 

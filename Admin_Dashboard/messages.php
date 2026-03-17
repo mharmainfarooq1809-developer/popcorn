@@ -19,11 +19,10 @@ $admin_id = $_SESSION['user_id']; // for storing replies
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messages · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Messages - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
@@ -1068,7 +1067,7 @@ $admin_id = $_SESSION['user_id']; // for storing replies
     <footer class="footer text-center">
         <div class="container">
             <p class="small">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
             </p>
         </div>
     </footer>
@@ -1148,7 +1147,7 @@ $admin_id = $_SESSION['user_id']; // for storing replies
                         data.replies.forEach(reply => {
                             html += `
                                 <div class="reply-bubble">
-                                    <small class="text-muted">Admin · ${new Date(reply.created_at).toLocaleString()}</small>
+                                    <small class="text-muted">Admin - ${new Date(reply.created_at).toLocaleString()}</small>
                                     <p class="mb-0">${reply.reply_text.replace(/\n/g, '<br>')}</p>
                                 </div>
                             `;
@@ -1172,12 +1171,12 @@ $admin_id = $_SESSION['user_id']; // for storing replies
         document.querySelectorAll('#messageList .list-group-item').forEach(item => {
             item.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 // Remove active class from all items
                 document.querySelectorAll('#messageList .list-group-item').forEach(li => {
                     li.classList.remove('active');
                 });
-                
+
                 // Add active class to clicked item
                 this.classList.add('active');
 
@@ -1220,11 +1219,11 @@ $admin_id = $_SESSION['user_id']; // for storing replies
                 alert('Please select a message first.');
                 return;
             }
-            
+
             if (!confirm('Are you sure you want to delete this message and all replies?')) {
                 return;
             }
-            
+
             fetch('delete_message.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -1254,7 +1253,7 @@ $admin_id = $_SESSION['user_id']; // for storing replies
 
             const subject = document.getElementById('replySubject').value;
             const message = document.getElementById('replyMessage').value.trim();
-            
+
             if (!message) {
                 alert('Please enter a reply message.');
                 return;
@@ -1262,7 +1261,7 @@ $admin_id = $_SESSION['user_id']; // for storing replies
 
             const btn = document.getElementById('sendReplyBtn');
             const statusDiv = document.getElementById('replyStatus');
-            
+
             btn.disabled = true;
             statusDiv.innerHTML = 'Sending...';
 
@@ -1286,11 +1285,11 @@ $admin_id = $_SESSION['user_id']; // for storing replies
             })
             .then(data => {
                 if (data.success) {
-                    statusDiv.innerHTML = '<span class="text-success">✓ Reply sent successfully!</span>';
+                    statusDiv.innerHTML = '<span class="text-success">" Reply sent successfully!</span>';
                     document.getElementById('replyMessage').value = '';
                     document.getElementById('replySubject').value = '';
                     loadReplies(feedbackId);
-                    
+
                     // Clear success message after 3 seconds
                     setTimeout(() => {
                         statusDiv.innerHTML = '';
@@ -1324,7 +1323,7 @@ $admin_id = $_SESSION['user_id']; // for storing replies
 
         // Initial load of unread count
         updateUnreadCount();
-        
+
         // Update unread count every 30 seconds
         setInterval(() => {
             updateUnreadCount();

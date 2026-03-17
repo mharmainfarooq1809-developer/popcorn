@@ -9,17 +9,17 @@ if (!$movie_id) {
 
 // Join with theatres to get the price. Adjust join condition if showtimes.theatre is ID.
 $stmt = $conn->prepare("
-    SELECT 
-        s.id, 
-        s.show_date, 
-        s.show_time, 
-        s.theatre, 
-        s.status, 
+    SELECT
+        s.id,
+        s.show_date,
+        s.show_time,
+        s.theatre,
+        s.status,
         t.price
     FROM showtimes s
     JOIN theatres t ON s.theatre = t.name   -- change to t.id if s.theatre stores ID
-    WHERE s.movie_id = ? 
-      AND s.status = 'active' 
+    WHERE s.movie_id = ?
+      AND s.status = 'active'
       AND (s.show_date > CURDATE() OR (s.show_date = CURDATE() AND s.show_time >= CURTIME()))
     ORDER BY s.show_date, s.show_time
 ");

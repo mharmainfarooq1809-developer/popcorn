@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require_once 'db_connect.php';
 session_start();
 // load global settings
@@ -22,12 +22,11 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Showtimes · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Showtimes - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary:
-                    <?= htmlspecialchars($settings['theme_color']) ?>
+                --theme-primary: <?= htmlspecialchars($settings['theme_color']) ?>
                 ;
             }
         </style>
@@ -906,6 +905,7 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -975,7 +975,7 @@ $movies = $conn->query("SELECT * FROM movies ORDER BY created_at DESC");
                             }
                         }
                     } catch (Exception $e) {
-                        // Table missing – ignore
+                        // Table missing - ignore
                     }
 
                     $currentHour = (int) date('H');

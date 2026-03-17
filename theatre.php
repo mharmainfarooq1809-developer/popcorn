@@ -27,10 +27,10 @@ while ($row = $theatres_result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?> · Theatres</title>
+    <title><?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?> - Theatres</title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
+            :root { --theme-primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
             header a, .btn-primary { color: var(--primary); }
         </style>
     <?php endif; ?>
@@ -267,7 +267,7 @@ while ($row = $theatres_result->fetch_assoc()) {
             margin: 0 auto 40px;
         }
 
-        /* Hero search bar � sleek and integrated */
+        /* Hero search bar  sleek and integrated */
         .hero-search {
             max-width: 700px;
             margin: 0 auto;
@@ -739,6 +739,7 @@ while ($row = $theatres_result->fetch_assoc()) {
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -895,7 +896,7 @@ while ($row = $theatres_result->fetch_assoc()) {
                                 class="testimonial-avatar">
                             <div class="testimonial-content">
                                 <h4>Ethan Harris</h4>
-                                <p>Crystal clear 3D – felt like I was in the movie. Highly recommended!</p>
+                                <p>Crystal clear 3D " felt like I was in the movie. Highly recommended!</p>
                                 <div class="testimonial-rating">
                                     <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i
                                         class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i

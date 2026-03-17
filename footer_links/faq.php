@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> | Popcorn Hub</title>
     <style>
-        /* Copy the full CSS block from page_template.php – exactly the same */
+        /* Copy the full CSS block from page_template.php " exactly the same */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
@@ -113,7 +113,7 @@
             font-size: 16px;
         }
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -127,7 +127,21 @@
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
@@ -135,7 +149,21 @@
             h1 { font-size: 32px; }
             .section h2 { font-size: 24px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
             .content-card { padding: 25px 15px; }
         }
@@ -148,30 +176,33 @@
     </div>
     <div class="page-container">
         <div class="content-card">
-            <h1>Frequently Asked Questions</h1>
-            
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1>Frequently Asked Questions</h1>
+
             <div class="section">
-                <h2>🎟️ Tickets & Bookings</h2>
+                <h2> Tickets & Bookings</h2>
                 <ul>
-                    <li><strong>How do I book a ticket?</strong> – Visit our showtimes page, choose a movie and time, then follow checkout.</li>
-                    <li><strong>Can I get a refund?</strong> – Refunds are available up to 2 hours before showtime.</li>
-                    <li><strong>Do you accept walk‑ins?</strong> – Yes, but booking in advance guarantees your seat.</li>
+                    <li><strong>How do I book a ticket?</strong> " Visit our showtimes page, choose a movie and time, then follow checkout.</li>
+                    <li><strong>Can I get a refund?</strong> " Refunds are available up to 2 hours before showtime.</li>
+                    <li><strong>Do you accept walk'ins?</strong> " Yes, but booking in advance guarantees your seat.</li>
                 </ul>
             </div>
 
             <div class="section">
-                <h2>🍿 Theatre Experience</h2>
+                <h2> Theatre Experience</h2>
                 <ul>
-                    <li><strong>What food do you offer?</strong> – Popcorn, nachos, candy, soft drinks, and more.</li>
-                    <li><strong>Are outside snacks allowed?</strong> – No, but we have plenty of delicious options.</li>
+                    <li><strong>What food do you offer?</strong> " Popcorn, nachos, candy, soft drinks, and more.</li>
+                    <li><strong>Are outside snacks allowed?</strong> " No, but we have plenty of delicious options.</li>
                 </ul>
             </div>
 
             <div class="section">
-                <h2>👥 Membership</h2>
+                <h2>' Membership</h2>
                 <ul>
-                    <li><strong>How do I join?</strong> – Create an account and opt in to our loyalty program.</li>
-                    <li><strong>What are the benefits?</strong> – Earn points on every purchase, get exclusive offers.</li>
+                    <li><strong>How do I join?</strong> " Create an account and opt in to our loyalty program.</li>
+                    <li><strong>What are the benefits?</strong> " Earn points on every purchase, get exclusive offers.</li>
                 </ul>
             </div>
         </div>

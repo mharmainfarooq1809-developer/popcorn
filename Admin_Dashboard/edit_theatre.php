@@ -71,11 +71,10 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Theatre · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Edit Theatre - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
@@ -944,7 +943,7 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
                                 <?php endforeach; ?>
                             </div>
                         </div>
-                        
+
                         <div class="col-12 mt-4">
                             <button type="submit" class="btn btn-primary">Update Theatre</button>
                             <a href="theatres.php" class="btn btn-secondary">Cancel</a>
@@ -958,7 +957,7 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
@@ -1022,22 +1021,22 @@ $current_facilities = json_decode($theatre['facilities'] ?? '[]', true);
 
                 if (isDataUrl(url)) {
                     const length = url.length;
-                    imageInfo.innerHTML = `📸 Data URL · Length: ${length} characters`;
+                    imageInfo.innerHTML = "Data URL - Length: " + length + " characters";
                 } else if (url.startsWith('http')) {
-                    imageInfo.innerHTML = `🌐 External URL`;
+                    imageInfo.innerHTML = "External URL";
                 } else {
-                    imageInfo.innerHTML = `📁 Local path`;
+                    imageInfo.innerHTML = "Local path";
                 }
 
                 previewImg.onerror = function() {
-                    imageInfo.innerHTML = '⚠️ Image failed to load';
+                    imageInfo.innerHTML = 'Warning: Image failed to load';
                     imageInfo.style.color = '#dc3545';
                 };
 
                 previewImg.onload = function() {
                     imageInfo.style.color = '';
-                    if (!imageInfo.innerHTML.includes('⚠️')) {
-                        imageInfo.innerHTML += ` · ${this.naturalWidth} x ${this.naturalHeight}px`;
+                    if (!imageInfo.innerHTML.includes('Warning:')) {
+                        imageInfo.innerHTML += ' - ' + this.naturalWidth + ' x ' + this.naturalHeight + 'px';
                     }
                 };
             } else {

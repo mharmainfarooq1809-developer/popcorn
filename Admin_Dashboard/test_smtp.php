@@ -1,5 +1,5 @@
 <?php
-// test_smtp.php – must start with <?php, no spaces before
+// test_smtp.php " must start with <?php, no spaces before
 session_start();
 require_once '../db_connect.php';
 require_once '../settings_init.php';

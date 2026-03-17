@@ -22,10 +22,9 @@ while ($row = $theatres_result->fetch_assoc()) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Movies &middot; <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1374,7 +1373,7 @@ while ($row = $theatres_result->fetch_assoc()) {
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
@@ -1396,28 +1395,28 @@ while ($row = $theatres_result->fetch_assoc()) {
             const url = document.getElementById('image_url').value;
             const preview = document.getElementById('imagePreview');
             const info = document.getElementById('dataUrlInfo');
-            
+
             if (url) {
                 preview.src = url;
                 preview.classList.add('show');
-                
+
                 if (isDataUrl(url)) {
-                    info.innerHTML = `📸 Data URL · Length: ${url.length} characters · Type: ${url.split(';')[0] || 'Unknown'}`;
+                    info.innerHTML = "Data URL - Length: " + url.length + " characters - Type: " + (url.split(';')[0] || 'Unknown');
                 } else if (url.startsWith('http')) {
-                    info.innerHTML = `🌐 External URL · ${url.substring(0, 100)}${url.length > 100 ? '...' : ''}`;
+                    info.innerHTML = "External URL - " + url.substring(0, 100) + (url.length > 100 ? '...' : '');
                 } else {
-                    info.innerHTML = `📁 Local path · ${url}`;
+                    info.innerHTML = "Local path - " + url;
                 }
-                
+
                 preview.onerror = function() {
-                    info.innerHTML = '⚠️ Image failed to load. Please check the URL.';
+                    info.innerHTML = 'Warning: Image failed to load. Please check the URL.';
                     info.style.color = '#dc3545';
                 };
-                
+
                 preview.onload = function() {
                     info.style.color = '';
-                    if (!info.innerHTML.includes('⚠️')) {
-                        info.innerHTML += ` · ${this.naturalWidth} x ${this.naturalHeight}px`;
+                    if (!info.innerHTML.includes('Warning:')) {
+                        info.innerHTML += ' - ' + this.naturalWidth + ' x ' + this.naturalHeight + 'px';
                     }
                 };
             } else {
@@ -1430,12 +1429,12 @@ while ($row = $theatres_result->fetch_assoc()) {
         // ================= HANDLE IMAGE ERRORS =================
         function handleImageError(img, movieTitle) {
             console.log('Image failed to load for:', movieTitle);
-            
+
             // Don't show alerts for data URLs
             if (img.src && isDataUrl(img.src)) {
                 return;
             }
-            
+
             // Replace with fallback
             const container = img.parentElement;
             if (container) {
@@ -1470,25 +1469,25 @@ while ($row = $theatres_result->fetch_assoc()) {
             const grid = document.getElementById('moviesGrid');
             if (!grid) return;
             grid.innerHTML = '';
-            
+
             moviesArray.forEach(movie => {
                 const isPremium = Number(movie.is_premium) === 1;
                 const isFeatured = Number(movie.is_featured) === 1;
                 const starIcon = isFeatured ? 'bi-star-fill' : 'bi-star';
                 const starClass = isFeatured ? 'btn-warning' : 'btn-outline-warning';
-                
+
                 const imageUrl = movie.image_url || 'https://via.placeholder.com/400x600?text=No+Poster';
-                
+
                 if (isDataUrl(imageUrl)) {
                     console.log(`Movie "${movie.title}" uses data URL (length: ${imageUrl.length} chars)`);
                 }
-                
+
                 const col = document.createElement('div');
                 col.className = 'col-md-6 col-lg-4 col-xl-3';
                 col.innerHTML = `
                     <div class="card movie-card">
                         <div class="poster-container">
-                            <img 
+                            <img
                                 src="${imageUrl.replace(/"/g, '&quot;')}"
                                 class="card-img-top"
                                 alt="${movie.title.replace(/"/g, '&quot;')}"
@@ -1553,22 +1552,22 @@ while ($row = $theatres_result->fetch_assoc()) {
             console.log('manageShowtimes called with movieId:', movieId);
             currentShowtimeMovieId = movieId;
             document.getElementById('currentMovieId').value = movieId;
-            
+
             // Reset the modal content
             document.getElementById('showtimesBody').innerHTML = '<tr><td colspan="5" class="text-center"><div class="spinner-border spinner-border-sm text-primary me-2"></div>Loading showtimes...</td></tr>';
-            
+
             // Clear form fields
             document.getElementById('newTheatre').value = '';
             document.getElementById('newDate').value = '';
             document.getElementById('newTime').value = '';
-            
+
             // Set default date to today
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('newDate').value = today;
-            
+
             // Load showtimes
             loadShowtimes(movieId);
-            
+
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('showtimeModal'));
             modal.show();
@@ -1576,7 +1575,7 @@ while ($row = $theatres_result->fetch_assoc()) {
 
         function loadShowtimes(movieId) {
             console.log('Loading showtimes for movie ID:', movieId);
-            
+
             fetch('get_showtimes.php?movie_id=' + movieId)
                 .then(response => {
                     if (!response.ok) {
@@ -1598,12 +1597,12 @@ while ($row = $theatres_result->fetch_assoc()) {
         function renderShowtimes(showtimesArray) {
             const tbody = document.getElementById('showtimesBody');
             if (!tbody) return;
-            
+
             if (!showtimesArray || showtimesArray.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center">No showtimes added yet.</td></tr>';
                 return;
             }
-            
+
             tbody.innerHTML = '';
             showtimesArray.forEach(st => {
                 const statusClass = st.status === 'active' ? 'status-active' : (st.status === 'ended' ? 'status-ended' : 'status-cancelled');
@@ -1624,33 +1623,33 @@ while ($row = $theatres_result->fetch_assoc()) {
         function addShowtime() {
             console.log('addShowtime called');
             console.log('currentShowtimeMovieId:', currentShowtimeMovieId);
-            
+
             const theatre = document.getElementById('newTheatre').value;
             const date = document.getElementById('newDate').value;
             const time = document.getElementById('newTime').value;
-            
+
             console.log('Theatre:', theatre);
             console.log('Date:', date);
             console.log('Time:', time);
-            
+
             if (!theatre || !date || !time) {
-                Swal.fire({ 
-                    icon: 'warning', 
-                    title: 'Missing fields', 
-                    text: 'Please fill all fields.' 
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing fields',
+                    text: 'Please fill all fields.'
                 });
                 return;
             }
-            
+
             if (!currentShowtimeMovieId) {
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'Error', 
-                    text: 'No movie selected.' 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No movie selected.'
                 });
                 return;
             }
-            
+
             // Show loading
             Swal.fire({
                 title: 'Adding...',
@@ -1671,7 +1670,7 @@ while ($row = $theatres_result->fetch_assoc()) {
 
             fetch('save_showtime.php', {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData.toString(),
@@ -1694,38 +1693,38 @@ while ($row = $theatres_result->fetch_assoc()) {
                     document.getElementById('newTheatre').value = '';
                     document.getElementById('newDate').value = '';
                     document.getElementById('newTime').value = '';
-                    
+
                     // Reload showtimes
                     loadShowtimes(currentShowtimeMovieId);
-                    
-                    Swal.fire({ 
-                        icon: 'success', 
-                        title: 'Added!', 
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Added!',
                         text: 'Showtime added successfully',
-                        timer: 1500, 
-                        showConfirmButton: false 
+                        timer: 1500,
+                        showConfirmButton: false
                     });
                 } else {
-                    Swal.fire({ 
-                        icon: 'error', 
-                        title: 'Error', 
-                        text: data.error || 'Failed to add showtime.' 
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.error || 'Failed to add showtime.'
                     });
                 }
             })
             .catch(error => {
                 console.error('Fetch error:', error);
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'Error', 
-                    text: error.message 
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message
                 });
             });
         }
 
         function deleteShowtime(showtimeId) {
             console.log('deleteShowtime called for ID:', showtimeId);
-            
+
             Swal.fire({
                 title: 'Delete showtime?',
                 text: "This action cannot be undone.",
@@ -1750,7 +1749,7 @@ while ($row = $theatres_result->fetch_assoc()) {
 
                     fetch('delete_showtime.php', {
                         method: 'POST',
-                        headers: { 
+                        headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
                         body: formData.toString(),
@@ -1770,19 +1769,19 @@ while ($row = $theatres_result->fetch_assoc()) {
                             loadShowtimes(currentShowtimeMovieId);
                             Swal.fire('Deleted!', '', 'success');
                         } else {
-                            Swal.fire({ 
-                                icon: 'error', 
-                                title: 'Error', 
-                                text: data.error || 'Failed to delete.' 
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.error || 'Failed to delete.'
                             });
                         }
                     })
                     .catch(error => {
                         console.error('Delete error:', error);
-                        Swal.fire({ 
-                            icon: 'error', 
-                            title: 'Error', 
-                            text: error.message 
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message
                         });
                     });
                 }
@@ -1816,11 +1815,11 @@ while ($row = $theatres_result->fetch_assoc()) {
             document.getElementById('image_url').value = movie.image_url;
             document.getElementById('trailer_url').value = movie.trailer_url || '';
             document.getElementById('is_premium').checked = movie.is_premium == 1;
-            
+
             if (movie.image_url) {
                 setTimeout(previewDataUrl, 100);
             }
-            
+
             new bootstrap.Modal(document.getElementById('movieModal')).show();
         }
 
@@ -1920,7 +1919,7 @@ while ($row = $theatres_result->fetch_assoc()) {
             loadMovies();
             updateNotifications();
             setInterval(updateNotifications, 30000);
-            
+
             // Image preview
             const imageInput = document.getElementById('image_url');
             if (imageInput) {

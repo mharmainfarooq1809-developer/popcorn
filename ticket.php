@@ -678,6 +678,7 @@ $site_logo      = !empty($settings['site_logo']) ? htmlspecialchars($settings['s
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 <body>
     <!-- Floating Navbar with Burger Menu -->

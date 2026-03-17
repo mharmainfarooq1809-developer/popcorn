@@ -17,7 +17,7 @@ $revenue_result = $conn->query("SELECT SUM(total_price) as total FROM bookings")
 $total_revenue = $revenue_result->fetch_assoc()['total'] ?? 0;
 
 $recent_bookings = $conn->query("
-    SELECT 
+    SELECT
         b.id AS booking_id,
         u.name AS customer,
         m.title AS movie,
@@ -50,10 +50,9 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Analytics - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1141,7 +1140,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 
@@ -1209,7 +1208,7 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
+                plugins: {
                     legend: { display: false },
                     tooltip: {
                         backgroundColor: '#1a2634',
@@ -1244,8 +1243,8 @@ $admin_name = $_SESSION['user_name'] ?? 'Admin';
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { 
-                    legend: { 
+                plugins: {
+                    legend: {
                         position: 'bottom',
                         labels: { color: '#6c757d' }
                     }

@@ -11,8 +11,8 @@ $PHPMAILER_LANG['data_not_accepted']    = 'SMTP-fout: data nie aanvaar nie.';
 $PHPMAILER_LANG['empty_message']        = 'Boodskapliggaam leeg.';
 $PHPMAILER_LANG['encoding']             = 'Onbekende kodering: ';
 $PHPMAILER_LANG['execute']              = 'Kon nie uitvoer nie: ';
-$PHPMAILER_LANG['file_access']          = 'Kon nie lêer oopmaak nie: ';
-$PHPMAILER_LANG['file_open']            = 'Lêerfout: Kon nie lêer oopmaak nie: ';
+$PHPMAILER_LANG['file_access']          = 'Kon nie lÃªer oopmaak nie: ';
+$PHPMAILER_LANG['file_open']            = 'LÃªerfout: Kon nie lÃªer oopmaak nie: ';
 $PHPMAILER_LANG['from_failed']          = 'Die volgende Van adres misluk: ';
 $PHPMAILER_LANG['instantiate']          = 'Kon nie posfunksie instansieer nie.';
 $PHPMAILER_LANG['invalid_address']      = 'Ongeldige adres: ';
@@ -24,3 +24,4 @@ $PHPMAILER_LANG['smtp_connect_failed']  = 'SMTP-verbinding () misluk.';
 $PHPMAILER_LANG['smtp_error']           = 'SMTP-bediener fout: ';
 $PHPMAILER_LANG['variable_set']         = 'Kan nie veranderlike instel of herstel nie: ';
 $PHPMAILER_LANG['extension_missing']    = 'Uitbreiding ontbreek: ';
+

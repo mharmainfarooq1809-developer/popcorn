@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $page_title; ?> | Popcorn Hub</title>
     <style>
-        /* Copy the full CSS block from page_template.php – exactly the same */
+        /* Copy the full CSS block from page_template.php " exactly the same */
         * {
             margin: 0;
             padding: 0;
@@ -155,7 +155,7 @@
         }
 
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -170,8 +170,21 @@
             font-size: 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header {
                 padding: 15px 25px;
             }
@@ -197,8 +210,21 @@
                 font-size: 24px;
             }
         }
-
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header {
                 flex-direction: column;
                 gap: 12px;
@@ -219,14 +245,17 @@
     </div>
     <div class="page-container">
         <div class="content-card">
-            <h1>Contact Us</h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1>Contact Us</h1>
             <p>We'd love to hear from you! Whether you have a question, feedback, or just want to say hello, reach out.
             </p>
 
             <div class="section">
                 <h2>General Inquiries</h2>
                 <p><i class="fas fa-envelope" style="color:#FFA500; width:25px;"></i> info@popcornhub.com<br>
-                    <i class="fas fa-phone-alt" style="color:#FFA500; width:25px;"></i> (555) 123‑4567<br>
+                    <i class="fas fa-phone-alt" style="color:#FFA500; width:25px;"></i> (555) 123'4567<br>
                     <i class="fas fa-map-marker-alt" style="color:#FFA500; width:25px;"></i> 123 Movie Lane, Hollywood,
                     CA 90210
                 </p>
@@ -239,8 +268,8 @@
 
             <div class="section">
                 <h2>Business Hours</h2>
-                <p>Monday – Friday: 9:00 AM – 9:00 PM<br>
-                    Saturday – Sunday: 10:00 AM – 10:00 PM</p>
+                <p>Monday " Friday: 9:00 AM " 9:00 PM<br>
+                    Saturday " Sunday: 10:00 AM " 10:00 PM</p>
             </div>
         </div>
     </div>

@@ -141,14 +141,42 @@
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
             .content-card { padding: 30px 20px; }
             h1 { font-size: 32px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
         }
     </style>
@@ -162,12 +190,15 @@
 
     <div class="page-container">
         <div class="content-card">
-            <h1>⭐ Exclusive Content</h1>
-            <p>Members‑only premieres, behind‑the‑scenes footage, and special screenings.</p>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1> Exclusive Content</h1>
+            <p>Members'only premieres, behind'the'scenes footage, and special screenings.</p>
 
             <div class="movie-grid">
                 <div class="movie-card">
-                    <img src="https://images.unsplash.com/photo-1535016120720-40c646be5580?w=300&h=400&fit=crop" alt="Director's Cut">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRq8P5uwVwfPAX9FnmiLtcFECf8l28lS9FN-g&s" alt="Director's Cut">
                     <div class="card-body">
                         <div class="card-title">Dune: Director's Cut</div>
                         <div class="card-meta">Exclusive screening</div>
@@ -176,14 +207,14 @@
                 <div class="movie-card">
                     <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=300&h=400&fit=crop" alt="Avatar">
                     <div class="card-body">
-                        <div class="card-title">Avatar: The Way of Water – Extended</div>
+                        <div class="card-title">Avatar: The Way of Water " Extended</div>
                         <div class="card-meta">With cast Q&A</div>
                     </div>
                 </div>
                 <div class="movie-card">
-                    <img src="https://images.unsplash.com/photo-1540224871915-bc8ffb782c8f?w=300&h=400&fit=crop" alt="Kung Fu Panda">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS32LsZ1qjbH_rvaXqni37DMAh5JvFBQWY3Cg&s" alt="Kung Fu Panda">
                     <div class="card-body">
-                        <div class="card-title">Kung Fu Panda 4 – Early Access</div>
+                        <div class="card-title">Kung Fu Panda 4 " Early Access</div>
                         <div class="card-meta">48h before release</div>
                     </div>
                 </div>

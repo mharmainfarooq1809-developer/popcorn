@@ -20,7 +20,7 @@ if (!$booking_id) {
 
 // Fetch booking details with joins
 $query = "
-    SELECT 
+    SELECT
         b.id AS booking_id,
         b.user_id,
         b.showtime_id,
@@ -83,12 +83,11 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking #BK-<?= str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT) ?> ·
+    <title>Booking #BK-<?= str_pad($booking['booking_id'], 4, '0', STR_PAD_LEFT) ?> -
         <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
             :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
             }
         </style>
     <?php endif; ?>
@@ -1100,7 +1099,7 @@ $messageLink = "messages.php?user_id=" . $booking['user_id'];
     <!-- Footer -->
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 

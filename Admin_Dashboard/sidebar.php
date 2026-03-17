@@ -40,7 +40,7 @@
                     <i class="bi bi-plus-circle"></i>
                     <span>Add Theatre</span>
                 </a>
-                
+
             </div>
         </div>
 
@@ -111,4 +111,5 @@
 
 <!-- Unified Toggle CSS -->
 <link rel="stylesheet" href="admin_toggle.css">
+
 

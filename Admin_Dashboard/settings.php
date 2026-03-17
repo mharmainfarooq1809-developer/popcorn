@@ -67,14 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
-    <?php if (!empty($settings['theme_color'])): ?>
-        <style>
-            :root {
-                --primary: <?= htmlspecialchars($settings['theme_color']) ?>;
-            }
-        </style>
-    <?php endif; ?>
+    <title>Settings - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -1142,7 +1135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" class="form-control" name="site_keywords"
                             value="<?= htmlspecialchars($settings['site_keywords'] ?? '') ?>"
                             placeholder="cinema, movies, popcorn hub, film">
-                        <small class="text-muted">Comma‑separated keywords for search engines.</small>
+                        <small class="text-muted">Comma'separated keywords for search engines.</small>
                     </div>
 
                     <div class="mb-3">
@@ -1257,7 +1250,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <footer class="footer text-center">
         <div class="container">
             <p class="small">
-                <?= htmlspecialchars($settings['footer_text'] ?? '© ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
+                <?= htmlspecialchars($settings['footer_text'] ?? ' ' . date('Y') . ' Popcorn Hub. All rights reserved.') ?>
             </p>
         </div>
     </footer>
@@ -1365,16 +1358,16 @@ $(document).ready(function () {
     $(document).on('click', '.delete-slide', function () {
         const id = $(this).data('id');
         const row = $(this).closest('.hero-slide-row');
-        
+
         if (!confirm('Delete this slide?')) return;
-        
+
         // Show loading state
         const originalText = $(this).text();
         $(this).text('Deleting...').prop('disabled', true);
-        
+
         fetch('delete_hero_slide.php', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({ id: id })
@@ -1388,9 +1381,9 @@ $(document).ready(function () {
         .then(data => {
             if (data.success) {
                 // Fade out and remove the row
-                row.fadeOut(300, function() { 
-                    $(this).remove(); 
-                    
+                row.fadeOut(300, function() {
+                    $(this).remove();
+
                     // Show message if no slides left
                     if ($('#hero-slides-container .hero-slide-row').length === 0) {
                         $('#hero-slides-container').html('<p class="text-muted">No slides yet. Add one below.</p>');
@@ -1449,3 +1442,4 @@ $(document).ready(function () {
     </script>
 </body>
 </html>
+

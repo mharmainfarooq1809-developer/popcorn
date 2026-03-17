@@ -48,18 +48,18 @@ if (isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cast Your Vote - <?php echo htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+
     <style>
         /* Copy all the base styles from first_page.php */
         * {
@@ -867,6 +867,7 @@ if (isset($_SESSION['user_id'])) {
             font-size: 14px;
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -1065,7 +1066,7 @@ if (isset($_SESSION['user_id'])) {
     <script>
         // Store user's voted movies
         const userVotes = <?php echo json_encode($user_votes); ?>;
-        
+
         // ================= NAVBAR SCROLL EFFECT =================
         const navbar = document.getElementById('navbar');
         window.addEventListener('scroll', function() {
@@ -1082,10 +1083,10 @@ if (isset($_SESSION['user_id'])) {
         if (menuToggle && navLinks) {
             menuToggle.addEventListener('click', () => {
                 navLinks.classList.toggle('active');
-                menuToggle.innerHTML = navLinks.classList.contains('active') ? 
+                menuToggle.innerHTML = navLinks.classList.contains('active') ?
                     '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
             });
-            
+
             navLinks.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     navLinks.classList.remove('active');
@@ -1099,7 +1100,7 @@ if (isset($_SESSION['user_id'])) {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
             const toastIcon = toast.querySelector('i');
-            
+
             toastMessage.textContent = message;
             if (isError) {
                 toastIcon.className = 'fas fa-exclamation-circle';
@@ -1110,9 +1111,9 @@ if (isset($_SESSION['user_id'])) {
                 toastIcon.style.color = 'var(--popcorn-orange)';
                 toast.style.borderLeftColor = 'var(--popcorn-orange)';
             }
-            
+
             toast.classList.add('show');
-            
+
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
@@ -1126,9 +1127,9 @@ if (isset($_SESSION['user_id'])) {
             const search = document.getElementById('searchInput').value;
             const genre = document.getElementById('genreFilter').value;
             const sort = document.getElementById('sortFilter').value;
-            
+
             currentPage = page;
-            
+
             const params = new URLSearchParams({
                 page: page,
                 search: search,
@@ -1143,7 +1144,7 @@ if (isset($_SESSION['user_id'])) {
                         showToast(data.error, true);
                         return;
                     }
-                    
+
                     renderMovies(data.movies);
                     renderPagination(data.total_pages, data.current_page);
                     updateStats(data.stats);
@@ -1157,7 +1158,7 @@ if (isset($_SESSION['user_id'])) {
 
         function renderMovies(movies) {
             const grid = document.getElementById('moviesGrid');
-            
+
             if (movies.length === 0) {
                 grid.innerHTML = `
                     <div class="no-results">
@@ -1168,11 +1169,11 @@ if (isset($_SESSION['user_id'])) {
                 `;
                 return;
             }
-            
+
             grid.innerHTML = movies.map(movie => {
                 const hasVoted = userVotes.includes(movie.id);
                 const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : 'TBA';
-                
+
                 return `
                     <div class="movie-card" data-movie-id="${movie.id}">
                         <div class="movie-poster" style="background-image: url('${movie.image_url || 'default-poster.jpg'}')">
@@ -1184,7 +1185,7 @@ if (isset($_SESSION['user_id'])) {
                                 ${escapeHtml(movie.title)}
                             </h3>
                             <div class="movie-genre">
-                                ${movie.genre.split(',').map(g => 
+                                ${movie.genre.split(',').map(g =>
                                     `<span class="genre-tag">${g.trim()}</span>`
                                 ).join('')}
                             </div>
@@ -1194,8 +1195,8 @@ if (isset($_SESSION['user_id'])) {
                                     <i class="fas fa-thumbs-up"></i> ${movie.votes}
                                 </span>
                             </div>
-                            <button class="vote-button ${hasVoted ? 'voted' : ''}" 
-                                    onclick="voteForMovie(${movie.id})" 
+                            <button class="vote-button ${hasVoted ? 'voted' : ''}"
+                                    onclick="voteForMovie(${movie.id})"
                                     ${hasVoted ? 'disabled' : ''}>
                                 <i class="fas fa-${hasVoted ? 'check' : 'thumbs-up'}"></i>
                                 ${hasVoted ? 'Voted' : 'Vote Now'}
@@ -1209,19 +1210,19 @@ if (isset($_SESSION['user_id'])) {
         function renderPagination(total, current) {
             totalPages = total;
             const pagination = document.getElementById('pagination');
-            
+
             if (total <= 1) {
                 pagination.innerHTML = '';
                 return;
             }
-            
+
             let html = '';
-            
+
             // Previous button
             html += `<button class="page-btn" onclick="loadMovies(${current - 1})" ${current === 1 ? 'disabled' : ''}>
                 <i class="fas fa-chevron-left"></i>
             </button>`;
-            
+
             // Page numbers
             for (let i = 1; i <= total; i++) {
                 if (i === 1 || i === total || (i >= current - 2 && i <= current + 2)) {
@@ -1230,12 +1231,12 @@ if (isset($_SESSION['user_id'])) {
                     html += `<button class="page-btn" disabled>...</button>`;
                 }
             }
-            
+
             // Next button
             html += `<button class="page-btn" onclick="loadMovies(${current + 1})" ${current === total ? 'disabled' : ''}>
                 <i class="fas fa-chevron-right"></i>
             </button>`;
-            
+
             pagination.innerHTML = html;
         }
 
@@ -1248,18 +1249,18 @@ if (isset($_SESSION['user_id'])) {
 
         function updateLeaderboard(leaderboard) {
             const tbody = document.getElementById('leaderboardBody');
-            
+
             if (leaderboard.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4">No data available</td></tr>';
                 return;
             }
-            
+
             const maxVotes = leaderboard[0]?.votes || 1;
-            
+
             tbody.innerHTML = leaderboard.map((movie, index) => {
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : '';
                 const percentage = Math.round((movie.votes / maxVotes) * 100);
-                
+
                 return `
                     <tr>
                         <td><span class="rank ${rankClass}">${index + 1}</span></td>
@@ -1297,7 +1298,7 @@ if (isset($_SESSION['user_id'])) {
                     userVotes.push(movieId);
                     showToast('Vote recorded successfully!');
                     loadMovies(currentPage); // Reload current page
-                    
+
                     // Also reload leaderboard
                     fetch('api/get_leaderboard.php')
                         .then(res => res.json())
@@ -1355,7 +1356,7 @@ if (isset($_SESSION['user_id'])) {
         // ================= INITIAL LOAD =================
         document.addEventListener('DOMContentLoaded', () => {
             loadMovies(1);
-            
+
             // Auto-refresh leaderboard every 30 seconds
             setInterval(() => {
                 fetch('api/get_leaderboard.php')

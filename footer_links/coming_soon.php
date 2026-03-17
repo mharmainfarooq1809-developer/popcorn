@@ -141,14 +141,42 @@
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
             .content-card { padding: 30px 20px; }
             h1 { font-size: 32px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
         }
     </style>
@@ -161,7 +189,10 @@
 
     <div class="page-container">
         <div class="content-card">
-            <h1>⏳ Coming Soon</h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1> Coming Soon</h1>
             <p>Get ready for these highly anticipated releases. Be the first to book!</p>
 
             <div class="movie-grid">
@@ -180,7 +211,7 @@
                     </div>
                 </div>
                 <div class="movie-card">
-                    <img src="https://images.unsplash.com/photo-1509347528160-9a47e3cd61b1?w=300&h=400&fit=crop" alt="Deadpool">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQk1xmfpyTo8qc0ON1xirEIr5u8nyjD4KiTNw&s" alt="Deadpool">
                     <div class="card-body">
                         <div class="card-title">Deadpool 3</div>
                         <div class="card-meta">July 2026</div>
@@ -189,7 +220,7 @@
                 <div class="movie-card">
                     <img src="https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&h=400&fit=crop" alt="Joker">
                     <div class="card-body">
-                        <div class="card-title">Joker: Folie à Deux</div>
+                        <div class="card-title">Joker: Folie  Deux</div>
                         <div class="card-meta">August 2026</div>
                     </div>
                 </div>

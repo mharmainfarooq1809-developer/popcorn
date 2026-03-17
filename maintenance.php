@@ -1,6 +1,6 @@
 <?php
 session_start();
-// maintenance.php – Under Construction page
+// maintenance.php " Under Construction page
 require_once 'settings_init.php';
 $public_pages = ['login.php', 'register.php', 'maintenance.php'];
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -18,7 +18,7 @@ $settings = get_settings($conn);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Construction · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Under Construction - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -103,10 +103,11 @@ $settings = get_settings($conn);
             100% { width: 70%; margin-left: 30%; }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 <body>
     <div class="maintenance-card">
-        <div class="icon">🚧</div>
+        <div class="icon"></div>
         <h1>Under Construction</h1>
         <p>We're currently performing scheduled maintenance to improve your experience.</p>
         <p>Our team is working hard to bring you something amazing. Please check back soon!</p>

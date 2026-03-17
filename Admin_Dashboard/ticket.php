@@ -63,10 +63,9 @@ $cinema = htmlspecialchars($booking['theatre'] ?? 'Bashundhara Shopping Mall, Pa
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ticket · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Ticket - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
         </style>
     <?php endif; ?>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -931,8 +930,8 @@ $cinema = htmlspecialchars($booking['theatre'] ?? 'Bashundhara Shopping Mall, Pa
                 <div class="ticket-card">
                     <div class="ticket-left">
                         <div class="ticket-header">
-                            <h1>🎟️ <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></h1>
-                            <p>Admin Ticket · E‑Ticket · Scan for verification</p>
+                            <h1> <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></h1>
+                            <p>Admin Ticket - E-Ticket - Scan for verification</p>
                         </div>
                         <div class="info-grid" id="ticketInfo"></div>
                     </div>
@@ -959,7 +958,7 @@ $cinema = htmlspecialchars($booking['theatre'] ?? 'Bashundhara Shopping Mall, Pa
 
         <footer class="footer text-center">
             <div class="container">
-                <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+                <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
             </div>
         </footer>
     </div>

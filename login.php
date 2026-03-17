@@ -158,7 +158,7 @@ $errors_display = $errors;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $site_name; ?> · access</title>
+    <title><?php echo $site_name; ?> - access</title>
     <!-- Modern fonts: Inter + Clash Display for headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -733,7 +733,7 @@ $errors_display = $errors;
                             <label for="login_password">Password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" id="login_password" name="login_password" placeholder="••••••••" required>
+                                <input type="password" id="login_password" name="login_password" placeholder="********" required>
                             </div>
                         </div>
                         <button type="submit" name="login" class="btn">Log in</button>
@@ -772,7 +772,7 @@ $errors_display = $errors;
                             <label for="reg_password">Password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" id="reg_password" name="reg_password" placeholder="••••••••" required
+                                <input type="password" id="reg_password" name="reg_password" placeholder="********" required
                                     minlength="6">
                             </div>
                         </div>
@@ -780,7 +780,7 @@ $errors_display = $errors;
                             <label for="reg_confirm">Confirm password</label>
                             <div class="input-wrapper">
                                 <i class="fas fa-lock"></i>
-                                <input type="password" id="reg_confirm" name="reg_confirm" placeholder="••••••••" required minlength="6">
+                                <input type="password" id="reg_confirm" name="reg_confirm" placeholder="********" required minlength="6">
                             </div>
                         </div>
                         <button type="submit" name="register" class="btn">Register</button>
@@ -818,9 +818,9 @@ $errors_display = $errors;
             
             // Apply initial state
             if (initialPanel === 'register') {
-                authCard.classList.remove('overlay-right'); // overlay left → register visible
+                authCard.classList.remove('overlay-right'); // overlay left  register visible
             } else {
-                authCard.classList.add('overlay-right'); // overlay right → login visible
+                authCard.classList.add('overlay-right'); // overlay right  login visible
             }
 
             // Toggle functions with strict event handling

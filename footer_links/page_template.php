@@ -122,7 +122,7 @@ $page_title = $page_title ?? "Popcorn Hub";
             font-size: 16px;
         }
         ul li::before {
-            content: "●";
+            content: "-";
             color: #FFA500;
             font-size: 20px;
             position: absolute;
@@ -136,7 +136,21 @@ $page_title = $page_title ?? "Popcorn Hub";
             font-size: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        @media (max-width: 768px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 768px) {
             .page-header { padding: 15px 25px; }
             .logo { font-size: 20px; }
             .back-btn { padding: 8px 16px; font-size: 14px; }
@@ -144,7 +158,21 @@ $page_title = $page_title ?? "Popcorn Hub";
             h1 { font-size: 32px; }
             .section h2 { font-size: 24px; }
         }
-        @media (max-width: 480px) {
+        .hero-image {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            margin: 0 0 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .hero-image img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+@media (max-width: 480px) {
             .page-header { flex-direction: column; gap: 12px; text-align: center; }
             .content-card { padding: 25px 15px; }
         }
@@ -158,7 +186,10 @@ $page_title = $page_title ?? "Popcorn Hub";
 
     <div class="page-container">
         <div class="content-card">
-            <h1><?php echo htmlspecialchars($page_title); ?></h1>
+            <div class="hero-image">
+                <img src="https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?q=80&w=2070&auto=format&fit=crop" alt="Popcorn Hub cinema" loading="lazy">
+            </div>
+<h1><?php echo htmlspecialchars($page_title); ?></h1>
             <p>This is a placeholder. Replace with your actual content.</p>
             <!-- Additional sections can be added here -->
         </div>

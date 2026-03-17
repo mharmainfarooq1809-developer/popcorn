@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once 'db_connect.php';
 require_once 'settings_init.php'; // load global settings
@@ -70,7 +70,8 @@ if (!$no_movies) {
     $showtimes_query->execute();
     $showtimes_result = $showtimes_query->get_result();
     while ($st = $showtimes_result->fetch_assoc()) {
-        if ($st['price'] === null) $st['price'] = 15.00;
+        if ($st['price'] === null)
+            $st['price'] = 15.00;
         $default_showtimes[] = $st;
     }
 }
@@ -81,11 +82,17 @@ if (!$no_movies) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>Booking - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <?php if (!empty($settings['theme_color'])): ?>
         <style>
-            :root { --primary: <?= htmlspecialchars($settings['theme_color']) ?>; }
-            .btn-primary { background: linear-gradient(145deg, var(--primary), var(--primary-dark)); }
+            :root {
+                --theme-primary: <?= htmlspecialchars($settings['theme_color']) ?>
+                ;
+            }
+
+            .btn-primary {
+                background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            }
         </style>
     <?php endif; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -98,6 +105,10 @@ if (!$no_movies) {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -202,7 +213,11 @@ if (!$no_movies) {
             color: var(--popcorn-orange);
         }
 
-        .logo img { max-height: 60px; width: auto; display: block; }
+        .logo img {
+            max-height: 60px;
+            width: auto;
+            display: block;
+        }
 
         /* Mobile menu toggle */
         .menu-toggle {
@@ -1260,13 +1275,14 @@ if (!$no_movies) {
             .seat i {
                 font-size: 14px;
             }
-            
+
             .form-row {
                 grid-template-columns: 1fr;
                 gap: 10px;
             }
         }
     </style>
+    <link rel="stylesheet" href="public_theme.php">
 </head>
 
 <body>
@@ -1274,7 +1290,8 @@ if (!$no_movies) {
     <header id="navbar">
         <a href="first_page.php" class="logo">
             <?php if (!empty($settings['site_logo'])): ?>
-                <img src="<?= htmlspecialchars($settings['site_logo']) ?>" alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
+                <img src="<?= htmlspecialchars($settings['site_logo']) ?>"
+                    alt="<?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>">
             <?php else: ?>
                 <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?>
             <?php endif; ?>
@@ -1346,9 +1363,11 @@ if (!$no_movies) {
                             </div>
                             <div class="selected-info">
                                 <div class="selected-title" id="selectedTitle">
-                                    <?= htmlspecialchars($default_movie['title']) ?></div>
+                                    <?= htmlspecialchars($default_movie['title']) ?>
+                                </div>
                                 <div class="selected-language" id="selectedLanguage">
-                                    <?= htmlspecialchars($default_movie['language'] ?? 'N/A') ?></div>
+                                    <?= htmlspecialchars($default_movie['language'] ?? 'N/A') ?>
+                                </div>
                             </div>
                             <i class="fas fa-chevron-down dropdown-arrow" id="dropdownArrow"></i>
                         </div>
@@ -1409,8 +1428,7 @@ if (!$no_movies) {
                 <div class="datetime-grid" id="showtimeGrid">
                     <?php foreach ($default_showtimes as $st): ?>
                         <div class="datetime-card <?= $st === $default_showtimes[0] ? 'selected' : '' ?>"
-                            data-showtime-id="<?= $st['id'] ?>"
-                            data-price="<?= $st['price'] ?? 15.00 ?>"
+                            data-showtime-id="<?= $st['id'] ?>" data-price="<?= $st['price'] ?? 15.00 ?>"
                             data-date="<?= htmlspecialchars(date('D, M j', strtotime($st['show_date']))) ?>"
                             data-time="<?= htmlspecialchars(date('g:i A', strtotime($st['show_time']))) ?>"
                             data-theatre="<?= htmlspecialchars($st['theatre'] ?? '') ?>" onclick="selectShowtime(this)">
@@ -1551,7 +1569,8 @@ if (!$no_movies) {
                 <!-- Terms and conditions -->
                 <div class="terms">
                     <input type="checkbox" id="terms">
-                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a> and <a href="cancelation_policy.html">Cancellation
+                    <label for="terms">I agree to the <a href="terms_conditions.html">Terms & Conditions</a> and <a
+                            href="cancelation_policy.html">Cancellation
                             Policy</a></label>
                 </div>
 
@@ -1563,7 +1582,7 @@ if (!$no_movies) {
             <?php endif; ?>
         </div>
     </main>
- <!-- Footer (full width) -->
+    <!-- Footer (full width) -->
     <footer>
         <div class="container">
             <div class="footer-grid">
@@ -1646,12 +1665,7 @@ if (!$no_movies) {
     </footer>
 
     <!-- Scripts -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.27/bundled/lenis.min.js"></script>
     <script>
-        // Lenis smooth scroll
-        const lenis = new Lenis({ duration: 1.6, smooth: true, smoothTouch: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
-        requestAnimationFrame(raf);
 
         // ================= REVEAL ON SCROLL =================
         const reveals = document.querySelectorAll('.reveal');
@@ -1895,6 +1909,9 @@ if (!$no_movies) {
                 const required = getRequiredSeats();
                 if (selectedSeats.length !== required) {
                     document.getElementById('seat-error').style.display = 'block';
+                    if (required > 0 && selectedSeats.length === 0) {
+                        alert('Please select your seat(s) before confirming.');
+                    }
                     return false;
                 } else {
                     document.getElementById('seat-error').style.display = 'none';
@@ -2179,4 +2196,5 @@ if (!$no_movies) {
         });
     </script>
 </body>
+
 </html>

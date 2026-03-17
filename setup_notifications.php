@@ -17,13 +17,13 @@ if ($table_exists->num_rows == 0) {
         INDEX idx_created_at (created_at DESC)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ";
-    
+
     if ($conn->query($create_table)) {
-        echo "✓ Notifications table created successfully!";
+        echo "OK: Notifications table created successfully!";
     } else {
-        echo "✗ Error creating notifications table: " . $conn->error;
+        echo "Error: Failed to create notifications table: " . $conn->error;
     }
 } else {
-    echo "✓ Notifications table already exists!";
+    echo "OK: Notifications table already exists!";
 }
 ?>

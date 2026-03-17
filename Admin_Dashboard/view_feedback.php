@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 require_once '../db_connect.php';
 require_once '../settings_init.php';
@@ -37,7 +37,7 @@ $admin_id = $_SESSION['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Feedback · <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
+    <title>View Feedback - <?= htmlspecialchars($settings['site_name'] ?? 'Popcorn Hub') ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -171,7 +171,7 @@ $admin_id = $_SESSION['user_id'];
 
     <div class="card p-4">
         <h5><?= htmlspecialchars($feedback['name']) ?></h5>
-        <p class="text-muted"><?= htmlspecialchars($feedback['email']) ?> · <?= date('M j, Y H:i', strtotime($feedback['submitted_at'])) ?></p>
+        <p class="text-muted"><?= htmlspecialchars($feedback['email']) ?> - <?= date('M j, Y H:i', strtotime($feedback['submitted_at'])) ?></p>
         <hr>
         <p><?= nl2br(htmlspecialchars($feedback['message'])) ?></p>
     </div>
@@ -198,7 +198,7 @@ $admin_id = $_SESSION['user_id'];
 
     <footer class="footer text-center">
         <div class="container">
-            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? '© '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
+            <p class="small"><?= htmlspecialchars($settings['footer_text'] ?? ' '.date('Y').' Popcorn Hub. All rights reserved.') ?></p>
         </div>
     </footer>
 </div>
@@ -266,7 +266,7 @@ function loadReplies() {
             let html = '';
             if (data.replies.length) {
                 data.replies.forEach(reply => {
-                    html += `<div class="reply-bubble"><small class="text-muted">Admin · ${new Date(reply.created_at).toLocaleString()}</small><p class="mb-0">${reply.reply_text.replace(/\n/g, '<br>')}</p></div>`;
+                    html += `<div class="reply-bubble"><small class="text-muted">Admin - ${new Date(reply.created_at).toLocaleString()}</small><p class="mb-0">${reply.reply_text.replace(/\n/g, '<br>')}</p></div>`;
                 });
             } else {
                 html = '<p class="text-muted">No replies yet.</p>';
@@ -309,3 +309,4 @@ loadReplies();
 </script>
 </body>
 </html>
+
